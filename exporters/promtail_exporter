@@ -1,0 +1,555 @@
+# HELP deprecated_flags_inuse_total The number of deprecated flags currently set.
+# TYPE deprecated_flags_inuse_total counter
+deprecated_flags_inuse_total 0
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 4.0576e-05
+go_gc_duration_seconds{quantile="0.25"} 5.6475e-05
+go_gc_duration_seconds{quantile="0.5"} 7.4147e-05
+go_gc_duration_seconds{quantile="0.75"} 8.8364e-05
+go_gc_duration_seconds{quantile="1"} 0.000268309
+go_gc_duration_seconds_sum 10.296411716
+go_gc_duration_seconds_count 121453
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 62
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.20.4"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 2.571456e+07
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 1.47327612784e+11
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.840493e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 9.44071448e+08
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 9.15428e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 2.571456e+07
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 2.1946368e+07
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 3.0154752e+07
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 45387
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 1.8669568e+07
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 5.210112e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.703593864487287e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 9.44116835e+08
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 38400
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 46800
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 399200
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 620160
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 4.7589768e+07
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 2.360163e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 2.424832e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 2.424832e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 6.8547848e+07
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 26
+# HELP inflight_requests Current number of inflight requests.
+# TYPE inflight_requests gauge
+inflight_requests{method="GET",route="metrics"} 1
+inflight_requests{method="GET",route="root"} 0
+# HELP jaeger_tracer_baggage_restrictions_updates_total Number of times baggage restrictions were successfully updated
+# TYPE jaeger_tracer_baggage_restrictions_updates_total counter
+jaeger_tracer_baggage_restrictions_updates_total{result="err"} 0
+jaeger_tracer_baggage_restrictions_updates_total{result="ok"} 0
+# HELP jaeger_tracer_baggage_truncations_total Number of times baggage was truncated as per baggage restrictions
+# TYPE jaeger_tracer_baggage_truncations_total counter
+jaeger_tracer_baggage_truncations_total 0
+# HELP jaeger_tracer_baggage_updates_total Number of times baggage was successfully written or updated on spans
+# TYPE jaeger_tracer_baggage_updates_total counter
+jaeger_tracer_baggage_updates_total{result="err"} 0
+jaeger_tracer_baggage_updates_total{result="ok"} 0
+# HELP jaeger_tracer_finished_spans_total Number of sampled spans finished by this tracer
+# TYPE jaeger_tracer_finished_spans_total counter
+jaeger_tracer_finished_spans_total{sampled="delayed"} 0
+jaeger_tracer_finished_spans_total{sampled="n"} 60612
+jaeger_tracer_finished_spans_total{sampled="y"} 0
+# HELP jaeger_tracer_reporter_queue_length Current number of spans in the reporter queue
+# TYPE jaeger_tracer_reporter_queue_length gauge
+jaeger_tracer_reporter_queue_length 0
+# HELP jaeger_tracer_reporter_spans_total Number of spans successfully reported
+# TYPE jaeger_tracer_reporter_spans_total counter
+jaeger_tracer_reporter_spans_total{result="dropped"} 0
+jaeger_tracer_reporter_spans_total{result="err"} 0
+jaeger_tracer_reporter_spans_total{result="ok"} 0
+# HELP jaeger_tracer_sampler_queries_total Number of times the Sampler succeeded to retrieve sampling strategy
+# TYPE jaeger_tracer_sampler_queries_total counter
+jaeger_tracer_sampler_queries_total{result="err"} 242966
+jaeger_tracer_sampler_queries_total{result="ok"} 0
+# HELP jaeger_tracer_sampler_updates_total Number of times the Sampler succeeded to retrieve and update sampling strategy
+# TYPE jaeger_tracer_sampler_updates_total counter
+jaeger_tracer_sampler_updates_total{result="err"} 0
+jaeger_tracer_sampler_updates_total{result="ok"} 0
+# HELP jaeger_tracer_span_context_decoding_errors_total Number of errors decoding tracing context
+# TYPE jaeger_tracer_span_context_decoding_errors_total counter
+jaeger_tracer_span_context_decoding_errors_total 0
+# HELP jaeger_tracer_started_spans_total Number of spans started by this tracer as sampled
+# TYPE jaeger_tracer_started_spans_total counter
+jaeger_tracer_started_spans_total{sampled="delayed"} 0
+jaeger_tracer_started_spans_total{sampled="n"} 60613
+jaeger_tracer_started_spans_total{sampled="y"} 0
+# HELP jaeger_tracer_throttled_debug_spans_total Number of times debug spans were throttled
+# TYPE jaeger_tracer_throttled_debug_spans_total counter
+jaeger_tracer_throttled_debug_spans_total 0
+# HELP jaeger_tracer_throttler_updates_total Number of times throttler successfully updated
+# TYPE jaeger_tracer_throttler_updates_total counter
+jaeger_tracer_throttler_updates_total{result="err"} 0
+jaeger_tracer_throttler_updates_total{result="ok"} 0
+# HELP jaeger_tracer_traces_total Number of traces started by this tracer as sampled
+# TYPE jaeger_tracer_traces_total counter
+jaeger_tracer_traces_total{sampled="n",state="joined"} 0
+jaeger_tracer_traces_total{sampled="n",state="started"} 60613
+jaeger_tracer_traces_total{sampled="y",state="joined"} 0
+jaeger_tracer_traces_total{sampled="y",state="started"} 0
+# HELP loki_experimental_features_in_use_total The number of experimental features in use.
+# TYPE loki_experimental_features_in_use_total counter
+loki_experimental_features_in_use_total 0
+# HELP loki_internal_log_messages_total Total number of log messages created by Loki itself.
+# TYPE loki_internal_log_messages_total counter
+loki_internal_log_messages_total{level="debug"} 60791
+loki_internal_log_messages_total{level="error"} 0
+loki_internal_log_messages_total{level="info"} 521
+loki_internal_log_messages_total{level="warn"} 1334
+# HELP loki_log_flushes Histogram of log flushes using the line-buffered logger.
+# TYPE loki_log_flushes histogram
+loki_log_flushes_bucket{le="1"} 1471
+loki_log_flushes_bucket{le="2"} 1610
+loki_log_flushes_bucket{le="4"} 1640
+loki_log_flushes_bucket{le="8"} 1641
+loki_log_flushes_bucket{le="16"} 1642
+loki_log_flushes_bucket{le="32"} 1642
+loki_log_flushes_bucket{le="64"} 1642
+loki_log_flushes_bucket{le="128"} 1642
+loki_log_flushes_bucket{le="256"} 1642
+loki_log_flushes_bucket{le="+Inf"} 1642
+loki_log_flushes_sum 1855
+loki_log_flushes_count 1642
+# HELP loki_log_messages_total DEPRECATED. Use internal_log_messages_total for the same functionality. Total number of log messages created by Loki itself.
+# TYPE loki_log_messages_total counter
+loki_log_messages_total{level="debug"} 60791
+loki_log_messages_total{level="error"} 0
+loki_log_messages_total{level="info"} 521
+loki_log_messages_total{level="warn"} 1334
+# HELP loki_logql_querystats_duplicates_total Total count of duplicates found while executing LogQL queries.
+# TYPE loki_logql_querystats_duplicates_total counter
+loki_logql_querystats_duplicates_total 0
+# HELP loki_logql_querystats_ingester_sent_lines_total Total count of lines sent from ingesters while executing LogQL queries.
+# TYPE loki_logql_querystats_ingester_sent_lines_total counter
+loki_logql_querystats_ingester_sent_lines_total 0
+# HELP loki_querier_index_cache_corruptions_total The number of cache corruptions for the index cache.
+# TYPE loki_querier_index_cache_corruptions_total counter
+loki_querier_index_cache_corruptions_total 0
+# HELP loki_querier_index_cache_encode_errors_total The number of errors for the index cache while encoding the body.
+# TYPE loki_querier_index_cache_encode_errors_total counter
+loki_querier_index_cache_encode_errors_total 0
+# HELP loki_querier_index_cache_gets_total The number of gets for the index cache.
+# TYPE loki_querier_index_cache_gets_total counter
+loki_querier_index_cache_gets_total 0
+# HELP loki_querier_index_cache_hits_total The number of cache hits for the index cache.
+# TYPE loki_querier_index_cache_hits_total counter
+loki_querier_index_cache_hits_total 0
+# HELP loki_querier_index_cache_puts_total The number of puts for the index cache.
+# TYPE loki_querier_index_cache_puts_total counter
+loki_querier_index_cache_puts_total 0
+# HELP net_conntrack_dialer_conn_attempted_total Total number of connections attempted by the given dialer a given name.
+# TYPE net_conntrack_dialer_conn_attempted_total counter
+net_conntrack_dialer_conn_attempted_total{dialer_name="promtail"} 69185
+# HELP net_conntrack_dialer_conn_closed_total Total number of connections closed which originated from the dialer of a given name.
+# TYPE net_conntrack_dialer_conn_closed_total counter
+net_conntrack_dialer_conn_closed_total{dialer_name="promtail"} 69167
+# HELP net_conntrack_dialer_conn_established_total Total number of connections successfully established by the given dialer a given name.
+# TYPE net_conntrack_dialer_conn_established_total counter
+net_conntrack_dialer_conn_established_total{dialer_name="promtail"} 69168
+# HELP net_conntrack_dialer_conn_failed_total Total number of connections failed to dial by the dialer a given name.
+# TYPE net_conntrack_dialer_conn_failed_total counter
+net_conntrack_dialer_conn_failed_total{dialer_name="promtail",reason="refused"} 0
+net_conntrack_dialer_conn_failed_total{dialer_name="promtail",reason="resolution"} 0
+net_conntrack_dialer_conn_failed_total{dialer_name="promtail",reason="timeout"} 17
+net_conntrack_dialer_conn_failed_total{dialer_name="promtail",reason="unknown"} 17
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 39662.33
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 524288
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 17
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 4.0132608e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.68901592478e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 2.6382336e+09
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes 1.8446744073709552e+19
+# HELP prometheus_remote_storage_exemplars_in_total Exemplars in to remote storage, compare to exemplars out for queue managers.
+# TYPE prometheus_remote_storage_exemplars_in_total counter
+prometheus_remote_storage_exemplars_in_total 0
+# HELP prometheus_remote_storage_histograms_in_total HistogramSamples in to remote storage, compare to histograms out for queue managers.
+# TYPE prometheus_remote_storage_histograms_in_total counter
+prometheus_remote_storage_histograms_in_total 0
+# HELP prometheus_remote_storage_samples_in_total Samples in to remote storage, compare to samples out for queue managers.
+# TYPE prometheus_remote_storage_samples_in_total counter
+prometheus_remote_storage_samples_in_total 0
+# HELP prometheus_remote_storage_string_interner_zero_reference_releases_total The number of times release has been called for strings that are not interned.
+# TYPE prometheus_remote_storage_string_interner_zero_reference_releases_total counter
+prometheus_remote_storage_string_interner_zero_reference_releases_total 0
+# HELP prometheus_sd_azure_failures_total Number of Azure service discovery refresh failures.
+# TYPE prometheus_sd_azure_failures_total counter
+prometheus_sd_azure_failures_total 0
+# HELP prometheus_sd_consul_rpc_duration_seconds The duration of a Consul RPC call in seconds.
+# TYPE prometheus_sd_consul_rpc_duration_seconds summary
+prometheus_sd_consul_rpc_duration_seconds{call="service",endpoint="catalog",quantile="0.5"} NaN
+prometheus_sd_consul_rpc_duration_seconds{call="service",endpoint="catalog",quantile="0.9"} NaN
+prometheus_sd_consul_rpc_duration_seconds{call="service",endpoint="catalog",quantile="0.99"} NaN
+prometheus_sd_consul_rpc_duration_seconds_sum{call="service",endpoint="catalog"} 0
+prometheus_sd_consul_rpc_duration_seconds_count{call="service",endpoint="catalog"} 0
+prometheus_sd_consul_rpc_duration_seconds{call="services",endpoint="catalog",quantile="0.5"} NaN
+prometheus_sd_consul_rpc_duration_seconds{call="services",endpoint="catalog",quantile="0.9"} NaN
+prometheus_sd_consul_rpc_duration_seconds{call="services",endpoint="catalog",quantile="0.99"} NaN
+prometheus_sd_consul_rpc_duration_seconds_sum{call="services",endpoint="catalog"} 0
+prometheus_sd_consul_rpc_duration_seconds_count{call="services",endpoint="catalog"} 0
+# HELP prometheus_sd_consul_rpc_failures_total The number of Consul RPC call failures.
+# TYPE prometheus_sd_consul_rpc_failures_total counter
+prometheus_sd_consul_rpc_failures_total 0
+# HELP prometheus_sd_consulagent_rpc_duration_seconds The duration of a Consul Agent RPC call in seconds.
+# TYPE prometheus_sd_consulagent_rpc_duration_seconds summary
+prometheus_sd_consulagent_rpc_duration_seconds{call="service",endpoint="agent",quantile="0.5"} NaN
+prometheus_sd_consulagent_rpc_duration_seconds{call="service",endpoint="agent",quantile="0.9"} NaN
+prometheus_sd_consulagent_rpc_duration_seconds{call="service",endpoint="agent",quantile="0.99"} NaN
+prometheus_sd_consulagent_rpc_duration_seconds_sum{call="service",endpoint="agent"} 0
+prometheus_sd_consulagent_rpc_duration_seconds_count{call="service",endpoint="agent"} 0
+prometheus_sd_consulagent_rpc_duration_seconds{call="services",endpoint="agent",quantile="0.5"} NaN
+prometheus_sd_consulagent_rpc_duration_seconds{call="services",endpoint="agent",quantile="0.9"} NaN
+prometheus_sd_consulagent_rpc_duration_seconds{call="services",endpoint="agent",quantile="0.99"} NaN
+prometheus_sd_consulagent_rpc_duration_seconds_sum{call="services",endpoint="agent"} 0
+prometheus_sd_consulagent_rpc_duration_seconds_count{call="services",endpoint="agent"} 0
+# HELP prometheus_sd_consulagent_rpc_failures_total The number of Consul Agent RPC call failures.
+# TYPE prometheus_sd_consulagent_rpc_failures_total counter
+prometheus_sd_consulagent_rpc_failures_total 0
+# HELP prometheus_sd_dns_lookup_failures_total The number of DNS-SD lookup failures.
+# TYPE prometheus_sd_dns_lookup_failures_total counter
+prometheus_sd_dns_lookup_failures_total 0
+# HELP prometheus_sd_dns_lookups_total The number of DNS-SD lookups.
+# TYPE prometheus_sd_dns_lookups_total counter
+prometheus_sd_dns_lookups_total 0
+# HELP prometheus_sd_file_read_errors_total The number of File-SD read errors.
+# TYPE prometheus_sd_file_read_errors_total counter
+prometheus_sd_file_read_errors_total 0
+# HELP prometheus_sd_file_scan_duration_seconds The duration of the File-SD scan in seconds.
+# TYPE prometheus_sd_file_scan_duration_seconds summary
+prometheus_sd_file_scan_duration_seconds{quantile="0.5"} NaN
+prometheus_sd_file_scan_duration_seconds{quantile="0.9"} NaN
+prometheus_sd_file_scan_duration_seconds{quantile="0.99"} NaN
+prometheus_sd_file_scan_duration_seconds_sum 0
+prometheus_sd_file_scan_duration_seconds_count 0
+# HELP prometheus_sd_file_watcher_errors_total The number of File-SD errors caused by filesystem watch failures.
+# TYPE prometheus_sd_file_watcher_errors_total counter
+prometheus_sd_file_watcher_errors_total 0
+# HELP prometheus_sd_kubernetes_events_total The number of Kubernetes events handled.
+# TYPE prometheus_sd_kubernetes_events_total counter
+prometheus_sd_kubernetes_events_total{event="add",role="endpoints"} 0
+prometheus_sd_kubernetes_events_total{event="add",role="endpointslice"} 0
+prometheus_sd_kubernetes_events_total{event="add",role="ingress"} 0
+prometheus_sd_kubernetes_events_total{event="add",role="node"} 0
+prometheus_sd_kubernetes_events_total{event="add",role="pod"} 0
+prometheus_sd_kubernetes_events_total{event="add",role="service"} 0
+prometheus_sd_kubernetes_events_total{event="delete",role="endpoints"} 0
+prometheus_sd_kubernetes_events_total{event="delete",role="endpointslice"} 0
+prometheus_sd_kubernetes_events_total{event="delete",role="ingress"} 0
+prometheus_sd_kubernetes_events_total{event="delete",role="node"} 0
+prometheus_sd_kubernetes_events_total{event="delete",role="pod"} 0
+prometheus_sd_kubernetes_events_total{event="delete",role="service"} 0
+prometheus_sd_kubernetes_events_total{event="update",role="endpoints"} 0
+prometheus_sd_kubernetes_events_total{event="update",role="endpointslice"} 0
+prometheus_sd_kubernetes_events_total{event="update",role="ingress"} 0
+prometheus_sd_kubernetes_events_total{event="update",role="node"} 0
+prometheus_sd_kubernetes_events_total{event="update",role="pod"} 0
+prometheus_sd_kubernetes_events_total{event="update",role="service"} 0
+# HELP prometheus_target_scrape_pool_exceeded_label_limits_total Total number of times scrape pools hit the label limits, during sync or config reload.
+# TYPE prometheus_target_scrape_pool_exceeded_label_limits_total counter
+prometheus_target_scrape_pool_exceeded_label_limits_total 0
+# HELP prometheus_target_scrape_pool_exceeded_target_limit_total Total number of times scrape pools hit the target limit, during sync or config reload.
+# TYPE prometheus_target_scrape_pool_exceeded_target_limit_total counter
+prometheus_target_scrape_pool_exceeded_target_limit_total 0
+# HELP prometheus_target_scrape_pool_reloads_failed_total Total number of failed scrape pool reloads.
+# TYPE prometheus_target_scrape_pool_reloads_failed_total counter
+prometheus_target_scrape_pool_reloads_failed_total 0
+# HELP prometheus_target_scrape_pool_reloads_total Total number of scrape pool reloads.
+# TYPE prometheus_target_scrape_pool_reloads_total counter
+prometheus_target_scrape_pool_reloads_total 0
+# HELP prometheus_target_scrape_pools_failed_total Total number of scrape pool creations that failed.
+# TYPE prometheus_target_scrape_pools_failed_total counter
+prometheus_target_scrape_pools_failed_total 0
+# HELP prometheus_target_scrape_pools_total Total number of scrape pool creation attempts.
+# TYPE prometheus_target_scrape_pools_total counter
+prometheus_target_scrape_pools_total 0
+# HELP prometheus_target_scrapes_cache_flush_forced_total How many times a scrape cache was flushed due to getting big while scrapes are failing.
+# TYPE prometheus_target_scrapes_cache_flush_forced_total counter
+prometheus_target_scrapes_cache_flush_forced_total 0
+# HELP prometheus_target_scrapes_exceeded_body_size_limit_total Total number of scrapes that hit the body size limit
+# TYPE prometheus_target_scrapes_exceeded_body_size_limit_total counter
+prometheus_target_scrapes_exceeded_body_size_limit_total 0
+# HELP prometheus_target_scrapes_exceeded_sample_limit_total Total number of scrapes that hit the sample limit and were rejected.
+# TYPE prometheus_target_scrapes_exceeded_sample_limit_total counter
+prometheus_target_scrapes_exceeded_sample_limit_total 0
+# HELP prometheus_target_scrapes_exemplar_out_of_order_total Total number of exemplar rejected due to not being out of the expected order.
+# TYPE prometheus_target_scrapes_exemplar_out_of_order_total counter
+prometheus_target_scrapes_exemplar_out_of_order_total 0
+# HELP prometheus_target_scrapes_sample_duplicate_timestamp_total Total number of samples rejected due to duplicate timestamps but different values.
+# TYPE prometheus_target_scrapes_sample_duplicate_timestamp_total counter
+prometheus_target_scrapes_sample_duplicate_timestamp_total 0
+# HELP prometheus_target_scrapes_sample_out_of_bounds_total Total number of samples rejected due to timestamp falling outside of the time bounds.
+# TYPE prometheus_target_scrapes_sample_out_of_bounds_total counter
+prometheus_target_scrapes_sample_out_of_bounds_total 0
+# HELP prometheus_target_scrapes_sample_out_of_order_total Total number of samples rejected due to not being out of the expected order.
+# TYPE prometheus_target_scrapes_sample_out_of_order_total counter
+prometheus_target_scrapes_sample_out_of_order_total 0
+# HELP prometheus_template_text_expansion_failures_total The total number of template text expansion failures.
+# TYPE prometheus_template_text_expansion_failures_total counter
+prometheus_template_text_expansion_failures_total 0
+# HELP prometheus_template_text_expansions_total The total number of template text expansions.
+# TYPE prometheus_template_text_expansions_total counter
+prometheus_template_text_expansions_total 0
+# HELP prometheus_treecache_watcher_goroutines The current number of watcher goroutines.
+# TYPE prometheus_treecache_watcher_goroutines gauge
+prometheus_treecache_watcher_goroutines 0
+# HELP prometheus_treecache_zookeeper_failures_total The total number of ZooKeeper failures.
+# TYPE prometheus_treecache_zookeeper_failures_total counter
+prometheus_treecache_zookeeper_failures_total 0
+# HELP promtail_batch_retries_total Number of times batches has had to be retried.
+# TYPE promtail_batch_retries_total counter
+promtail_batch_retries_total{host="loki.mydomain.com",tenant=""} 1332
+# HELP promtail_build_info A metric with a constant '1' value labeled by version, revision, branch, goversion from which promtail was built, and the goos and goarch for the build.
+# TYPE promtail_build_info gauge
+promtail_build_info{branch="HEAD",goarch="amd64",goos="linux",goversion="go1.20.4",revision="9f809eda7",version="2.8.2"} 1
+# HELP promtail_config_reload_fail_total Number of reload fail times.
+# TYPE promtail_config_reload_fail_total counter
+promtail_config_reload_fail_total 0
+# HELP promtail_config_reload_success_total Number of reload success times.
+# TYPE promtail_config_reload_success_total counter
+promtail_config_reload_success_total 0
+# HELP promtail_dropped_bytes_total Number of bytes dropped because failed to be sent to the ingester after all retries.
+# TYPE promtail_dropped_bytes_total counter
+promtail_dropped_bytes_total{host="loki.mydomain.com",reason="ingester_error",tenant=""} 0
+promtail_dropped_bytes_total{host="loki.mydomain.com",reason="line_too_long",tenant=""} 0
+promtail_dropped_bytes_total{host="loki.mydomain.com",reason="rate_limited",tenant=""} 0
+promtail_dropped_bytes_total{host="loki.mydomain.com",reason="stream_limited",tenant=""} 0
+# HELP promtail_dropped_entries_total Number of log entries dropped because failed to be sent to the ingester after all retries.
+# TYPE promtail_dropped_entries_total counter
+promtail_dropped_entries_total{host="loki.mydomain.com",reason="ingester_error",tenant=""} 0
+promtail_dropped_entries_total{host="loki.mydomain.com",reason="line_too_long",tenant=""} 0
+promtail_dropped_entries_total{host="loki.mydomain.com",reason="rate_limited",tenant=""} 0
+promtail_dropped_entries_total{host="loki.mydomain.com",reason="stream_limited",tenant=""} 0
+# HELP promtail_encoded_bytes_total Number of bytes encoded and ready to send.
+# TYPE promtail_encoded_bytes_total counter
+promtail_encoded_bytes_total{host="loki.mydomain.com"} 2.00047437e+08
+# HELP promtail_file_bytes_total Number of bytes total.
+# TYPE promtail_file_bytes_total gauge
+promtail_file_bytes_total{path="/data/logs/monitoring/monitoring_imports.log"} 486
+promtail_file_bytes_total{path="/data/logs/monitoring/monitoring_syncmaps.log"} 2.975688e+07
+promtail_file_bytes_total{path="/data/logs/php_error_log"} 571294
+# HELP promtail_files_active_total Number of active files.
+# TYPE promtail_files_active_total gauge
+promtail_files_active_total 3
+# HELP promtail_mutated_bytes_total The total number of bytes that have been mutated.
+# TYPE promtail_mutated_bytes_total counter
+promtail_mutated_bytes_total{host="loki.mydomain.com",reason="ingester_error",tenant=""} 0
+promtail_mutated_bytes_total{host="loki.mydomain.com",reason="line_too_long",tenant=""} 0
+promtail_mutated_bytes_total{host="loki.mydomain.com",reason="rate_limited",tenant=""} 0
+promtail_mutated_bytes_total{host="loki.mydomain.com",reason="stream_limited",tenant=""} 0
+# HELP promtail_mutated_entries_total The total number of log entries that have been mutated.
+# TYPE promtail_mutated_entries_total counter
+promtail_mutated_entries_total{host="loki.mydomain.com",reason="ingester_error",tenant=""} 0
+promtail_mutated_entries_total{host="loki.mydomain.com",reason="line_too_long",tenant=""} 0
+promtail_mutated_entries_total{host="loki.mydomain.com",reason="rate_limited",tenant=""} 0
+promtail_mutated_entries_total{host="loki.mydomain.com",reason="stream_limited",tenant=""} 0
+# HELP promtail_read_bytes_total Number of bytes read.
+# TYPE promtail_read_bytes_total gauge
+promtail_read_bytes_total{path="/data/logs/monitoring/monitoring_imports.log"} 486
+promtail_read_bytes_total{path="/data/logs/monitoring/monitoring_syncmaps.log"} 2.975688e+07
+promtail_read_bytes_total{path="/data/logs/php_error_log"} 571294
+# HELP promtail_read_lines_total Number of lines read.
+# TYPE promtail_read_lines_total counter
+promtail_read_lines_total{path="/data/logs/monitoring/monitoring_syncmaps.log"} 242967
+promtail_read_lines_total{path="/data/logs/php_error_log"} 2.361059e+06
+# HELP promtail_request_duration_seconds Duration of send requests.
+# TYPE promtail_request_duration_seconds histogram
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.005"} 130
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.01"} 157
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.025"} 184
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.05"} 189
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.1"} 1306
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.25"} 1309
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.5"} 1309
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="1"} 1310
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="2.5"} 1310
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="5"} 1310
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="10"} 1310
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="+Inf"} 1332
+promtail_request_duration_seconds_sum{host="loki.mydomain.com",status_code="-1"} 298.97439011299997
+promtail_request_duration_seconds_count{host="loki.mydomain.com",status_code="-1"} 1332
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.005"} 0
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.01"} 0
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.025"} 0
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.05"} 0
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.1"} 329588
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.25"} 332491
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.5"} 400833
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="1"} 401705
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="2.5"} 401721
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="5"} 401731
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="10"} 401737
+promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="+Inf"} 401737
+promtail_request_duration_seconds_sum{host="loki.mydomain.com",status_code="204"} 55837.34348764703
+promtail_request_duration_seconds_count{host="loki.mydomain.com",status_code="204"} 401737
+# HELP promtail_sent_bytes_total Number of bytes sent.
+# TYPE promtail_sent_bytes_total counter
+promtail_sent_bytes_total{host="loki.mydomain.com"} 2.00047437e+08
+# HELP promtail_sent_entries_total Number of log entries sent to the ingester.
+# TYPE promtail_sent_entries_total counter
+promtail_sent_entries_total{host="loki.mydomain.com"} 2.604008e+06
+# HELP promtail_targets_active_total Number of active total.
+# TYPE promtail_targets_active_total gauge
+promtail_targets_active_total 2
+# HELP request_duration_seconds Time (in seconds) spent serving HTTP requests.
+# TYPE request_duration_seconds histogram
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.005"} 60590
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.01"} 60608
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.025"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.05"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.1"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.25"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.5"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="1"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="2.5"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="5"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="10"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="25"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="50"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="100"} 60611
+request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="+Inf"} 60611
+request_duration_seconds_sum{method="GET",route="metrics",status_code="200",ws="false"} 110.1584120280005
+request_duration_seconds_count{method="GET",route="metrics",status_code="200",ws="false"} 60611
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.005"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.01"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.025"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.05"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.1"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.25"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.5"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="1"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="2.5"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="5"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="10"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="25"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="50"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="100"} 1
+request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="+Inf"} 1
+request_duration_seconds_sum{method="GET",route="root",status_code="303",ws="false"} 0.000186277
+request_duration_seconds_count{method="GET",route="root",status_code="303",ws="false"} 1
+# HELP request_message_bytes Size (in bytes) of messages received in the request.
+# TYPE request_message_bytes histogram
+request_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+06"} 60611
+request_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+06"} 60611
+request_message_bytes_bucket{method="GET",route="metrics",le="5.24288e+06"} 60611
+request_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+07"} 60611
+request_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+07"} 60611
+request_message_bytes_bucket{method="GET",route="metrics",le="5.24288e+07"} 60611
+request_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+08"} 60611
+request_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+08"} 60611
+request_message_bytes_bucket{method="GET",route="metrics",le="+Inf"} 60611
+request_message_bytes_sum{method="GET",route="metrics"} 0
+request_message_bytes_count{method="GET",route="metrics"} 60611
+request_message_bytes_bucket{method="GET",route="root",le="1.048576e+06"} 1
+request_message_bytes_bucket{method="GET",route="root",le="2.62144e+06"} 1
+request_message_bytes_bucket{method="GET",route="root",le="5.24288e+06"} 1
+request_message_bytes_bucket{method="GET",route="root",le="1.048576e+07"} 1
+request_message_bytes_bucket{method="GET",route="root",le="2.62144e+07"} 1
+request_message_bytes_bucket{method="GET",route="root",le="5.24288e+07"} 1
+request_message_bytes_bucket{method="GET",route="root",le="1.048576e+08"} 1
+request_message_bytes_bucket{method="GET",route="root",le="2.62144e+08"} 1
+request_message_bytes_bucket{method="GET",route="root",le="+Inf"} 1
+request_message_bytes_sum{method="GET",route="root"} 0
+request_message_bytes_count{method="GET",route="root"} 1
+# HELP response_message_bytes Size (in bytes) of messages sent in response.
+# TYPE response_message_bytes histogram
+response_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+06"} 60611
+response_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+06"} 60611
+response_message_bytes_bucket{method="GET",route="metrics",le="5.24288e+06"} 60611
+response_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+07"} 60611
+response_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+07"} 60611
+response_message_bytes_bucket{method="GET",route="metrics",le="5.24288e+07"} 60611
+response_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+08"} 60611
+response_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+08"} 60611
+response_message_bytes_bucket{method="GET",route="metrics",le="+Inf"} 60611
+response_message_bytes_sum{method="GET",route="metrics"} 3.31409263e+08
+response_message_bytes_count{method="GET",route="metrics"} 60611
+response_message_bytes_bucket{method="GET",route="root",le="1.048576e+06"} 1
+response_message_bytes_bucket{method="GET",route="root",le="2.62144e+06"} 1
+response_message_bytes_bucket{method="GET",route="root",le="5.24288e+06"} 1
+response_message_bytes_bucket{method="GET",route="root",le="1.048576e+07"} 1
+response_message_bytes_bucket{method="GET",route="root",le="2.62144e+07"} 1
+response_message_bytes_bucket{method="GET",route="root",le="5.24288e+07"} 1
+response_message_bytes_bucket{method="GET",route="root",le="1.048576e+08"} 1
+response_message_bytes_bucket{method="GET",route="root",le="2.62144e+08"} 1
+response_message_bytes_bucket{method="GET",route="root",le="+Inf"} 1
+response_message_bytes_sum{method="GET",route="root"} 35
+response_message_bytes_count{method="GET",route="root"} 1
+# HELP tcp_connections Current number of accepted TCP connections.
+# TYPE tcp_connections gauge
+tcp_connections{protocol="grpc"} 0
+tcp_connections{protocol="http"} 2
+# HELP tcp_connections_limit The max number of TCP connections that can be accepted (0 means no limit).
+# TYPE tcp_connections_limit gauge
+tcp_connections_limit{protocol="grpc"} 0
+tcp_connections_limit{protocol="http"} 0

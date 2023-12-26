@@ -1,0 +1,207 @@
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 1.5072e-05
+go_gc_duration_seconds{quantile="0.25"} 2.0308e-05
+go_gc_duration_seconds{quantile="0.5"} 2.5689e-05
+go_gc_duration_seconds{quantile="0.75"} 3.2798e-05
+go_gc_duration_seconds{quantile="1"} 0.000170226
+go_gc_duration_seconds_sum 0.158088782
+go_gc_duration_seconds_count 5521
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 9
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.19.5"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 3.208824e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 5.956254152e+09
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 4237
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 1.0346134e+07
+# HELP go_memstats_gc_cpu_fraction The fraction of this program's available CPU time used by the GC since the program started.
+# TYPE go_memstats_gc_cpu_fraction gauge
+go_memstats_gc_cpu_fraction 5.219018187462249e-07
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 9.170848e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 3.208824e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 6.832128e+06
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 4.440064e+06
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 5565
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 6.643712e+06
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 1.1272192e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.7035920048992789e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 1.0351699e+07
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 19200
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 31200
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 187488
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 227808
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 4.194304e+06
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 1.919011e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 1.212416e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 1.212416e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 2.3837712e+07
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 19
+# HELP nvme_avail_spare Normalized percentage of remaining spare capacity available
+# TYPE nvme_avail_spare gauge
+nvme_avail_spare{device="/dev/nvme0n1"} 99
+nvme_avail_spare{device="/dev/nvme1n1"} 99
+# HELP nvme_controller_busy_time Amount of time in minutes controller busy with IO commands
+# TYPE nvme_controller_busy_time counter
+nvme_controller_busy_time{device="/dev/nvme0n1"} 45420
+nvme_controller_busy_time{device="/dev/nvme1n1"} 42054
+# HELP nvme_critical_comp_time Amount of time in minutes temperature > critical threshold
+# TYPE nvme_critical_comp_time counter
+nvme_critical_comp_time{device="/dev/nvme0n1"} 0
+nvme_critical_comp_time{device="/dev/nvme1n1"} 0
+# HELP nvme_critical_warning Critical warnings for the state of the controller
+# TYPE nvme_critical_warning gauge
+nvme_critical_warning{device="/dev/nvme0n1"} 4
+nvme_critical_warning{device="/dev/nvme1n1"} 4
+# HELP nvme_data_units_read Number of 512 byte data units host has read
+# TYPE nvme_data_units_read counter
+nvme_data_units_read{device="/dev/nvme0n1"} 2.9643254e+07
+nvme_data_units_read{device="/dev/nvme1n1"} 2.9400876e+07
+# HELP nvme_data_units_written Number of 512 byte data units the host has written
+# TYPE nvme_data_units_written counter
+nvme_data_units_written{device="/dev/nvme0n1"} 3.095431119e+09
+nvme_data_units_written{device="/dev/nvme1n1"} 3.095414353e+09
+# HELP nvme_endurance_grp_critical_warning_summary Critical warnings for the state of endurance groups
+# TYPE nvme_endurance_grp_critical_warning_summary gauge
+nvme_endurance_grp_critical_warning_summary{device="/dev/nvme0n1"} 0
+nvme_endurance_grp_critical_warning_summary{device="/dev/nvme1n1"} 0
+# HELP nvme_host_read_commands Number of read commands completed
+# TYPE nvme_host_read_commands counter
+nvme_host_read_commands{device="/dev/nvme0n1"} 2.22350325e+08
+nvme_host_read_commands{device="/dev/nvme1n1"} 1.95997261e+08
+# HELP nvme_host_write_commands Number of write commands completed
+# TYPE nvme_host_write_commands counter
+nvme_host_write_commands{device="/dev/nvme0n1"} 5.464915814e+09
+nvme_host_write_commands{device="/dev/nvme1n1"} 5.464277715e+09
+# HELP nvme_media_errors Number of unrecovered data integrity errors
+# TYPE nvme_media_errors counter
+nvme_media_errors{device="/dev/nvme0n1"} 0
+nvme_media_errors{device="/dev/nvme1n1"} 0
+# HELP nvme_num_err_log_entries Lifetime number of error log entries
+# TYPE nvme_num_err_log_entries counter
+nvme_num_err_log_entries{device="/dev/nvme0n1"} 0
+nvme_num_err_log_entries{device="/dev/nvme1n1"} 0
+# HELP nvme_percent_used Vendor specific estimate of the percentage of life used
+# TYPE nvme_percent_used gauge
+nvme_percent_used{device="/dev/nvme0n1"} 255
+nvme_percent_used{device="/dev/nvme1n1"} 255
+# HELP nvme_power_cycles Number of power cycles
+# TYPE nvme_power_cycles counter
+nvme_power_cycles{device="/dev/nvme0n1"} 67
+nvme_power_cycles{device="/dev/nvme1n1"} 67
+# HELP nvme_power_on_hours Number of power on hours
+# TYPE nvme_power_on_hours counter
+nvme_power_on_hours{device="/dev/nvme0n1"} 8285
+nvme_power_on_hours{device="/dev/nvme1n1"} 8279
+# HELP nvme_spare_thresh Async event completion may occur when avail spare < threshold
+# TYPE nvme_spare_thresh gauge
+nvme_spare_thresh{device="/dev/nvme0n1"} 10
+nvme_spare_thresh{device="/dev/nvme1n1"} 10
+# HELP nvme_temperature Temperature in degrees fahrenheit
+# TYPE nvme_temperature gauge
+nvme_temperature{device="/dev/nvme0n1"} 110.93000000000004
+nvme_temperature{device="/dev/nvme1n1"} 103.73000000000005
+# HELP nvme_thm_temp1_trans_count Number of times controller transitioned to lower power
+# TYPE nvme_thm_temp1_trans_count counter
+nvme_thm_temp1_trans_count{device="/dev/nvme0n1"} 0
+nvme_thm_temp1_trans_count{device="/dev/nvme1n1"} 0
+# HELP nvme_thm_temp1_trans_time Total number of seconds controller transitioned to lower power
+# TYPE nvme_thm_temp1_trans_time counter
+nvme_thm_temp1_trans_time{device="/dev/nvme0n1"} 0
+nvme_thm_temp1_trans_time{device="/dev/nvme1n1"} 0
+# HELP nvme_thm_temp2_trans_count Number of times controller transitioned to lower power
+# TYPE nvme_thm_temp2_trans_count counter
+nvme_thm_temp2_trans_count{device="/dev/nvme0n1"} 0
+nvme_thm_temp2_trans_count{device="/dev/nvme1n1"} 0
+# HELP nvme_thm_temp2_trans_time Total number of seconds controller transitioned to lower power
+# TYPE nvme_thm_temp2_trans_time counter
+nvme_thm_temp2_trans_time{device="/dev/nvme0n1"} 0
+nvme_thm_temp2_trans_time{device="/dev/nvme1n1"} 0
+# HELP nvme_unsafe_shutdowns Number of unsafe shutdowns
+# TYPE nvme_unsafe_shutdowns counter
+nvme_unsafe_shutdowns{device="/dev/nvme0n1"} 57
+nvme_unsafe_shutdowns{device="/dev/nvme1n1"} 57
+# HELP nvme_warning_temp_time Amount of time in minutes temperature > warning threshold
+# TYPE nvme_warning_temp_time counter
+nvme_warning_temp_time{device="/dev/nvme0n1"} 0
+nvme_warning_temp_time{device="/dev/nvme1n1"} 0
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 16.39
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 524288
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 12
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 1.5327232e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.70289625139e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 2.024341504e+09
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes 1.8446744073709552e+19
+# HELP promhttp_metric_handler_requests_in_flight Current number of scrapes being served.
+# TYPE promhttp_metric_handler_requests_in_flight gauge
+promhttp_metric_handler_requests_in_flight 1
+# HELP promhttp_metric_handler_requests_total Total number of scrapes by HTTP status code.
+# TYPE promhttp_metric_handler_requests_total counter
+promhttp_metric_handler_requests_total{code="200"} 5799
+promhttp_metric_handler_requests_total{code="500"} 0
+promhttp_metric_handler_requests_total{code="503"} 0

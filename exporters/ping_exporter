@@ -1,0 +1,38 @@
+# HELP ping_loss_ratio Packet loss from 0.0 to 1.0
+# TYPE ping_loss_ratio gauge
+ping_loss_ratio{ip="172.17.40.211",ip_version="4",target="172.17.40.211"} 0
+ping_loss_ratio{ip="172.18.40.211",ip_version="4",target="172.18.40.211"} 0
+ping_loss_ratio{ip="172.19.40.211",ip_version="4",target="172.19.40.211"} 0
+ping_loss_ratio{ip="172.21.254.11",ip_version="4",target="172.21.254.11"} 0
+ping_loss_ratio{ip="172.29.40.211",ip_version="4",target="172.29.40.211"} 0
+# HELP ping_rtt_best_ms Best round trip time in millis (deprecated)
+# TYPE ping_rtt_best_ms gauge
+ping_rtt_best_ms{ip="172.17.40.211",ip_version="4",target="172.17.40.211"} 168.1904296875
+ping_rtt_best_ms{ip="172.18.40.211",ip_version="4",target="172.18.40.211"} 9.540822982788086
+ping_rtt_best_ms{ip="172.19.40.211",ip_version="4",target="172.19.40.211"} 79.14444732666016
+ping_rtt_best_ms{ip="172.21.254.11",ip_version="4",target="172.21.254.11"} 84.94157409667969
+ping_rtt_best_ms{ip="172.29.40.211",ip_version="4",target="172.29.40.211"} 82.70304107666016
+# HELP ping_rtt_mean_ms Mean round trip time in millis (deprecated)
+# TYPE ping_rtt_mean_ms gauge
+ping_rtt_mean_ms{ip="172.17.40.211",ip_version="4",target="172.17.40.211"} 168.78146362304688
+ping_rtt_mean_ms{ip="172.18.40.211",ip_version="4",target="172.18.40.211"} 9.94507884979248
+ping_rtt_mean_ms{ip="172.19.40.211",ip_version="4",target="172.19.40.211"} 79.38322448730469
+ping_rtt_mean_ms{ip="172.21.254.11",ip_version="4",target="172.21.254.11"} 85.11058807373047
+ping_rtt_mean_ms{ip="172.29.40.211",ip_version="4",target="172.29.40.211"} 82.92643737792969
+# HELP ping_rtt_std_deviation_ms Standard deviation in millis (deprecated)
+# TYPE ping_rtt_std_deviation_ms gauge
+ping_rtt_std_deviation_ms{ip="172.17.40.211",ip_version="4",target="172.17.40.211"} 0.6558457016944885
+ping_rtt_std_deviation_ms{ip="172.18.40.211",ip_version="4",target="172.18.40.211"} 0.5141305923461914
+ping_rtt_std_deviation_ms{ip="172.19.40.211",ip_version="4",target="172.19.40.211"} 0.25533580780029297
+ping_rtt_std_deviation_ms{ip="172.21.254.11",ip_version="4",target="172.21.254.11"} 0.1224852129817009
+ping_rtt_std_deviation_ms{ip="172.29.40.211",ip_version="4",target="172.29.40.211"} 0.2711542546749115
+# HELP ping_rtt_worst_ms Worst round trip time in millis (deprecated)
+# TYPE ping_rtt_worst_ms gauge
+ping_rtt_worst_ms{ip="172.17.40.211",ip_version="4",target="172.17.40.211"} 171.5570526123047
+ping_rtt_worst_ms{ip="172.18.40.211",ip_version="4",target="172.18.40.211"} 12.887113571166992
+ping_rtt_worst_ms{ip="172.19.40.211",ip_version="4",target="172.19.40.211"} 80.35057067871094
+ping_rtt_worst_ms{ip="172.21.254.11",ip_version="4",target="172.21.254.11"} 85.44707489013672
+ping_rtt_worst_ms{ip="172.29.40.211",ip_version="4",target="172.29.40.211"} 84.14612579345703
+# HELP ping_up ping_exporter version
+# TYPE ping_up gauge
+ping_up{version="1.0.1"} 1
