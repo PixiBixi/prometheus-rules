@@ -1,0 +1,170 @@
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 2.12e-05
+go_gc_duration_seconds{quantile="0.25"} 3.2042e-05
+go_gc_duration_seconds{quantile="0.5"} 4.3563e-05
+go_gc_duration_seconds{quantile="0.75"} 6.5441e-05
+go_gc_duration_seconds{quantile="1"} 0.000224427
+go_gc_duration_seconds_sum 13.293165831
+go_gc_duration_seconds_count 237247
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 7
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.20.6"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 4.108072e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 5.60215054448e+11
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 4266
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 1.461753494e+09
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 8.260304e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 4.108072e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 9.404416e+06
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 6.455296e+06
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 7890
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 7.692288e+06
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 1.5859712e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.7035935506517022e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 1.461761384e+09
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 9600
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 15600
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 155200
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 195840
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 7.2418e+06
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 1.746598e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 917504
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 917504
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 2.6999824e+07
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 12
+# HELP keepalived_address_list_errors_total Address list errors
+# TYPE keepalived_address_list_errors_total counter
+keepalived_address_list_errors_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_advertisements_interval_errors_total Advertisement interval errors
+# TYPE keepalived_advertisements_interval_errors_total counter
+keepalived_advertisements_interval_errors_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_advertisements_received_total Advertisements received
+# TYPE keepalived_advertisements_received_total counter
+keepalived_advertisements_received_total{iname="vip_lan",intf="eno2",vrid="50"} 3.524803e+06
+# HELP keepalived_advertisements_sent_total Advertisements sent
+# TYPE keepalived_advertisements_sent_total counter
+keepalived_advertisements_sent_total{iname="vip_lan",intf="eno2",vrid="50"} 223240
+# HELP keepalived_authentication_failure_total Authentication failure
+# TYPE keepalived_authentication_failure_total counter
+keepalived_authentication_failure_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_authentication_invalid_total Authentication invalid
+# TYPE keepalived_authentication_invalid_total counter
+keepalived_authentication_invalid_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_authentication_mismatch_total Authentication mismatch
+# TYPE keepalived_authentication_mismatch_total counter
+keepalived_authentication_mismatch_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_become_master_total Became master
+# TYPE keepalived_become_master_total counter
+keepalived_become_master_total{iname="vip_lan",intf="eno2",vrid="50"} 2
+# HELP keepalived_exporter_build_info A metric with a constant '1' value labeled by version, revision, branch, goversion from which keepalived_exporter was built, and the goos and goarch for the build.
+# TYPE keepalived_exporter_build_info gauge
+keepalived_exporter_build_info{branch="HEAD",goarch="amd64",goos="linux",goversion="go1.20.6",revision="50b7c520504fd30b48496a2647fd0f41fbabe8a8",tags="unknown",version="1.3.2"} 1
+# HELP keepalived_gratuitous_arp_delay_total Gratuitous ARP delay
+# TYPE keepalived_gratuitous_arp_delay_total counter
+keepalived_gratuitous_arp_delay_total{iname="vip_lan",intf="eno2",vrid="50"} 5
+# HELP keepalived_invalid_type_received_total Invalid type errors
+# TYPE keepalived_invalid_type_received_total counter
+keepalived_invalid_type_received_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_ip_ttl_errors_total TTL errors
+# TYPE keepalived_ip_ttl_errors_total counter
+keepalived_ip_ttl_errors_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_packet_length_errors_total Packet length errors
+# TYPE keepalived_packet_length_errors_total counter
+keepalived_packet_length_errors_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_priority_zero_received_total Priority zero received
+# TYPE keepalived_priority_zero_received_total counter
+keepalived_priority_zero_received_total{iname="vip_lan",intf="eno2",vrid="50"} 2
+# HELP keepalived_priority_zero_sent_total Priority zero sent
+# TYPE keepalived_priority_zero_sent_total counter
+keepalived_priority_zero_sent_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+# HELP keepalived_release_master_total Released master
+# TYPE keepalived_release_master_total counter
+keepalived_release_master_total{iname="vip_lan",intf="eno2",vrid="50"} 1
+# HELP keepalived_up Status
+# TYPE keepalived_up gauge
+keepalived_up 1
+# HELP keepalived_vrrp_state State of vrrp
+# TYPE keepalived_vrrp_state gauge
+keepalived_vrrp_state{iname="vip_lan",intf="eno2",ip_address="172.17.254.251/16",vrid="50"} 2
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 1869.91
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 524288
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 11
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 1.8878464e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.69218536057e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 7.3951232e+08
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes 1.8446744073709552e+19
+# HELP promhttp_metric_handler_requests_in_flight Current number of scrapes being served.
+# TYPE promhttp_metric_handler_requests_in_flight gauge
+promhttp_metric_handler_requests_in_flight 1
+# HELP promhttp_metric_handler_requests_total Total number of scrapes by HTTP status code.
+# TYPE promhttp_metric_handler_requests_total counter
+promhttp_metric_handler_requests_total{code="200"} 760363
+promhttp_metric_handler_requests_total{code="500"} 0
+promhttp_metric_handler_requests_total{code="503"} 0
