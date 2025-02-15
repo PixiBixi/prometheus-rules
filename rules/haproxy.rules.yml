@@ -1,0 +1,125 @@
+- name: haproxy.rules
+  rules:
+    - alert: HAproxyDown
+      expr: sum(min_over_time(up{job=~".*haproxy.*"}[5m])) by (job,instance) == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+        summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
+    - alert: HAproxyBackendDown
+      expr: sum(min_over_time(haproxy_backend_agg_server_check_status{state="UP"}[5m]) == 0)
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "All HAproxy backends of {{$labels.proxy}} are down on {{$labels.instance}}"
+        description: "All HAproxy backends are down, you must take a look ASAP"
+
+    - alert: HAproxyHighHttp4xxErrorRateBackend
+      expr: ((sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{code="4xx"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 50
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy high HTTP 4xx error rate backend (instance {{ $labels.instance }})"
+        description: "Too many HTTP requests with status 4xx (> 50%) on backend {{ $labels.instance }}/{{ $labels.proxy }}"
+    - alert: HAproxyHighHttp4xxErrorRateBackend
+      expr: ((sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{code="4xx"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 15
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: HAProxy high HTTP 4xx error rate backend (instance {{ $labels.instance }})
+        description: "Too many HTTP requests with status 4xx (> 15%) on backend {{ $labels.instance }}/{{ $labels.proxy }}"
+
+    - alert: HAproxyHighHttp5xxErrorRateBackend
+      expr: ((sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy high HTTP 5xx error rate backend (instance {{ $labels.instance }})"
+        description: "Too many HTTP requests with status 5xx (> 5%) on backend {{ $labels.instance }}/{{ $labels.proxy }}"
+    - alert: HAproxyHighHttp4xxErrorRateServer
+      expr: ((sum by (server,instance) (rate(haproxy_server_http_responses_total{code="4xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 15
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy high HTTP 4xx error rate server (instance {{ $labels.instance }})"
+        description: "Too many HTTP requests with status 4xx (> 15%) on server {{ $labels.server }}"
+    - alert: HAproxyHighHttp4xxErrorRateServer
+      expr: ((sum by (server,instance) (rate(haproxy_server_http_responses_total{code="4xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 50
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy high HTTP 4xx error rate server (instance {{ $labels.instance }})"
+        description: "Too many HTTP requests with status 4xx (> 50%) on server {{ $labels.server }}"
+    - alert: HAproxyHighHttp5xxErrorRateServer
+      expr: ((sum by (server,instance) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy high HTTP 5xx error rate server (instance {{ $labels.instance }})"
+        description: "Too many HTTP requests with status 5xx (> 5%) on server {{ $labels.server }}"
+    - alert: HAproxyServerResponseErrors
+      expr: ((sum by (server,instance,job) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: HAProxy server response errors (instance {{ $labels.instance }})
+        description: "Too many response errors to {{ $labels.server }} server (> 5%)."
+    - alert: HAproxyBackendConnectionErrors
+      expr: (sum by (proxy,instance,job) (rate(haproxy_backend_connection_errors_total[5m]))) > 100
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: HAProxy backend connection errors (instance {{ $labels.instance }})
+        description: "Too many connection errors to {{ $labels.instance }}/{{ $labels.proxy }} backend (> 100 req/s). Request throughput may be too high."
+    - alert: HAproxyServerConnectionErrors
+      expr: (sum by (proxy,job,instance,server) (rate(haproxy_server_connection_errors_total[5m]))) > 100
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy server connection errors (instance {{ $labels.instance }})"
+        description: "Too many connection errors to {{ $labels.server }} server (> 100 req/s). Request throughput may be too high."
+    - alert: HAproxyBackendMaxActiveSession>80%
+      expr: (haproxy_server_max_sessions > 0 * 100) / (haproxy_server_limit_sessions > 0) > 80
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy backend max active session > 80% (instance {{ $labels.instance }})"
+        description: "Session limit from backend {{ $labels.proxy }} to server {{ $labels.server }} reached 80% of limit - {{ $value | printf \"%.2f\"}}%"
+    - alert: HAproxyPendingRequests
+      expr: sum by (proxy,job,instance) (rate(haproxy_backend_current_queue[5m])) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy pending requests (instance {{ $labels.instance }})"
+        description: "Some HAProxy requests are pending on {{ $labels.proxy }} - {{ $value | printf \"%.2f\"}}"
+    - alert: HAproxyRetryHigh
+      expr: sum by (proxy,job,instance) (rate(haproxy_backend_retry_warnings_total[5m])) > 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy retry high (instance {{ $labels.instance }})"
+        description: "High rate of retry on {{ $labels.proxy }} - {{ $value | printf \"%.2f\"}}"
+    - alert: HAproxyHAsNoAliveBackends
+      expr: (haproxy_backend_active_servers + haproxy_backend_backup_servers) == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAproxy has no alive backends (instance {{ $labels.instance }})"
+        description: "HAProxy has no alive active or backup backends for {{ $labels.proxy }}"
+

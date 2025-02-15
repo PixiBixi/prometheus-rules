@@ -1,0 +1,27 @@
+- name: certs.rules
+  rules:
+    # Certs = blackbox_exporter ; OCSP = ssl_exporter
+    - alert: CertExpireLessThanFourDays
+      expr: min(probe_ssl_last_chain_expiry_timestamp_seconds{job=~"blackbox.*"} - time()) by (job, instance, cust) / 86400 < 4
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Certificate for {{ $labels.job }} @ {{ $labels.instance }} will expire soon (< 4 days)"
+        description: "It seems HAproxy/whatever didnt reloaded well. You should probably dig in this way (or check the certificate itself)"
+    - alert: TargetDown
+      expr: probe_success == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Target {{ $labels.job }} is down from {{ $labels.instance }}"
+        description: "Target {{ $labels.job }} is down from {{ $labels.instance }}"
+    - alert: OCSPInvalid
+      expr: sum(ssl_ocsp_response_status{job="ssl"}) by (instance,job) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        mummary: "OCSP for {{ $labels.instance }} is invalid"
+

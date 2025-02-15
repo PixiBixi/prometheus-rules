@@ -1,0 +1,26 @@
+- name: nvme.rules
+  rules:
+    - alert: NVMEDown
+      expr: sum(min_over_time(up{job="nvme_exporter"}[2m])) by (job,instance) == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "nvme_exporter seems down on {{$labels.instance}}"
+        summary: "NVME Exporter Unreachable {{$labels.instance}}"
+    - alert: NVMEMediaError
+      expr: sum(rate(nvme_media_errors[1m])) by (instance,device,job) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Critical Usage for {{ $labels.device }}"
+        description: "You should change the NVME {{ $labels.device }} on {{ $labels.instance }}"
+    - alert: NVMEUsage
+      expr: nvme_percent_used > 60
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Critical Usage for {{ $labels.device }}"
+        description: "You should change the NVME {{ $labels.device }} on {{ $labels.instance }}"

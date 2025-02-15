@@ -1,0 +1,385 @@
+- name: basis.rules
+  rules:
+    - alert: HostDown
+      expr: up{job=~".*node-exporter"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "node_exporter seems down on {{$labels.instance}}, then the host is probably down"
+        summary: "Host down {{$labels.instance}} (node_exporter)"
+
+    - alert: TemperatureTooHigh
+      expr: avg(node_hwmon_temp_celsius) by (instance) > 80
+      for: 1h
+      labels:
+        severity: critical
+      annotations:
+        summary: "High Temperature for {{ $labels.instance }}"
+        description: "Temperature has exceeded 80° for more than 30 min on {{ $labels.instance }}. Please open a ticket on OVH/LW/whatever"
+    - alert: CPUThrottled
+      expr: sum(rate(node_cpu_core_throttles_total[5m]) > 0) by (instance)
+      for: 5m
+      labels:
+        severity: info
+      annotations:
+        summary: "CPU Throttled on {{ $labels.instance }}"
+        description: "CPU has been throttled on {{ $labels.instance }} for at least 5 minuts, it directly impact performances because it reduces frequency. Please check T° of your processor"
+    - alert: SlowCPU
+      expr: avg(node_cpu_scaling_frequency_hertz) by (instance) < avg(node_cpu_frequency_max_hertz) by (instance)*0.30
+      for: 5m
+      labels:
+        severity: info
+      annotations:
+        summary: "Slow CPU on {{ $labels.instance }}"
+        description: "Slow CPU on {{ $labels.instance }} ({{ $value }}) for at least 5 minuts (< 30% of maximum frequency). It directly impact performances because it reduces frequency."
+
+    - alert: CantScrapeTextfile
+      expr: node_textfile_scrape_error > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Cant scrape {{ $labels.instance }} file"
+        description: "Cant scrape {{ $labels.instance }} for more than 5 minuts, please check the instance"
+    - alert: OldMetricsTextfile
+      expr: node_textfile_mtime_seconds{file=~".*bid.*"} < time() - 60
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
+        description: "Check why `{{ $labels.file}}` hasn't been scraped on {{ $labels.instance}} for 2 minuts"
+    - alert: OldMetricsTextfile
+      expr: node_textfile_mtime_seconds{file=~".*aerospike_backup.*"} < time() - 3700
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
+        description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minuts"
+    - alert: OldMetricsTextfile
+      expr: node_textfile_mtime_seconds{file!~"(.*bid.*|.*server_metrics.*|.*aerospike_backup.*)"} < time() - 60
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
+        description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minuts"
+
+    - alert: HighDroppedPackages
+      expr: (irate(node_network_receive_drop_total{ignoredDroppedPackage=""}[5m])/irate(node_network_receive_packets_total[5m])) > 0.1
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "High Drop on {{ $labels.instance }}"
+        description: "High drop detected (> 10%) on {{ $labels.device }} @ {{ $labels.instance }}. Misconfiguration or NIC has an issue"
+    - alert: HighListenDrop
+      expr: irate(node_netstat_TcpExt_ListenDrops[1m]) > 10
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has high listen drops"
+        summary: "{{ $labels.instance }} has high listen drop, that's significate your application could be unstable or drop traffic, please look at your metrics"
+    - alert: ConntrackAlmostFull
+      expr: (node_nf_conntrack_entries / node_nf_conntrack_entries_limit) > 0.50
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has its conntrack stack almost full"
+        summary: "{{ $labels.instance }} of job {{ $labels.job }} has its conntrack stack almost full, please check if HAproxy/whatever is running fine, also, check sysctl conntrack value"
+
+    - alert: NodeRAIDDiskFailure
+      expr: node_md_disks{state="failed",device!=""} > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        description: At least one device in RAID array on {{ $labels.instance }} failed.
+          Array "{{ $labels.device }}" needs attention and possibly a disk swap.
+        summary: Failed device in RAID array
+    - alert: RaidDegraded
+      expr: sum(node_md_disks) by (instance, device,job) < sum(node_md_disks_required) by (instance,device,job)
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MDRaid is degraded {{ $labels.device }} for {{ $labels.instance }}"
+        description: "A disk seems disabled by kernel {{ $labels.device }} for {{ $labels.instance }}"
+
+    - alert: NTPUnsync
+      expr: sum(node_timex_sync_status < 1) by (instance,job)
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "NTP Unsync for `{{ $labels.instance }}`, take a look to `timedatectl status` and 123 UDP OUT FW"
+        description: "NTP Unsync {{ $labels.instance }}"
+
+    # Memory
+    # Take a look : https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=34e431b0ae398fc54ea69ff85ec700722c9da773
+    - alert: HostLowOfMemory
+      expr: sum ((node_memory_MemAvailable_bytes{ignoreMonitoringMemory=""} / node_memory_MemTotal_bytes * 100) < 10) by (instance,job)
+      labels:
+        severity: critical
+      annotations:
+        summary: "Host out of memory (instance {{ $labels.instance }})"
+        description: "Node memory is filling up (< 10% left)\n VALUE = {{ $value }}"
+    - alert: HostOomKillDetected
+      expr: increase(node_vmstat_oom_kill{ignoreOOM=""}[5m]) > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: Host OOM kill detected instance on {{ $labels.instance }}
+        description: "OOM kill detected\n"
+
+    # Misc
+    - alert: Segfault
+      expr: server_metrics{dimension="segfault"} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Segfault detected on {{ $labels.instance }}"
+        description: "Segfault has been detected in the last minut, please check `/var/log/kern.log`"
+
+    # Disk
+    ## All Servers
+    - alert: HostOutOfDiskSpace
+      expr: (node_filesystem_free_bytes{fstype!="tmpfs",mountpoint!~"(/boot|/boot/efi)",job!="rds-enhanced",ignoreDiskUsage=""} / node_filesystem_size_bytes * 100) < 20
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Host out of disk space (instance {{ $labels.instance }})"
+        description: "Disk is almost full (< 20% left)\n {{ $labels.instance_short }}\n {{ $labels.mountpoint }}\n VALUE = {{ printf \"node_filesystem_avail_bytes{mountpoint=\"%s\"}\" .Labels.mountpoint | query | first | value | humanize1024 }}"
+
+    - alert: NodeFilesystemAlmostOutOfFiles
+      expr: |
+        (
+          node_filesystem_files_free{fstype!="tmpfs",mountpoint!~"(/boot|/boot/efi)"} / node_filesystem_files{fstype!="",mountpoint!=""} * 100 < 10
+        and
+          node_filesystem_readonly{fstype!="",mountpoint!=""} == 0
+        )
+      for: 1h
+      labels:
+        severity: critical
+      annotations:
+        description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has
+          only {{ printf "%.2f" $value }}% available inodes left.
+        summary: Filesystem has less than 10% inodes left.
+
+    # FIXME: It can be simplified in only one rule, but as we want to introduce ignore and some unit are always failing
+    # We prefer usig unit by unit
+    # Systemd rules
+    - alert: DownSystemdNginx
+      expr: node_systemd_unit_state{state="failed",name="nginx.service",ignoreNginxDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for nginx on {{ $labels.instance }}"
+        description: "Systemd failed for nginx, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdDocker
+      expr: node_systemd_unit_state{state="failed",name="docker.service",ignoreDockerDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for nginx on {{ $labels.instance }}"
+        description: "Systemd failed for nginx, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdMySQL
+      expr: node_systemd_unit_state{state="failed",name="mysql.service",ignoreMysqlDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for nginx on {{ $labels.instance }}"
+        description: "Systemd failed for nginx, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdAerospike
+      expr: node_systemd_unit_state{state="failed",name="aerospike.service",ignoreAerospikeDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for aerospike {{ $labels.instance }}"
+        description: "Systemd failed for aerospike, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdASGateway
+      expr: node_systemd_unit_state{state="failed",name="as-rest-gateway.service",ignoreASRestDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for as-rest-gateway {{ $labels.instance }}"
+        description: "Systemd failed for as-rest-gateway, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdPromtail
+      expr: node_systemd_unit_state{state="failed",name="promtail.service",ignorePromtailDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for promtail {{ $labels.instance }}"
+        description: "Systemd failed for promtail, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdCron
+      expr: node_systemd_unit_state{state="failed",name="crond?.service",ignoreCronDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for cron {{ $labels.instance }}"
+        description: "Systemd failed for cron, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdSSH
+      expr: node_systemd_unit_state{state="failed",name="sshd?.service",ignoreSSHDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for SSH {{ $labels.instance }}"
+        description: "Systemd failed for SSH, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdHAproxy
+      expr: node_systemd_unit_state{state="failed",name="haproxy.service",ignoreHAproxyDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for HAproxy {{ $labels.instance }}"
+        description: "Systemd failed for HAproxy, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdKeyDB
+      expr: node_systemd_unit_state{state="failed",name="keydb.service",ignoreKeydbDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for KeyDB {{ $labels.instance }}"
+        description: "Systemd failed for KeyDB, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdRedis
+      expr: node_systemd_unit_state{state="failed",name=~"redis_.*.service",ignoreRedisDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for Redis {{ $labels.instance }}"
+        description: "Systemd failed for Redis, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdBidRequest
+      expr: node_systemd_unit_state{state="failed",name=~"bid_request_.*.service"} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for Bid Request Logger {{ $labels.instance }}"
+        description: "Systemd failed for Bid Request Logger, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdPHPFPM
+      expr: node_systemd_unit_state{state="failed",name=~"php.*-fpm.service",ignorePHPDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for PHPFPM {{ $labels.instance }}"
+        description: "Systemd failed for PHPFPM, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdNTP
+      expr: node_systemd_unit_state{state="failed",name=~"(chrony|systemd-timesyncd).*",ignoreNTPDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for NTP {{ $labels.instance }}"
+        description: "Systemd failed for NTP, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdTeleport
+      expr: node_systemd_unit_state{state="failed",name=~"teleport.service",ignoreTeleportDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for NTP {{ $labels.instance }}"
+        description: "Systemd failed for NTP, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdKafkaConnect
+      expr: node_systemd_unit_state{state="failed",name="confluent-kafka-connect.service",ignoreKafkaConnectDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdSchemaRegistry
+      expr: node_systemd_unit_state{state="failed",name="confluent-schema-registry.service",ignoreSchemaRegistryDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdKsqlDB
+      expr: node_systemd_unit_state{state="failed",name="confluent-ksqldb.service",ignoreKsqlDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdZookeeper
+      expr: node_systemd_unit_state{state="failed",name="confluent-zookeeper.service",ignoreZookeeperDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdKafka
+      expr: node_systemd_unit_state{state="failed",name="confluent-kafka.service",ignoreKafkaDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdKafkaRest
+      expr: node_systemd_unit_state{state="failed",name="confluent-kafka-rest.service",ignoreKafkaRestDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdSquid
+      expr: node_systemd_unit_state{state="failed",name="squid.service",ignoreSquidDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdOpenVPN
+      expr: node_systemd_unit_state{state="failed",name="openvpn-client@.*",ignoreOpenVPNDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdKeepalived
+      expr: node_systemd_unit_state{state="failed",name="keepalived.service",ignoreKeepalivedDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdSquid
+      expr: node_systemd_unit_state{state="failed",name="squid.service",ignoreSquidDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
+        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+
+    # CPU
+    - alert: CPULoad
+      expr: instance:node_cpu_utilization:ratio{ignoreCPULoad="",ignoreSingleCPU=""} > 0.9
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: “Host high CPU load (instance {{ $labels.instance }})”
+        description: “The CPU load reported from {{ $labels.instance }} has exceeded 90% for more than 20 minutes.”
+    - alert: CPULoadRDS
+      # rds-enhanced metric
+      expr: node_cpu_average{mode="idle"} < 10
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: “Host high CPU load (instance RDS {{ $labels.instance }})”
+        description: “The CPU load reported from RDS {{ $labels.instance }} has exceeded 90% for more than 1 minut.”
+    - alert: CPUwaitIO
+      expr: instance:node_cpu_utilization:ratio{ignoreCPULoad="",mode="iowait",ignoreSingleCPU=""} > 0.1
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "High IOWait ({{$value| printf \"%.0f\"}}%) on {{$labels.instance}}"
+    - alert: CPULoadServerType
+      expr: job:node_cpu_utilization:avg_ratio > 0.80
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Host high CPU load for {{ $labels.servertype }} @ {{ $labels.pop }} : {{ $value }}"
+        description: "The CPU load reported from {{ $labels.servertype }} on {{ $labels.pop }} has exceeded 80% for more than 15 minutes."
