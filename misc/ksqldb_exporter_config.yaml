@@ -1,0 +1,71 @@
+# Took from https://github.com/confluentinc/jmx-monitoring-stacks/blob/7.2-post/shared-assets/jmx-exporter/confluent_ksql.yml
+---
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+cacheRules: false
+whitelistObjectNames:
+  - "io.confluent.ksql.metrics:*"
+  # The two lines below are used to pull the Kafka Client Producer & consumer metrics from KSQL Client.
+  # If you care about Producer/Consumer metrics for KSQL, please uncomment 2 lines below.
+  # Please note that this increases the scrape duration to about 1 second as it needs to parse a lot of data.
+  - "kafka.consumer:*"
+  - "kafka.producer:*"
+  - "kafka.streams:*"
+blacklistObjectNames:
+  - "io.confluent.ksql.metrics:name=*"
+  - kafka.streams:type=kafka-metrics-count
+  # This will ignore the admin client metrics from KSQL server and will blacklist certain metrics
+  # that do not make sense for ingestion.
+  - "kafka.admin.client:*"
+  - "kafka.consumer:type=*,id=*"
+  - "kafka.consumer:type=*,client-id=*"
+  - "kafka.consumer:type=*,client-id=*,node-id=*"
+  - "kafka.producer:type=*,id=*"
+  - "kafka.producer:type=*,client-id=*"
+  - "kafka.producer:type=*,client-id=*,node-id=*"
+  - "kafka.streams:type=stream-processor-node-metrics,thread-id=*,task-id=*,processor-node-id=*"
+  - "kafka.*:type=kafka-metrics-count,*"
+  - "io.confluent.ksql.metrics:type=_confluent-ksql-rest-app-command-runner,*"
+rules:
+  # "io.confluent.ksql.metrics:type=producer-metrics,key=*,id=*"
+  # "io.confluent.ksql.metrics:type=consumer-metrics,key=*,id=*"
+  - pattern: io.confluent.ksql.metrics<type=(.+), key=(.+), id=(.+)><>([^:]+)
+    name: ksql_$1_$4
+    labels:
+      key: "$2"
+      id: "$3"
+  # "io.confluent.ksql.metrics:type=_confluent-ksql-<cluster-id>ksql-engine-query-stats"
+  # The below statement parses KSQL Cluster Name and adds a new label so that per cluster data is searchable.
+  - pattern: io.confluent.ksql.metrics<type=_confluent-ksql-(.+)ksql-engine-query-stats><>([^:]+)
+    name: "ksql_ksql_engine_query_stats_$2"
+    labels:
+      ksql_cluster: $1
+  # "io.confluent.ksql.metrics:type=ksql-queries,status=_confluent-ksql-<cluser-id>_query_<query>
+  # The below statement parses KSQL query specific status
+  - pattern: "io.confluent.ksql.metrics<type=(.+), status=_confluent-ksql-(.*)query_(.+)><>(.+): (.+)"
+    value: 1
+    name: ksql_ksql_metrics_$1_$4
+    labels:
+      ksql_query: $3
+      ksql_cluster: $2
+      $4: $5
+  # io.confluent.ksql.metrics:type=_confluent-ksql-pull-query, ksql_service_id=value, query_plan_type=value, query_routing_type=value, query_source=value
+  - pattern: 'io.confluent.ksql.metrics<type=_confluent-ksql-(.+), (.+)=(.+), (.+)=(.+), (.+)=(.+), (.+)=(.+)><>(.+)-detailed-distribution-(\d+):'
+    name: ksql_ksql_metrics_$1
+    type: GAUGE
+    labels:
+      $2: $3
+      $4: $5
+      $6: $7
+      $8: $9
+      attribute_name: $10
+      quantile: "0.$11"
+  - pattern: 'io.confluent.ksql.metrics<type=_confluent-ksql-(.+), (.+)=(.+), (.+)=(.+), (.+)=(.+), (.+)=(.+)><>(.+)-detailed-([\w-]+):'
+    name: ksql_ksql_metrics_$1
+    labels:
+      $2: $3
+      $4: $5
+      $6: $7
+      $8: $9
+      attribute_name: $10
+      value_type: $11

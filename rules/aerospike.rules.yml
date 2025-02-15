@@ -1,0 +1,106 @@
+- name: aerospike.rules
+  rules:
+    - alert: AerospikeExporterDown
+      expr: sum(up{job=~".*aerospike.*"}) by (job,instance) == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+        summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
+    - alert: AerospikeDown
+      expr: sum(aerospike_node_up) by (job,instance,cluster_name) == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of cluster {{ $labels.cluster_name }} has been down for more than 2 minutes."
+        summary: "Node {{ $labels.instance }} having an issue on {{ $labels.cluster_name }}"
+    - alert: NamespaceIsDownWrite
+      expr: sum(aerospike_namespace_stop_writes) by (cluster_name,ns,job) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Down write for {{ $labels.ns }} @ {{ $labels.cluster_name }}"
+        description: "AS can't write any bin on {{ $labels.ns }} @ {{ $labels.cluster_name }}, please dig ASAP"
+    - alert: UnavailablePartitions
+      expr: sum(aerospike_namespace_unavailable_partitions) by (ns,cluster_name,job) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Partitions unvailable for {{ $labels.ns }} @ {{ $labels.cluster_name }}"
+        description: "AS can't access to all partitions for {{ $labels.ns }} @ {{ $labels.cluster_name }}"
+    - alert: DeviceLowOnFreespace
+      expr: sum(aerospike_namespace_device_available_pct) by (instance,ns,job) < 15
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Low Freespace for {{ $labels.ns }} @ {{ $labels.instance }}"
+        description: "AS Low Freespace for {{ $labels.ns }} @ {{ $labels.instance }}"
+    - alert: RAMExceedHighWatermarkPCT
+      expr: 100-(sum(aerospike_namespace_memory_free_pct) by (instance,ns)) > (sum(aerospike_namespace_high_water_memory_pct) by (instance,ns))
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - Low Memory for {{ $labels.ns }} @ {{ $labels.instance }} (< 20%)"
+        description: "AS Low Memory for {{ $labels.ns }} @ {{ $labels.instance }}, if it continues, cluster will be down for OOM, please dig"
+    - alert: DeviceCloseToStopWrite
+      expr: 100-(sum(aerospike_namespace_memory_free_pct+15) by (instance,ns)) > (sum(aerospike_namespace_stop_writes_pct) by (instance,ns))
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Stop Write Limit close for {{ $labels.ns }} @ {{ $labels.instance }} (< 15%)"
+        description: "AS is configure to stop write when threshold is {{ printf \"aerospike_namespace_stop_writes_pct{instance=\"%s\",ns=\"%s\"}\" .labels.instance .labels.ns }}, it remains only 15% before reaching this limit"
+    - alert: ClockStopWrite
+      expr: sum(aerospike_node_stats_cluster_clock_skew_stop_writes_sec) by (cluster_name,ns,instance,job) > 20
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - Soon Stop Write because of close for {{ $labels.ns }} @ {{ $labels.instance }} (< 15%)"
+        description: "Ensure clocks are synchronized across the cluster. {{ $labels.ns }} @ {{ $labels.instance }} (< 15%)"
+    - alert: ClockAreUnsync
+      expr: sum(aerospike_node_stats_cluster_clock_skew_stop_writes_sec) by (cluster_name,ns,instance,job) > 20
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - Soon Stop Write because of close for {{ $labels.ns }} @ {{ $labels.instance }} (> 20s)"
+        description: "Ensure clocks are synchronized across the cluster. {{ $labels.ns }} @ {{ $labels.instance }} (> 20s)"
+    - alert: ClockAreUnsync
+      expr: sum(aerospike_node_stats_cluster_clock_skew_stop_writes_sec) by (cluster_name,ns,instance,job) > 40
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Stop Write because of close for {{ $labels.ns }} @ {{ $labels.instance }} (> 40s)"
+        description: "Ensure clocks are synchronized across the cluster. {{ $labels.ns }} @ {{ $labels.instance }} (> 40s)"
+    - alert: LowHeapEfficiency
+      expr: sum(aerospike_node_stats_heap_efficiency_pct) by (instance) < 50
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Heap Efficiency {{ $labels.instance }} (< 50%)"
+        description: "Heap efficiency is very low for {{ $labels.instance }} (< 50%). You should check your configuration"
+    - alert: AerospikeBackupFail
+      expr: backup_aerospike_state < 1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "Backup for {{ $labels.instance }}/{{ $labels.namespace }} has fail"
+        summary: "Backup for {{ $labels.instance }}/{{ $labels.namespace }} has fail"
+    - alert: AerospikePopBackupFail
+      expr: sum(backup_aerospike_state) by (pop) == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "Backup for {{ $labels.pop }}/{{ $labels.namespace }} has fail"
+        summary: "Backup for {{ $labels.pop }}/{{ $labels.namespace }} has fail"

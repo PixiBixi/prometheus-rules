@@ -1,0 +1,26 @@
+- name: php.rules
+  rules:
+    - alert: PHPFPMExporter
+      expr: sum(up{job="phpfpm"}) by (job,instance) == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+        summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
+    - alert: PHPFPMDown
+      expr: sum(phpfpm_up) by (instance,job) == 0
+      for: 2m
+      annotations:
+        summary: "PHPFPM Exporter is UP but PHPFPM seems down for {{ $labels.instance }}"
+      labels:
+        severity: critical
+
+    - alert: PHPFPMConnectionLimit
+      expr: sum(rate(phpfpm_max_children_reached[2m])) by (instance,job) > 0
+      for: 0s
+      annotations:
+        summary: "High connection usage on PHPFPM for {{ $labels.instance }} for all pools"
+      labels:
+        severity: critical
+

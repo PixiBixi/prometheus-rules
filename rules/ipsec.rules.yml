@@ -1,0 +1,19 @@
+- name: ipsec.rules
+  rules:
+    - alert: ExporterIPSECDown
+      expr: up{job="vpn-ipsec"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "IPSEC Exporter seems down for {{ $labels.instance }}"
+        description: "IPSEC Exporter seems down for {{ $labels.instance }}"
+    - alert: IPSECDown
+      expr: ipsec_status != 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Tunnel {{ $labels.tunnel }} @ {{ $labels.instance }} down"
+        description: "Tunnel {{ $labels.tunnel }} @ {{ $labels.instance }} down, check for systemd status and syslog"
+

@@ -1,0 +1,42 @@
+- name: kafka.rules
+  rules:
+    - alert: KafkaExporter
+      expr: up{job="kafka"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+        summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
+    - alert: KafkaUnderReplicatedPartitions
+      expr: kafka_server_replicamanager_underreplicatedpartitions > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has some underreplicated partitions"
+        summary: "{{ $labels.instance }} of job {{ $labels.job }} has some underreplicated partitions"
+    - alert: KafkaOfflinePartitions
+      expr: kafka_controller_kafkacontroller_offlinepartitionscount > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has offline partitions"
+        summary: "{{ $labels.instance }} of job {{ $labels.job }} has offline partitions, some services may be unavailable"
+    - alert: KafkaSlowReassigningPartition
+      expr: kafka_server_replicamanager_reassigningpartitions > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has some reassagning partitions"
+        summary: "{{ $labels.instance }} of job {{ $labels.job }} has some reassagning partitions"
+    - alert: KafkaLagExporter
+      expr: up{job="consumer"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+        summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"

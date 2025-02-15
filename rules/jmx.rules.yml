@@ -1,0 +1,11 @@
+- name: jmx.rules
+  rules:
+    - alert: HighJVMUsage
+      expr: sum(jvm_memory_bytes_max) by (instance,job,server) * 100 > 80
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "JVM Usage of {{ $labels.instance }} @ {{ $labels.job }}  is used more than 80% for 20 minutes"
+        description: "JVM Usage is high (> 80%) for more than 20 minutes, you probably should update -Xmx value for your JVM"
+

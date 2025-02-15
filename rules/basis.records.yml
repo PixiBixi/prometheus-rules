@@ -1,0 +1,68 @@
+- name: basis.records
+  # for unspecified = default (0m)
+  interval: 1m
+  rules:
+    # MemoryRecords
+    - record: instance:node_memory_available:ratio
+      expr: >
+        (
+          node_memory_MemAvailable_bytes or
+          (
+            node_memory_Buffers_bytes +
+            node_memory_Cached_bytes +
+            node_memory_MemFree_bytes +
+            node_memory_Slab_bytes
+          )
+        ) /
+        node_memory_MemTotal_bytes
+    - record: instance:node_memory_utilization:ratio
+      expr: 1 - instance:node_memory_available:ratio
+    # CPURecords
+    # The count of CPUs per node, useful for getting CPU time as a percent of total.
+    - record: instance:node_cpus:count
+      expr: >
+        count without (cpu, mode) (
+          node_cpu_seconds_total{mode="idle"}
+        )
+    # CPU in use by CPU.
+    - record: instance_cpu:node_cpu_seconds_not_idle:rate1m
+      expr: >
+        sum without (mode) (
+          1 - rate(node_cpu_seconds_total{mode="idle"}[1m])
+        )
+    # CPU in use by mode.
+    # Split recording for iowait to avoid reset bugs.
+    - record: instance_mode:node_cpu_seconds:rate1m
+      expr: >
+        sum without (cpu) (
+          rate(node_cpu_seconds_total{mode!="iowait"}[1m])
+        )
+    - record: instance_mode:node_cpu_seconds:rate1m
+      expr: >
+        sum without (cpu) (
+          deriv(node_cpu_seconds_total{mode="iowait"}[1m]) > 0
+        )
+    # CPU in use ratio.
+    - record: instance:node_cpu_utilization:ratio
+      expr: >
+        avg without (cpu) (
+          instance_cpu:node_cpu_seconds_not_idle:rate1m
+        )
+    # CPU summaries by servertype/pop
+    - record: job:node_cpu_utilization:min_ratio
+      expr: >
+        min without (fqdn,instance,node,pod) (
+          instance:node_cpu_utilization:ratio
+        )
+    - record: job:node_cpu_utilization:avg_ratio
+      expr: >
+        avg without (fqdn,instance,node,pod) (
+          instance:node_cpu_utilization:ratio
+        )
+    - record: job:node_cpu_utilization:max_ratio
+      expr: >
+        max without (fqdn,instance,node,pod) (
+          instance:node_cpu_utilization:ratio
+        )
+
+

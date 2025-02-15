@@ -1,0 +1,20 @@
+- name: zookeeper.rules
+  rules:
+    - alert: ZookeeperExporter
+      expr: up{job="zookeeper"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+        summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
+    - alert: ZookeperWrongQuorum
+      expr: min(zookeeper_QuorumSize) by (instance) < 3
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has an unsuciffiient Quorum"
+        summary: "{{ $labels.instance }} of job {{ $labels.job }} has an unsuciffiient Quorum"
+
+

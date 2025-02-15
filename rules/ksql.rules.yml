@@ -1,0 +1,52 @@
+- name: ksql.rules
+  rules:
+    - alert: KsqldbExporter
+      expr: up{job="ksqldb"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+        summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
+    - alert: KsqlConnectorDown
+      expr: sum(ksql_ksql_metrics_ksql_queries_ksql_service_id_default_query_status{query_status!="RUNNING"}) by (instance,job,ksql_query)
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has a down connector for {{ $labels.ksql_query }}"
+        summary: "Instance {{ $labels.instance }} has a down connector"
+    - alert: KsqlConnectorDown
+      expr: sum(ksql_ksql_metrics_ksql_queries_query_status{query_status!="RUNNING"}) by (ksql_query,job,instance)
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has a down connector for {{ $labels.ksql_query }}"
+        summary: "Instance {{ $labels.instance }} has a down connector"
+    - alert: KsqlServerDown
+      expr: sum(ksql_ksql_engine_query_stats_liveness_indicator < 1) by (instance,job)
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+        summary: "KSQL {{ $labels.instance }} having an issue"
+    - alert: KsqlQueriesNotRunning
+      expr: sum(ksql_ksql_engine_query_stats_not_running_queries > 0) by (instance,job)
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has some down queries, please check why"
+        summary: "KSQL queries down on {{ $labels.instance }}"
+    - alert: KsqlQueriesAreRebalancing
+      expr: sum(ksql_ksql_engine_query_stats_rebalancing_queries > 0) by (instance,job)
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "{{ $labels.instance }} has rebalancing queries for 5 minuts, it could be normal"
+        summary: "KSQL queries are rebalancing on {{ $labels.instance }} for 5 minuts"
+
+

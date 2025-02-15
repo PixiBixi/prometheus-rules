@@ -1,0 +1,34 @@
+- name: redis.rules
+  rules:
+    - alert: RedisDown
+      expr: sum(redis_up) by (instance,job) != 1
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Redis is down for {{ $labels.instance }}"
+        description: "Redis is down for {{ $labels.instance }} for more than 5 minuts."
+    - alert: RedisOutOfMemory
+      expr: redis_memory_used_bytes / redis_memory_max_bytes * 100) > 90
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Redis out of memory for instance {{ $labels.instance }}"
+        description: "Redis will be soon out of memory (> 90%)\n  VALUE = {{ $value }}"
+    - alert: RedisClusterSlotFail
+      expr: redis_cluster_slots_fail > 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Number of hash slots mapping to a node in FAIL state for instance {{ $labels.instance }}"
+        description: "Redis cluster has slots fail\n  VALUE = {{ $value }}"
+    - alert: RedisClusterStateNotOk
+      expr: redis_cluster_state == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Redis cluster state is not ok for instance {{ $labels.instance }}"
+        description: "Redis cluster is not ok"
