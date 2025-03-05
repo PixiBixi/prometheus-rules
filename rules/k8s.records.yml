@@ -1,0 +1,45 @@
+- name: k8s.records
+  # for unspecified = default (0m)
+  interval: 1m
+  rules:
+    - record: kube_container_cpu_usage_5m
+      expr: sum by (dc, k8s_cluster_name, namespace, pod) (rate(container_cpu_usage_seconds_total{container!=""}[5m]))
+
+    - record: kube_container_memory_usage
+      expr: sum(container_memory_working_set_bytes{image!="",container!=""}) by (dc, k8s_cluster_name, namespace, pod)
+
+    - record: kube_namespace_cpu_limit
+      expr: sum by(dc, k8s_cluster_name, namespace, pod) (kube_pod_container_resource_limits{resource="cpu"} * on(pod,cluster_id,container,instance) group_right kube_pod_container_status_running)
+
+    - record: kube_namespace_cpu_request
+      expr: sum by(dc, k8s_cluster_name, namespace, pod) (kube_pod_container_resource_requests{resource="cpu"} * on(pod,cluster_id,container,instance) group_right kube_pod_container_status_running)
+
+    - record: kube_pod_cpu5m_request_ratio
+      expr: kube_container_cpu_usage_5m/kube_namespace_cpu_request
+
+    - record: kube_pod_cpu5m_limit_ratio
+      expr: kube_container_cpu_usage_5m/kube_namespace_cpu_limit
+
+    - record: kube_namespace_cpu5m_limit_ratio
+      expr: avg(kube_pod_cpu5m_limit_ratio) without(pod)
+
+    - record: kube_namespace_cpu5m_request_ratio
+      expr: avg(kube_pod_cpu5m_request_ratio) without(pod)
+
+    - record: kube_namespace_memory_limit
+      expr: sum by(dc, k8s_cluster_name, namespace, pod) (kube_pod_container_resource_limits{resource="memory"} * on(pod,cluster_id,container,instance) group_right kube_pod_container_status_running)
+
+    - record: kube_namespace_memory_request
+      expr: sum by(dc, k8s_cluster_name, namespace, pod) (kube_pod_container_resource_requests{resource="memory"} * on(pod,cluster_id,container,instance) group_right kube_pod_container_status_running)
+
+    - record: kube_pod_memory_request_ratio
+      expr: kube_container_memory_usage/kube_namespace_memory_request
+
+    - record: kube_pod_memory_limit_ratio
+      expr: kube_container_memory_usage/kube_namespace_memory_limit
+
+    - record: kube_namespace_memory_request_ratio
+      expr: avg(kube_pod_memory_request_ratio) without(pod)
+
+    - record: kube_namespace_memory_limit_ratio
+      expr: avg(kube_pod_memory_limit_ratio) without(pod)
