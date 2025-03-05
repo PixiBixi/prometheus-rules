@@ -74,7 +74,7 @@ Also, some collector have been disabled because I don't use them
 
 #### haproxy
 
-We're using the internal exporter for HAproxy with this configuration 
+We're using the internal exporter for HAproxy with this configuration
 
 ```
 frontend prometheus
@@ -105,7 +105,7 @@ frontend prometheus
 
 Kafka metrics rely on the way to configure the exporter. Please refer to the `kafka_exporter_config.yaml` to have the same metrics as me.
 
-Then, you must create an override of your Kafka systemd unit like this : 
+Then, you must create an override of your Kafka systemd unit like this :
 
 ```
 [Service]
@@ -119,7 +119,7 @@ Environment="KAFKA_OPTS=-javaagent:/usr/share/java/kafka/jmx_prometheus_javaagen
 
 KSQL metrics rely on the way to configure the exporter. Please refer to the `ksqldb_exporter_config.yaml` to have the same metrics as me.
 
-Then, you must create an override of your KSQL systemd unit like this : 
+Then, you must create an override of your KSQL systemd unit like this :
 
 ```
 [Service]
@@ -133,7 +133,7 @@ Environment="KSQL_OPTS=-javaagent:/usr/share/java/kafka/jmx_prometheus_javaagent
 
 Zookeeper metrics rely on the way to configure the exporter. Please refer to the `ksqldb_exporter_config.yaml` to have the same metrics as me.
 
-Then, you must create an override of your zookeeper systemd unit like this : 
+Then, you must create an override of your zookeeper systemd unit like this :
 
 ```
 [Service]
@@ -168,7 +168,9 @@ Please don't forget there's no sense to monitor Prometheus uptime from Prom itse
 
 #### postgres_exporter
 
+
 **postgres_exporter link :** [postgres_exporter](https://github.com/prometheus-community/postgres_exporter)
+
 **Version used :** 0.15.0
 
 If you want running the exporter as a non-super user, please follow [these steps](https://github.com/prometheus-community/postgres_exporter?tab=readme-ov-file#running-as-non-superuser)
