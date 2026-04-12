@@ -17,10 +17,18 @@
         summary: "Critical Usage for {{ $labels.device }}"
         description: "You should change the NVME {{ $labels.device }} on {{ $labels.instance }}"
     - alert: NVMEUsage
+      expr: nvme_percent_used > 40
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High NVMe wear level for {{ $labels.device }} on {{ $labels.instance }}"
+        description: "NVMe {{ $labels.device }} on {{ $labels.instance }} wear level is above 40% — plan for replacement."
+    - alert: NVMEUsage
       expr: nvme_percent_used > 60
       for: 1m
       labels:
         severity: critical
       annotations:
-        summary: "Critical Usage for {{ $labels.device }}"
-        description: "You should change the NVME {{ $labels.device }} on {{ $labels.instance }}"
+        summary: "Critical NVMe wear level for {{ $labels.device }} on {{ $labels.instance }}"
+        description: "NVMe {{ $labels.device }} on {{ $labels.instance }} wear level is above 60% — replace soon."
