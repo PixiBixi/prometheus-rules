@@ -368,7 +368,7 @@ prometheus_treecache_watcher_goroutines 0
 prometheus_treecache_zookeeper_failures_total 0
 # HELP promtail_batch_retries_total Number of times batches has had to be retried.
 # TYPE promtail_batch_retries_total counter
-promtail_batch_retries_total{host="loki.mydomain.com",tenant=""} 1332
+promtail_batch_retries_total{host="myhost",tenant=""} 1332
 # HELP promtail_build_info A metric with a constant '1' value labeled by version, revision, branch, goversion from which promtail was built, and the goos and goarch for the build.
 # TYPE promtail_build_info gauge
 promtail_build_info{branch="HEAD",goarch="amd64",goos="linux",goversion="go1.20.4",revision="9f809eda7",version="2.8.2"} 1
@@ -380,19 +380,19 @@ promtail_config_reload_fail_total 0
 promtail_config_reload_success_total 0
 # HELP promtail_dropped_bytes_total Number of bytes dropped because failed to be sent to the ingester after all retries.
 # TYPE promtail_dropped_bytes_total counter
-promtail_dropped_bytes_total{host="loki.mydomain.com",reason="ingester_error",tenant=""} 0
-promtail_dropped_bytes_total{host="loki.mydomain.com",reason="line_too_long",tenant=""} 0
-promtail_dropped_bytes_total{host="loki.mydomain.com",reason="rate_limited",tenant=""} 0
-promtail_dropped_bytes_total{host="loki.mydomain.com",reason="stream_limited",tenant=""} 0
+promtail_dropped_bytes_total{host="myhost",reason="ingester_error",tenant=""} 0
+promtail_dropped_bytes_total{host="myhost",reason="line_too_long",tenant=""} 0
+promtail_dropped_bytes_total{host="myhost",reason="rate_limited",tenant=""} 0
+promtail_dropped_bytes_total{host="myhost",reason="stream_limited",tenant=""} 0
 # HELP promtail_dropped_entries_total Number of log entries dropped because failed to be sent to the ingester after all retries.
 # TYPE promtail_dropped_entries_total counter
-promtail_dropped_entries_total{host="loki.mydomain.com",reason="ingester_error",tenant=""} 0
-promtail_dropped_entries_total{host="loki.mydomain.com",reason="line_too_long",tenant=""} 0
-promtail_dropped_entries_total{host="loki.mydomain.com",reason="rate_limited",tenant=""} 0
-promtail_dropped_entries_total{host="loki.mydomain.com",reason="stream_limited",tenant=""} 0
+promtail_dropped_entries_total{host="myhost",reason="ingester_error",tenant=""} 0
+promtail_dropped_entries_total{host="myhost",reason="line_too_long",tenant=""} 0
+promtail_dropped_entries_total{host="myhost",reason="rate_limited",tenant=""} 0
+promtail_dropped_entries_total{host="myhost",reason="stream_limited",tenant=""} 0
 # HELP promtail_encoded_bytes_total Number of bytes encoded and ready to send.
 # TYPE promtail_encoded_bytes_total counter
-promtail_encoded_bytes_total{host="loki.mydomain.com"} 2.00047437e+08
+promtail_encoded_bytes_total{host="myhost"} 2.00047437e+08
 # HELP promtail_file_bytes_total Number of bytes total.
 # TYPE promtail_file_bytes_total gauge
 promtail_file_bytes_total{path="/data/logs/monitoring/monitoring_imports.log"} 486
@@ -403,16 +403,16 @@ promtail_file_bytes_total{path="/data/logs/php_error_log"} 571294
 promtail_files_active_total 3
 # HELP promtail_mutated_bytes_total The total number of bytes that have been mutated.
 # TYPE promtail_mutated_bytes_total counter
-promtail_mutated_bytes_total{host="loki.mydomain.com",reason="ingester_error",tenant=""} 0
-promtail_mutated_bytes_total{host="loki.mydomain.com",reason="line_too_long",tenant=""} 0
-promtail_mutated_bytes_total{host="loki.mydomain.com",reason="rate_limited",tenant=""} 0
-promtail_mutated_bytes_total{host="loki.mydomain.com",reason="stream_limited",tenant=""} 0
+promtail_mutated_bytes_total{host="myhost",reason="ingester_error",tenant=""} 0
+promtail_mutated_bytes_total{host="myhost",reason="line_too_long",tenant=""} 0
+promtail_mutated_bytes_total{host="myhost",reason="rate_limited",tenant=""} 0
+promtail_mutated_bytes_total{host="myhost",reason="stream_limited",tenant=""} 0
 # HELP promtail_mutated_entries_total The total number of log entries that have been mutated.
 # TYPE promtail_mutated_entries_total counter
-promtail_mutated_entries_total{host="loki.mydomain.com",reason="ingester_error",tenant=""} 0
-promtail_mutated_entries_total{host="loki.mydomain.com",reason="line_too_long",tenant=""} 0
-promtail_mutated_entries_total{host="loki.mydomain.com",reason="rate_limited",tenant=""} 0
-promtail_mutated_entries_total{host="loki.mydomain.com",reason="stream_limited",tenant=""} 0
+promtail_mutated_entries_total{host="myhost",reason="ingester_error",tenant=""} 0
+promtail_mutated_entries_total{host="myhost",reason="line_too_long",tenant=""} 0
+promtail_mutated_entries_total{host="myhost",reason="rate_limited",tenant=""} 0
+promtail_mutated_entries_total{host="myhost",reason="stream_limited",tenant=""} 0
 # HELP promtail_read_bytes_total Number of bytes read.
 # TYPE promtail_read_bytes_total gauge
 promtail_read_bytes_total{path="/data/logs/monitoring/monitoring_imports.log"} 486
@@ -424,40 +424,40 @@ promtail_read_lines_total{path="/data/logs/monitoring/monitoring_syncmaps.log"} 
 promtail_read_lines_total{path="/data/logs/php_error_log"} 2.361059e+06
 # HELP promtail_request_duration_seconds Duration of send requests.
 # TYPE promtail_request_duration_seconds histogram
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.005"} 130
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.01"} 157
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.025"} 184
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.05"} 189
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.1"} 1306
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.25"} 1309
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="0.5"} 1309
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="1"} 1310
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="2.5"} 1310
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="5"} 1310
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="10"} 1310
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="-1",le="+Inf"} 1332
-promtail_request_duration_seconds_sum{host="loki.mydomain.com",status_code="-1"} 298.97439011299997
-promtail_request_duration_seconds_count{host="loki.mydomain.com",status_code="-1"} 1332
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.005"} 0
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.01"} 0
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.025"} 0
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.05"} 0
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.1"} 329588
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.25"} 332491
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="0.5"} 400833
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="1"} 401705
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="2.5"} 401721
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="5"} 401731
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="10"} 401737
-promtail_request_duration_seconds_bucket{host="loki.mydomain.com",status_code="204",le="+Inf"} 401737
-promtail_request_duration_seconds_sum{host="loki.mydomain.com",status_code="204"} 55837.34348764703
-promtail_request_duration_seconds_count{host="loki.mydomain.com",status_code="204"} 401737
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.005"} 130
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.01"} 157
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.025"} 184
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.05"} 189
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.1"} 1306
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.25"} 1309
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.5"} 1309
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="1"} 1310
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="2.5"} 1310
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="5"} 1310
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="10"} 1310
+promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="+Inf"} 1332
+promtail_request_duration_seconds_sum{host="myhost",status_code="-1"} 298.97439011299997
+promtail_request_duration_seconds_count{host="myhost",status_code="-1"} 1332
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.005"} 0
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.01"} 0
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.025"} 0
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.05"} 0
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.1"} 329588
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.25"} 332491
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.5"} 400833
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="1"} 401705
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="2.5"} 401721
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="5"} 401731
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="10"} 401737
+promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="+Inf"} 401737
+promtail_request_duration_seconds_sum{host="myhost",status_code="204"} 55837.34348764703
+promtail_request_duration_seconds_count{host="myhost",status_code="204"} 401737
 # HELP promtail_sent_bytes_total Number of bytes sent.
 # TYPE promtail_sent_bytes_total counter
-promtail_sent_bytes_total{host="loki.mydomain.com"} 2.00047437e+08
+promtail_sent_bytes_total{host="myhost"} 2.00047437e+08
 # HELP promtail_sent_entries_total Number of log entries sent to the ingester.
 # TYPE promtail_sent_entries_total counter
-promtail_sent_entries_total{host="loki.mydomain.com"} 2.604008e+06
+promtail_sent_entries_total{host="myhost"} 2.604008e+06
 # HELP promtail_targets_active_total Number of active total.
 # TYPE promtail_targets_active_total gauge
 promtail_targets_active_total 2
