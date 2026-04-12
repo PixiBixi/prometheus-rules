@@ -154,7 +154,7 @@
         severity: critical
       annotations:
         summary: "Host out of disk space (instance {{ $labels.instance }})"
-        description: "Disk is almost full (< 20% left)\n {{ $labels.instance_short }}\n {{ $labels.mountpoint }}\n VALUE = {{ printf \"node_filesystem_avail_bytes{mountpoint=\"%s\"}\" .Labels.mountpoint | query | first | value | humanize1024 }}"
+        description: "Disk is almost full (< 20% left)\n  Instance: {{ $labels.instance }}\n  Mount: {{ $labels.mountpoint }}\n  Free: {{ $value | humanize }}%"
 
     - alert: NodeFilesystemAlmostOutOfFiles
       expr: |
