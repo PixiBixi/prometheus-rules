@@ -35,6 +35,8 @@ These rules are a curated mix from multiple sources, reviewed and adapted for pr
 
 All rules have been reviewed, deduplicated, and adjusted (thresholds, labels, expressions) to avoid common pitfalls from blindly copy-pasting community rules.
 
+> **Running Kubernetes?** [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus/tree/main/manifests) ships a comprehensive set of production-grade rules out of the box — look for the `*-prometheusRule.yaml` manifests. It covers etcd, kube-state-metrics, node-exporter, Prometheus itself, Alertmanager, and more. The rules in this repo are complementary and focus on the application layer (databases, proxies, message queues…).
+
   * Most of rules have a `job{} == 0` rule to be sure the exporter is working fine. Please don't forget to change this to match with your job name
     * This kind of rule doesn't work with `remote_write`
 
