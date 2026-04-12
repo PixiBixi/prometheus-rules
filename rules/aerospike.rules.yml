@@ -55,7 +55,7 @@
         severity: critical
       annotations:
         summary: "AS - Stop Write Limit close for {{ $labels.ns }} @ {{ $labels.instance }} (< 15%)"
-        description: "AS is configure to stop write when threshold is {{ printf \"aerospike_namespace_stop_writes_pct{instance=\"%s\",ns=\"%s\"}\" .labels.instance .labels.ns }}, it remains only 15% before reaching this limit"
+        description: "AS stop write threshold (aerospike_namespace_stop_writes_pct) for ns={{ $labels.ns }} @ {{ $labels.instance }} is nearly reached — only 15% remaining before writes are blocked."
     - alert: ClockStopWrite
       expr: sum(aerospike_node_stats_cluster_clock_skew_stop_writes_sec) by (cluster_name,ns,instance,job) > 20
       for: 1m
