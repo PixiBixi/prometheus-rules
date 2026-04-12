@@ -26,7 +26,14 @@ You'll see not so much warning severity rules. Why would you tell me? Because fr
 
 ### Rules
 
-Most of these rules have been grabbed from [Awesome Prometheus alerts](https://samber.github.io/awesome-prometheus-alerts/rules#haproxy), [Mixin Rules](https://monitoring.mixins.dev/) or simply from official exporters and customizing by myself (or left as grabbed)
+These rules are a curated mix from multiple sources, reviewed and adapted for production use:
+
+- **[Awesome Prometheus Alerts](https://samber.github.io/awesome-prometheus-alerts/)** (samber) — community-maintained alert collection
+- **[Monitoring Mixins](https://monitoring.mixins.dev/)** — vendor/project-maintained mixin rules (cert-manager, etcd, CoreDNS, Loki…)
+- **Official exporters** — alerts and recording rules extracted from exporter documentation or default configs
+- **Custom rules** — written from scratch based on operational experience, not available in any of the above
+
+All rules have been reviewed, deduplicated, and adjusted (thresholds, labels, expressions) to avoid common pitfalls from blindly copy-pasting community rules.
 
   * Most of rules have a `job{} == 0` rule to be sure the exporter is working fine. Please don't forget to change this to match with your job name
     * This kind of rule doesn't work with `remote_write`
