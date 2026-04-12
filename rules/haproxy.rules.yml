@@ -123,3 +123,21 @@
         summary: "HAproxy has no alive backends (instance {{ $labels.instance }})"
         description: "HAProxy has no alive active or backup backends for {{ $labels.proxy }}"
 
+    - alert: HAproxyFrontendSecurityBlockedRequests
+      expr: sum by (proxy) (rate(haproxy_frontend_denied_connections_total[2m])) > 10
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy frontend security blocked requests (instance {{ $labels.instance }})"
+        description: "HAProxy is blocking requests for security reasons on {{ $labels.proxy }} ({{ $value }} req/s)"
+
+    - alert: HAproxyServerHealthcheckFailure
+      expr: increase(haproxy_server_check_failures_total[1m]) > 2
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
+        description: "{{ $value }} healthcheck failures in the last minute on {{ $labels.server }}"
+

@@ -1,0 +1,24 @@
+- name: promtail.rules
+  rules:
+    - alert: PromtailRequestErrors
+      expr: |
+        100 * sum(rate(promtail_request_duration_seconds_count{status_code=~"5..|failed"}[1m])) by (namespace, job, route, instance)
+        / sum(rate(promtail_request_duration_seconds_count[1m])) by (namespace, job, route, instance)
+        > 10
+        and sum(rate(promtail_request_duration_seconds_count[1m])) by (namespace, job, route, instance) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Promtail request errors (instance {{ $labels.instance }})"
+        description: "{{ $labels.job }} {{ $labels.route }} is experiencing {{ printf \"%.2f\" $value }}% errors"
+
+    - alert: PromtailRequestLatency
+      expr: |
+        histogram_quantile(0.99, sum(rate(promtail_request_duration_seconds_bucket[5m])) by (namespace, job, route, le)) > 1
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Promtail request latency (instance {{ $labels.instance }})"
+        description: "{{ $labels.job }} {{ $labels.route }} p99 latency is {{ printf \"%.2f\" $value }}s"

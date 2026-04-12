@@ -1,0 +1,46 @@
+- name: stackdriver.rules
+  rules:
+    - alert: StackdriverExporterScrapeError
+      expr: stackdriver_monitoring_last_scrape_error > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Stackdriver exporter scrape error (project {{ $labels.project_id }})"
+        description: "Stackdriver exporter failed to scrape GCP Monitoring API for project {{ $labels.project_id }}"
+
+    - alert: StackdriverExporterSlowScrape
+      expr: stackdriver_monitoring_last_scrape_duration_seconds > 300
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Stackdriver exporter slow scrape (project {{ $labels.project_id }})"
+        description: "Stackdriver scrape for project {{ $labels.project_id }} is taking more than 5 minutes ({{ $value }}s)"
+
+    - alert: StackdriverExporterScrapeErrorsIncreasing
+      expr: increase(stackdriver_monitoring_scrape_errors_total[15m]) > 5
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Stackdriver exporter scrape errors increasing (project {{ $labels.project_id }})"
+        description: "{{ $value }} scrape errors in the last 15 minutes for project {{ $labels.project_id }}"
+
+    - alert: StackdriverExporterScrapeStale
+      expr: time() - stackdriver_monitoring_last_scrape_timestamp > 600
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Stackdriver exporter scrape stale (project {{ $labels.project_id }})"
+        description: "No successful scrape for project {{ $labels.project_id }} in the last 10 minutes"
+
+    - alert: StackdriverExporterHighApiCalls
+      expr: rate(stackdriver_monitoring_api_calls_total[5m]) * 60 > 100
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Stackdriver exporter high API calls (project {{ $labels.project_id }})"
+        description: "{{ $value }} API calls/min for project {{ $labels.project_id }} — may hit GCP quota"

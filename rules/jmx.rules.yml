@@ -9,3 +9,75 @@
         summary: "JVM Usage of {{ $labels.instance }} @ {{ $labels.job }}  is used more than 80% for 20 minutes"
         description: "JVM Usage is high (> 80%) for more than 20 minutes, you probably should update -Xmx value for your JVM"
 
+    - alert: JvmMemoryFillingUp
+      expr: (sum by (instance)(jvm_memory_used_bytes{area="heap"}) / sum by (instance)(jvm_memory_max_bytes{area="heap"})) * 100 > 80 and sum by (instance)(jvm_memory_max_bytes{area="heap"}) > 0
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "JVM heap memory filling up (instance {{ $labels.instance }})"
+        description: "JVM heap memory is filling up (> 80%) on {{ $labels.instance }}\n  VALUE = {{ $value }}"
+
+    - alert: JvmGcTimeTooHigh
+      expr: sum by (instance)(rate(jvm_gc_collection_seconds_sum[5m])) > 0.05
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "JVM GC time too high (instance {{ $labels.instance }})"
+        description: "JVM is spending more than 5% of wall clock time in GC on {{ $labels.instance }}\n  VALUE = {{ $value }}"
+
+    - alert: JvmOldGenGcFrequency
+      expr: rate(jvm_gc_collection_seconds_count{gc=~".*old.*|.*major.*"}[5m]) > 0.3
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "JVM old gen GC frequency high (instance {{ $labels.instance }})"
+        description: "Frequent old/major GC cycles indicate memory pressure on {{ $labels.instance }}\n  VALUE = {{ $value }}"
+
+    - alert: JvmThreadsDeadlocked
+      expr: jvm_threads_deadlocked > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "JVM threads deadlocked (instance {{ $labels.instance }})"
+        description: "JVM has {{ $value }} deadlocked threads on {{ $labels.instance }}"
+
+    - alert: JvmThreadCountHigh
+      expr: jvm_threads_current > 300
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "JVM thread count high (instance {{ $labels.instance }})"
+        description: "JVM thread count is {{ $value }} (> 300) on {{ $labels.instance }} — potential thread leak"
+
+    - alert: JvmThreadsBlocked
+      expr: jvm_threads_state{state="BLOCKED"} > 50
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "JVM threads BLOCKED (instance {{ $labels.instance }})"
+        description: "{{ $value }} BLOCKED threads on {{ $labels.instance }} — lock contention suspected"
+
+    - alert: JvmDirectBufferPoolFillingUp
+      expr: (jvm_buffer_pool_used_bytes / jvm_buffer_pool_capacity_bytes) * 100 > 90 and jvm_buffer_pool_capacity_bytes > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "JVM direct buffer pool filling up (instance {{ $labels.instance }})"
+        description: "JVM direct buffer pool > 90% on {{ $labels.instance }}\n  VALUE = {{ $value }}"
+
+    - alert: JvmFileDescriptorsExhaustion
+      expr: (process_open_fds / process_max_fds) * 100 > 90 and process_max_fds > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "JVM file descriptors near exhaustion (instance {{ $labels.instance }})"
+        description: "JVM process is using > 90% of available file descriptors on {{ $labels.instance }}\n  VALUE = {{ $value }}"
+
