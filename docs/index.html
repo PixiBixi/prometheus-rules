@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en" x-data="app()" x-init="init()" :class="{ dark: darkMode }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prometheus Rules &amp; Metrics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    pre { white-space: pre-wrap; word-break: break-all; }
+    .sidebar-active { @apply bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold border-r-2 border-indigo-600; }
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans transition-colors" x-cloak>
+
+<!-- TOP NAV -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-14 flex items-center px-4 gap-3">
+  <a :href="meta.github_repo" target="_blank"
+    class="font-bold text-indigo-700 dark:text-indigo-400 text-base tracking-tight whitespace-nowrap flex items-center gap-1.5 hover:opacity-80">
+    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+    Prometheus Rules
+  </a>
+
+  <!-- Search -->
+  <div class="flex-1 max-w-lg relative">
+    <input type="text" x-model="search" @input="onSearch" @keydown.escape="search=''; onSearch()" @keydown.slash.window.prevent="$el.focus()"
+      placeholder="Search… (press /)"
+      class="w-full pl-9 pr-8 py-1.5 text-sm border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+    <svg class="absolute left-2.5 top-2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg>
+    <button x-show="search" @click="search=''; onSearch()" class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-0.5 text-sm">
+    <button @click="setTab('home')" :class="tab==='home' ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">Home</button>
+    <button @click="setTab('metrics')" :class="tab==='metrics' ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
+      Metrics <span class="text-xs opacity-70" x-text="'('+totalMetrics+')'"></span>
+    </button>
+    <button @click="setTab('alerts')" :class="tab==='alerts' ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
+      Alerts <span class="text-xs opacity-70" x-text="'('+totalAlerts+')'"></span>
+    </button>
+    <button @click="setTab('records')" :class="tab==='records' ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
+      Records <span class="text-xs opacity-70" x-text="'('+totalRecords+')'"></span>
+    </button>
+    <button @click="setTab('uncovered')" :class="tab==='uncovered' ? 'bg-amber-500 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
+      Uncovered <span class="text-xs opacity-70" x-text="'('+uncoveredMetrics.length+')'"></span>
+    </button>
+  </div>
+
+  <!-- Grafana config -->
+  <div class="relative flex items-center gap-1.5 ml-auto">
+    <button @click="showGrafanaInput = !showGrafanaInput" title="Configure Grafana URL"
+      :class="grafanaUrl ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'"
+      class="hover:opacity-80 transition flex items-center gap-1 text-xs">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      <span x-show="!grafanaUrl" class="hidden lg:inline">Grafana</span>
+      <span x-show="grafanaUrl" class="hidden lg:inline">Grafana ✓</span>
+    </button>
+    <!-- Grafana URL dropdown -->
+    <div x-show="showGrafanaInput" @click.outside="showGrafanaInput=false"
+      class="absolute top-8 right-0 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 z-50">
+      <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Grafana URL</p>
+      <input type="url" x-model="grafanaUrl" @input="saveGrafanaUrl" placeholder="https://grafana.example.com"
+        class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+      <p class="text-xs text-gray-400 dark:text-gray-500 mt-1.5">Saved in localStorage. Enables "Open in Explore" on each alert.</p>
+    </div>
+  </div>
+
+  <!-- Dark mode toggle -->
+  <button @click="toggleDarkMode" class="text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition shrink-0">
+    <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+    <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+  </button>
+</nav>
+
+<!-- LAYOUT -->
+<div class="flex pt-14 h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-56 shrink-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-y-auto" x-show="tab !== 'home' && tab !== 'uncovered'">
+
+    <!-- Metrics sidebar -->
+    <div x-show="tab==='metrics'">
+      <div class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Exporters</div>
+      <template x-for="exp in filteredExporters" :key="exp.name">
+        <button @click="selectExporter(exp.name)"
+          :class="selectedExporter===exp.name ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold border-r-2 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
+          class="w-full text-left px-4 py-2 text-sm flex justify-between items-center gap-1">
+          <span x-text="exp.name" class="truncate"></span>
+          <div class="flex items-center gap-1 shrink-0">
+            <span x-show="exp.related_alerts && exp.related_alerts.length > 0" class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+            <span class="text-xs text-gray-400 dark:text-gray-500" x-text="exp.metrics.length"></span>
+          </div>
+        </button>
+      </template>
+      <div x-show="filteredExporters.length===0" class="px-4 py-3 text-sm text-gray-400">No results</div>
+    </div>
+
+    <!-- Alerts sidebar -->
+    <div x-show="tab==='alerts'">
+      <div class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Severity</div>
+      <div class="px-3 pb-3 flex gap-1.5">
+        <button @click="severityFilter='all'" :class="severityFilter==='all' ? 'bg-gray-700 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'" class="flex-1 text-xs py-1 rounded font-medium transition">All</button>
+        <button @click="severityFilter='critical'" :class="severityFilter==='critical' ? 'bg-red-600 text-white' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'" class="flex-1 text-xs py-1 rounded font-medium transition">Crit</button>
+        <button @click="severityFilter='warning'" :class="severityFilter==='warning' ? 'bg-yellow-500 text-white' : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400'" class="flex-1 text-xs py-1 rounded font-medium transition">Warn</button>
+      </div>
+      <div class="px-4 pb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Alert files</div>
+      <template x-for="grp in filteredAlertGroups" :key="grp.file">
+        <button @click="selectRuleGroup(grp.file)"
+          :class="selectedRuleGroup===grp.file ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold border-r-2 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
+          class="w-full text-left px-4 py-2 text-sm flex justify-between items-center gap-1">
+          <span x-text="grp.file.replace(/\.rules\.yml$|\.yml$/,'')" class="truncate"></span>
+          <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0" x-text="grp.rules.length"></span>
+        </button>
+      </template>
+      <div x-show="filteredAlertGroups.length===0" class="px-4 py-3 text-sm text-gray-400">No results</div>
+    </div>
+
+    <!-- Records sidebar -->
+    <div x-show="tab==='records'">
+      <div class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Record files</div>
+      <template x-for="grp in filteredRecordGroups" :key="grp.file">
+        <button @click="selectRuleGroup(grp.file)"
+          :class="selectedRuleGroup===grp.file ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold border-r-2 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
+          class="w-full text-left px-4 py-2 text-sm flex justify-between items-center gap-1">
+          <span x-text="grp.file.replace(/\.records\.yml$|\.yml$/,'')" class="truncate"></span>
+          <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0" x-text="grp.rules.length"></span>
+        </button>
+      </template>
+      <div x-show="filteredRecordGroups.length===0" class="px-4 py-3 text-sm text-gray-400">No results</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 overflow-y-auto px-6 py-5">
+
+    <!-- ── HOME / STATS ── -->
+    <div x-show="tab==='home'">
+      <h1 class="text-2xl font-bold mb-6">Overview</h1>
+
+      <!-- Stat cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Exporters</p>
+          <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400" x-text="exporters.length"></p>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Metrics</p>
+          <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400" x-text="totalMetrics"></p>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Alerts</p>
+          <div class="flex items-end gap-2">
+            <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400" x-text="totalAlerts"></p>
+            <div class="flex gap-1 mb-1">
+              <span class="text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-1.5 py-0.5 rounded" x-text="stats.critical + ' crit'"></span>
+              <span class="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-1.5 py-0.5 rounded" x-text="stats.warning + ' warn'"></span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Uncovered metrics</p>
+          <div class="flex items-end gap-2">
+            <p class="text-3xl font-bold text-amber-500" x-text="uncoveredMetrics.length"></p>
+            <p class="text-xs text-gray-400 mb-1" x-text="'/ ' + totalMetrics"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Coverage -->
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-sm font-semibold mb-4">Exporter coverage</p>
+          <div class="space-y-2.5">
+            <template x-for="exp in stats.exporterCoverage" :key="exp.name">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <button @click="setTab('metrics'); selectExporter(exp.name)" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 truncate" x-text="exp.name"></button>
+                  <span class="text-gray-400 shrink-0 ml-2" x-text="exp.alerts + ' alerts'"></span>
+                </div>
+                <div class="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all"
+                    :class="exp.alerts > 0 ? 'bg-green-400' : 'bg-gray-300 dark:bg-gray-700'"
+                    :style="'width:' + (exp.alerts > 0 ? Math.min(100, exp.alerts * 10) : 5) + '%'">
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Severity breakdown + top exporters -->
+        <div class="space-y-6">
+
+          <!-- Severity bars -->
+          <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+            <p class="text-sm font-semibold mb-4">Alerts by severity</p>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-red-600 dark:text-red-400 font-medium">Critical</span>
+                  <span class="text-gray-400" x-text="stats.critical"></span>
+                </div>
+                <div class="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-red-500 rounded-full" :style="'width:' + (totalAlerts ? stats.critical/totalAlerts*100 : 0) + '%'"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-yellow-600 dark:text-yellow-400 font-medium">Warning</span>
+                  <span class="text-gray-400" x-text="stats.warning"></span>
+                </div>
+                <div class="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-yellow-400 rounded-full" :style="'width:' + (totalAlerts ? stats.warning/totalAlerts*100 : 0) + '%'"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top exporters by metric count -->
+          <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+            <p class="text-sm font-semibold mb-4">Top exporters by metric count</p>
+            <div class="space-y-2">
+              <template x-for="exp in stats.topExporters" :key="exp.name">
+                <div class="flex items-center gap-3">
+                  <button @click="setTab('metrics'); selectExporter(exp.name)"
+                    class="text-xs text-gray-700 dark:text-gray-300 hover:text-indigo-600 w-36 truncate text-left" x-text="exp.name"></button>
+                  <div class="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-400 rounded-full" :style="'width:' + (exp.count / stats.topExporters[0].count * 100) + '%'"></div>
+                  </div>
+                  <span class="text-xs text-gray-400 w-10 text-right" x-text="exp.count"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── METRICS VIEW ── -->
+    <div x-show="tab==='metrics'">
+      <template x-if="activeExporter">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <h1 class="text-xl font-bold" x-text="activeExporter.name"></h1>
+            <span class="text-sm text-gray-400" x-text="visibleMetrics.length + ' metrics'"></span>
+            <a :href="activeExporter.github_url" target="_blank"
+              class="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-600 transition">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              View raw
+            </a>
+          </div>
+
+          <!-- Related alerts banner -->
+          <div x-show="activeExporter.related_alerts && activeExporter.related_alerts.length > 0"
+            class="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+            <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-2">
+              Related alerts (<span x-text="activeExporter.related_alerts.length"></span>)
+            </p>
+            <div class="flex flex-wrap gap-1.5">
+              <template x-for="a in activeExporter.related_alerts" :key="a.file+a.alert">
+                <button @click="goToAlert(a.file, a.alert)"
+                  :class="{'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-700': a.severity==='critical', 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700': a.severity==='warning', 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700': !['critical','warning'].includes(a.severity)}"
+                  class="text-xs px-2 py-0.5 rounded border font-medium hover:opacity-80 transition" x-text="a.alert">
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <!-- Type filter -->
+          <div class="flex gap-1.5 mb-4">
+            <button @click="metricTypeFilter=''" :class="metricTypeFilter==='' ? 'bg-gray-700 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'" class="text-xs px-2.5 py-1 rounded font-medium transition">All</button>
+            <template x-for="t in ['gauge','counter','histogram','summary']" :key="t">
+              <button @click="metricTypeFilter = metricTypeFilter===t ? '' : t"
+                :class="{
+                  'bg-blue-600 text-white': metricTypeFilter===t && t==='gauge',
+                  'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': metricTypeFilter!==t && t==='gauge',
+                  'bg-green-600 text-white': metricTypeFilter===t && t==='counter',
+                  'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300': metricTypeFilter!==t && t==='counter',
+                  'bg-purple-600 text-white': metricTypeFilter===t && t==='histogram',
+                  'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300': metricTypeFilter!==t && t==='histogram',
+                  'bg-orange-600 text-white': metricTypeFilter===t && t==='summary',
+                  'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300': metricTypeFilter!==t && t==='summary',
+                }"
+                class="text-xs px-2.5 py-1 rounded font-medium capitalize transition" x-text="t">
+              </button>
+            </template>
+          </div>
+
+          <div class="space-y-3">
+            <template x-for="metric in visibleMetrics" :key="metric.name">
+              <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition"
+                :id="'m-' + metric.name">
+                <div class="flex items-start justify-between gap-4 mb-1.5">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <code class="text-sm font-mono font-semibold text-indigo-700 dark:text-indigo-400" x-text="metric.name"></code>
+                    <span :class="{
+                      'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': metric.type==='gauge',
+                      'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300': metric.type==='counter',
+                      'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300': metric.type==='histogram',
+                      'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300': metric.type==='summary',
+                      'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400': !['gauge','counter','histogram','summary'].includes(metric.type)
+                    }" class="text-xs px-2 py-0.5 rounded-full font-medium capitalize" x-text="metric.type"></span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <button @click="copyPermalink('metrics', activeExporter.name, metric.name)" title="Copy permalink"
+                      class="text-gray-300 dark:text-gray-600 hover:text-indigo-500 transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    </button>
+                    <button @click="copyText(metric.name)" title="Copy metric name"
+                      class="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <p x-show="metric.help" class="text-sm text-gray-600 dark:text-gray-400 mb-2" x-text="metric.help"></p>
+                <div x-show="metric.labels.length > 0" class="flex flex-wrap gap-1 mb-2">
+                  <template x-for="label in metric.labels" :key="label">
+                    <span class="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded font-mono" x-text="label"></span>
+                  </template>
+                </div>
+                <pre class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded px-3 py-2 font-mono" x-text="metric.example"></pre>
+              </div>
+            </template>
+          </div>
+          <div x-show="visibleMetrics.length===0" class="text-center py-16 text-gray-400">No metrics match your filters.</div>
+        </div>
+      </template>
+      <template x-if="!activeExporter">
+        <div class="text-center py-20 text-gray-400">
+          <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582 4 8 4"/></svg>
+          <p>Select an exporter</p>
+        </div>
+      </template>
+    </div>
+
+    <!-- ── ALERTS VIEW ── -->
+    <div x-show="tab==='alerts'">
+      <template x-if="activeRuleGroup">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <h1 class="text-xl font-bold" x-text="activeRuleGroup.name"></h1>
+            <span class="text-sm text-gray-400" x-text="visibleRules.length + ' alerts'"></span>
+            <a :href="activeRuleGroup.github_url" target="_blank" class="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-600 transition">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+          <div class="space-y-3">
+            <template x-for="rule in visibleRules" :key="rule.alert">
+              <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition"
+                :id="'r-' + rule.alert">
+                <div class="flex items-start justify-between gap-4 mb-2">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-semibold text-sm" x-text="rule.alert"></span>
+                    <span x-show="rule.severity"
+                      :class="{'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400': rule.severity==='critical', 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400': rule.severity==='warning', 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': !['critical','warning'].includes(rule.severity)}"
+                      class="text-xs px-2 py-0.5 rounded-full font-medium capitalize" x-text="rule.severity">
+                    </span>
+                    <span x-show="rule.for" class="text-xs text-gray-400" x-text="'for ' + rule.for"></span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <button @click="copyPermalink('alerts', activeRuleGroup.file, rule.alert)" title="Copy permalink"
+                      class="text-gray-300 dark:text-gray-600 hover:text-indigo-500 transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    </button>
+                    <a x-show="grafanaUrl" :href="grafanaExploreUrl(rule.expr)" target="_blank"
+                      title="Open in Grafana Explore"
+                      class="text-orange-400 hover:text-orange-500 transition">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <button @click="copyText(rule.expr)" class="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center gap-1 text-xs whitespace-nowrap">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                      Copy
+                    </button>
+                  </div>
+                </div>
+                <p x-show="rule.summary" class="text-sm text-gray-600 dark:text-gray-400 mb-1" x-text="rule.summary"></p>
+                <p x-show="rule.description && rule.description !== rule.summary" class="text-xs text-gray-500 dark:text-gray-500 mb-2" x-text="rule.description"></p>
+                <pre class="text-xs bg-gray-900 text-green-400 rounded px-3 py-2 font-mono overflow-x-auto" x-text="rule.expr"></pre>
+                <div x-show="rule.metric_refs && rule.metric_refs.length > 0" class="mt-2 flex flex-wrap gap-1">
+                  <template x-for="ref in rule.metric_refs" :key="ref">
+                    <button @click="goToMetric(ref)"
+                      class="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-700 px-1.5 py-0.5 rounded font-mono hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
+                      x-text="ref">
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+          <div x-show="visibleRules.length===0" class="text-center py-16 text-gray-400">No alerts match your filters.</div>
+        </div>
+      </template>
+      <template x-if="!activeRuleGroup">
+        <div class="text-center py-20 text-gray-400">
+          <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <p>Select an alert file</p>
+        </div>
+      </template>
+    </div>
+
+    <!-- ── RECORDS VIEW ── -->
+    <div x-show="tab==='records'">
+      <template x-if="activeRuleGroup">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <h1 class="text-xl font-bold" x-text="activeRuleGroup.name"></h1>
+            <span class="text-sm text-gray-400" x-text="visibleRules.length + ' records'"></span>
+            <a :href="activeRuleGroup.github_url" target="_blank" class="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-600 transition">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+          <div class="space-y-3">
+            <template x-for="rule in visibleRules" :key="rule.record">
+              <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition">
+                <div class="flex items-start justify-between gap-4 mb-2">
+                  <div class="flex items-center gap-2">
+                    <code class="font-semibold text-sm font-mono text-indigo-700 dark:text-indigo-400" x-text="rule.record"></code>
+                    <span class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full">record</span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <a x-show="grafanaUrl" :href="grafanaExploreUrl(rule.expr)" target="_blank" title="Open in Grafana Explore" class="text-orange-400 hover:text-orange-500 transition">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <button @click="copyText(rule.expr)" class="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center gap-1 text-xs whitespace-nowrap">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                      Copy
+                    </button>
+                  </div>
+                </div>
+                <pre class="text-xs bg-gray-900 text-green-400 rounded px-3 py-2 font-mono overflow-x-auto" x-text="rule.expr"></pre>
+                <div x-show="rule.metric_refs && rule.metric_refs.length > 0" class="mt-2 flex flex-wrap gap-1">
+                  <template x-for="ref in rule.metric_refs" :key="ref">
+                    <button @click="goToMetric(ref)"
+                      class="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-700 px-1.5 py-0.5 rounded font-mono hover:bg-indigo-100 transition"
+                      x-text="ref">
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+          <div x-show="visibleRules.length===0" class="text-center py-16 text-gray-400">No records match your search.</div>
+        </div>
+      </template>
+      <template x-if="!activeRuleGroup">
+        <div class="text-center py-20 text-gray-400">
+          <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <p>Select a record file</p>
+        </div>
+      </template>
+    </div>
+
+    <!-- ── UNCOVERED METRICS ── -->
+    <div x-show="tab==='uncovered'" class="max-w-4xl">
+      <div class="flex items-center gap-3 mb-2">
+        <h1 class="text-xl font-bold">Uncovered metrics</h1>
+        <span class="text-sm text-gray-400" x-text="filteredUncovered.length + ' metrics not referenced in any alert'"></span>
+      </div>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">These metrics have no associated alerting rules — potential gaps in coverage.</p>
+
+      <div class="space-y-2">
+        <template x-for="item in filteredUncovered" :key="item.exporter + item.metric.name">
+          <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3 flex items-start gap-3 hover:border-amber-300 dark:hover:border-amber-700 transition">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <button @click="goToMetric(item.metric.name)"
+                  class="text-sm font-mono font-semibold text-indigo-700 dark:text-indigo-400 hover:underline truncate"
+                  x-text="item.metric.name">
+                </button>
+                <span :class="{
+                  'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': item.metric.type==='gauge',
+                  'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300': item.metric.type==='counter',
+                  'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300': item.metric.type==='histogram',
+                  'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300': item.metric.type==='summary',
+                  'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400': !['gauge','counter','histogram','summary'].includes(item.metric.type)
+                }" class="text-xs px-2 py-0.5 rounded-full font-medium capitalize shrink-0" x-text="item.metric.type">
+                </span>
+              </div>
+              <p x-show="item.metric.help" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate" x-text="item.metric.help"></p>
+            </div>
+            <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0 pt-0.5" x-text="item.exporter"></span>
+          </div>
+        </template>
+      </div>
+      <div x-show="filteredUncovered.length===0" class="text-center py-16 text-gray-400">
+        <p>🎉 All metrics are covered by at least one alert!</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- COPY TOAST -->
+<div x-show="toastMsg" x-transition class="fixed bottom-4 right-4 bg-gray-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50" x-text="toastMsg"></div>
+
+<script>
+function app() {
+  return {
+    meta: { github_repo: '#', branch: 'main' },
+    exporters: [],
+    ruleGroups: [],
+
+    tab: 'home',
+    search: '',
+    selectedExporter: null,
+    selectedRuleGroup: null,
+    severityFilter: 'all',
+    metricTypeFilter: '',
+    darkMode: false,
+    grafanaUrl: '',
+    showGrafanaInput: false,
+    toastMsg: '',
+
+    filteredExporters: [],
+    filteredAlertGroups: [],
+    filteredRecordGroups: [],
+
+    _fuseAllMetrics: null,
+    _fuseAllRules: null,
+
+    // ── computed ──────────────────────────────────────────
+
+    get totalMetrics() { return this.exporters.reduce((s,e) => s+e.metrics.length, 0); },
+    get totalAlerts()  { return this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='alert').length, 0); },
+    get totalRecords() { return this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='record').length, 0); },
+
+    get activeExporter() {
+      return this.filteredExporters.find(e => e.name === this.selectedExporter) || null;
+    },
+    get activeRuleGroup() {
+      const list = this.tab === 'alerts' ? this.filteredAlertGroups : this.filteredRecordGroups;
+      return list.find(g => g.file === this.selectedRuleGroup) || null;
+    },
+    get visibleMetrics() {
+      if (!this.activeExporter) return [];
+      let m = this.activeExporter.metrics;
+      if (this.metricTypeFilter) m = m.filter(x => x.type === this.metricTypeFilter);
+      return m;
+    },
+    get visibleRules() {
+      if (!this.activeRuleGroup) return [];
+      let r = this.activeRuleGroup.rules;
+      if (this.tab === 'alerts' && this.severityFilter !== 'all')
+        r = r.filter(x => x.severity === this.severityFilter);
+      return r;
+    },
+    get uncoveredMetrics() {
+      const allRefs = new Set(
+        this.ruleGroups.flatMap(g => g.rules.flatMap(r => r.metric_refs || []))
+      );
+      return this.exporters.flatMap(e =>
+        e.metrics
+          .filter(m => !allRefs.has(m.name))
+          .map(m => ({ exporter: e.name, metric: m }))
+      );
+    },
+    get filteredUncovered() {
+      if (!this.search) return this.uncoveredMetrics;
+      const q = this.search.toLowerCase();
+      return this.uncoveredMetrics.filter(i =>
+        i.metric.name.includes(q) || i.metric.help.toLowerCase().includes(q) || i.exporter.includes(q)
+      );
+    },
+    get stats() {
+      const critical = this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='alert'&&r.severity==='critical').length, 0);
+      const warning  = this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='alert'&&r.severity==='warning').length, 0);
+      const exporterCoverage = [...this.exporters]
+        .map(e => ({ name: e.name, alerts: (e.related_alerts||[]).length, metrics: e.metrics.length }))
+        .sort((a,b) => b.alerts - a.alerts);
+      const topExporters = [...this.exporters]
+        .map(e => ({ name: e.name, count: e.metrics.length }))
+        .sort((a,b) => b.count - a.count)
+        .slice(0, 8);
+      return { critical, warning, exporterCoverage, topExporters };
+    },
+
+    // ── init ─────────────────────────────────────────────
+
+    async init() {
+      this.darkMode   = localStorage.getItem('darkMode') === 'true';
+      this.grafanaUrl = localStorage.getItem('grafanaUrl') || '';
+
+      const res  = await fetch('data.json');
+      const data = await res.json();
+      this.meta       = data.meta;
+      this.exporters  = data.exporters;
+      this.ruleGroups = data.rules;
+      this.resetFilters();
+      this._buildIndexes();
+      this._parseHash();
+      window.addEventListener('hashchange', () => this._parseHash());
+    },
+
+    resetFilters() {
+      this.filteredExporters    = [...this.exporters];
+      this.filteredAlertGroups  = this.ruleGroups
+        .map(g => ({ ...g, rules: g.rules.filter(r=>r.kind==='alert') }))
+        .filter(g => g.rules.length > 0);
+      this.filteredRecordGroups = this.ruleGroups
+        .map(g => ({ ...g, rules: g.rules.filter(r=>r.kind==='record') }))
+        .filter(g => g.rules.length > 0);
+    },
+
+    _buildIndexes() {
+      this._fuseAllMetrics = new Fuse(
+        this.exporters.flatMap(e => e.metrics.map(m => ({ ...m, _exporter: e.name }))),
+        { keys: ['name','help'], threshold: 0.3 }
+      );
+      this._fuseAllRules = new Fuse(
+        this.ruleGroups.flatMap(g => g.rules.map(r => ({ ...r, _file: g.file }))),
+        { keys: ['alert','record','expr','summary'], threshold: 0.3 }
+      );
+    },
+
+    // ── hash-based permalinks ─────────────────────────────
+
+    _parseHash() {
+      const hash = decodeURIComponent(window.location.hash.slice(1));
+      if (!hash) return;
+      const [tab, a, b] = hash.split('/');
+      if (tab === 'home') { this.setTab('home'); return; }
+      if (tab === 'uncovered') { this.setTab('uncovered'); return; }
+      if (tab === 'metrics' && a) {
+        this.setTab('metrics');
+        this.selectExporter(a);
+        if (b) this.$nextTick(() => {
+          const el = document.getElementById('m-'+b);
+          if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+        });
+        return;
+      }
+      if ((tab === 'alerts' || tab === 'records') && a) {
+        this.setTab(tab);
+        this.selectRuleGroup(a);
+        if (b) this.$nextTick(() => {
+          const el = document.getElementById('r-'+b);
+          if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+        });
+      }
+    },
+
+    _setHash(parts) {
+      window.history.replaceState(null, '', '#' + parts.map(encodeURIComponent).join('/'));
+    },
+
+    copyPermalink(tab, a, b) {
+      const url = window.location.origin + window.location.pathname + '#' + [tab,a,b].map(encodeURIComponent).join('/');
+      navigator.clipboard.writeText(url);
+      this._toast('Link copied!');
+    },
+
+    // ── navigation ────────────────────────────────────────
+
+    setTab(t) {
+      this.tab = t;
+      this.search = '';
+      this.metricTypeFilter = '';
+      this.severityFilter = 'all';
+      this.resetFilters();
+      if (t === 'home' || t === 'uncovered') {
+        this.selectedRuleGroup = null;
+        this._setHash([t]);
+      }
+    },
+
+    onSearch() {
+      const q = this.search.trim();
+      if (!q) { this.resetFilters(); return; }
+
+      if (this.tab === 'metrics') {
+        const hits = this._fuseAllMetrics.search(q);
+        const byExp = {};
+        hits.forEach(h => { const e=h.item._exporter; if(!byExp[e]) byExp[e]=[]; byExp[e].push(h.item); });
+        this.filteredExporters = this.exporters.filter(e=>byExp[e.name]).map(e=>({...e, metrics:byExp[e.name]}));
+        if (this.filteredExporters.length > 0 && !this.filteredExporters.find(e=>e.name===this.selectedExporter))
+          this.selectedExporter = this.filteredExporters[0].name;
+      } else if (this.tab === 'alerts' || this.tab === 'records') {
+        const kind = this.tab === 'alerts' ? 'alert' : 'record';
+        const hits = this._fuseAllRules.search(q).filter(h=>h.item.kind===kind);
+        const byFile = {};
+        hits.forEach(h => { const f=h.item._file; if(!byFile[f]) byFile[f]=[]; byFile[f].push(h.item); });
+        const filtered = this.ruleGroups.filter(g=>byFile[g.file]).map(g=>({...g, rules:byFile[g.file]}));
+        if (this.tab==='alerts') this.filteredAlertGroups=filtered; else this.filteredRecordGroups=filtered;
+        const list = this.tab==='alerts' ? this.filteredAlertGroups : this.filteredRecordGroups;
+        if (list.length>0 && !list.find(g=>g.file===this.selectedRuleGroup)) this.selectedRuleGroup=list[0].file;
+      }
+    },
+
+    selectExporter(name) {
+      this.selectedExporter = name;
+      this.metricTypeFilter = '';
+      this._setHash(['metrics', name]);
+    },
+
+    selectRuleGroup(file) {
+      this.selectedRuleGroup = file;
+      this._setHash([this.tab, file]);
+    },
+
+    goToAlert(file, alertName) {
+      this.tab = 'alerts';
+      this.search = '';
+      this.severityFilter = 'all';
+      this.resetFilters();
+      this.selectedRuleGroup = file;
+      this._setHash(['alerts', file, alertName]);
+      this.$nextTick(() => {
+        const el = document.getElementById('r-'+alertName);
+        if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+      });
+    },
+
+    goToMetric(metricName) {
+      const exporter = this.exporters.find(e => e.metrics.some(m => m.name === metricName));
+      if (!exporter) return;
+      this.tab = 'metrics';
+      this.search = '';
+      this.metricTypeFilter = '';
+      this.resetFilters();
+      this.selectedExporter = exporter.name;
+      this._setHash(['metrics', exporter.name, metricName]);
+      this.$nextTick(() => {
+        const el = document.getElementById('m-'+metricName);
+        if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+      });
+    },
+
+    // ── Grafana ───────────────────────────────────────────
+
+    saveGrafanaUrl() {
+      localStorage.setItem('grafanaUrl', this.grafanaUrl);
+    },
+
+    grafanaExploreUrl(expr) {
+      if (!this.grafanaUrl) return '#';
+      const left = JSON.stringify({
+        datasource: { type: 'prometheus' },
+        queries: [{ refId: 'A', expr: String(expr), range: true, instant: false }],
+        range: { from: 'now-1h', to: 'now' }
+      });
+      return `${this.grafanaUrl.replace(/\/$/, '')}/explore?orgId=1&left=${encodeURIComponent(left)}`;
+    },
+
+    // ── utils ─────────────────────────────────────────────
+
+    toggleDarkMode() {
+      this.darkMode = !this.darkMode;
+      localStorage.setItem('darkMode', this.darkMode);
+    },
+
+    async copyText(text) {
+      await navigator.clipboard.writeText(text);
+      this._toast('Copied!');
+    },
+
+    _toast(msg) {
+      this.toastMsg = msg;
+      setTimeout(() => this.toastMsg = '', 1500);
+    },
+  };
+}
+</script>
+</body>
+</html>
