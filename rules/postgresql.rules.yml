@@ -132,3 +132,95 @@
         description: "PostgreSQL replication is high (> 10s) for 10 minuts on {{ $labels.instance }}"
         summary: "PostgreSQL replication high for {{ $labels.instance }}"
 
+    - alert: PostgresqlDeadLocks
+      expr: increase(pg_stat_database_deadlocks{datname!~"template.*|postgres",datid!="0"}[1m]) > 5
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL dead locks (instance {{ $labels.instance }})"
+        description: "PostgreSQL has {{ $value }} dead-locks in the last minute on {{ $labels.instance }}"
+
+    - alert: PostgresqlHighRollbackRate
+      expr: |
+        sum by (namespace,datname,instance) (rate(pg_stat_database_xact_rollback{datname!~"template.*|postgres",datid!="0"}[3m]))
+        / (
+          sum by (namespace,datname,instance) (rate(pg_stat_database_xact_rollback{datname!~"template.*|postgres",datid!="0"}[3m]))
+          + sum by (namespace,datname,instance) (rate(pg_stat_database_xact_commit{datname!~"template.*|postgres",datid!="0"}[3m]))
+        ) > 0.02
+        and (
+          sum by (namespace,datname,instance) (rate(pg_stat_database_xact_rollback{datname!~"template.*|postgres",datid!="0"}[3m]))
+          + sum by (namespace,datname,instance) (rate(pg_stat_database_xact_commit{datname!~"template.*|postgres",datid!="0"}[3m]))
+        ) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL high rollback rate (instance {{ $labels.instance }})"
+        description: "Ratio of rollbacks vs commits > 2% on {{ $labels.instance }}/{{ $labels.datname }}\n  VALUE = {{ $value }}"
+
+    - alert: PostgresqlTooManyDeadTuples
+      expr: ((pg_stat_user_tables_n_dead_tup > 10000) / (pg_stat_user_tables_n_live_tup + pg_stat_user_tables_n_dead_tup)) >= 0.1 and (pg_stat_user_tables_n_live_tup + pg_stat_user_tables_n_dead_tup) > 0
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL too many dead tuples (instance {{ $labels.instance }})"
+        description: "Dead tuples ratio >= 10% on {{ $labels.instance }} table {{ $labels.relname }} — VACUUM may be needed"
+
+    - alert: PostgresqlTooManyLocksAcquired
+      expr: ((sum by (instance) (pg_locks_count)) / (pg_settings_max_locks_per_transaction * pg_settings_max_connections)) > 0.20 and (pg_settings_max_locks_per_transaction * pg_settings_max_connections) > 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "PostgreSQL too many locks acquired (instance {{ $labels.instance }})"
+        description: "More than 20% of max_locks_per_transaction used on {{ $labels.instance }} — consider increasing max_locks_per_transaction"
+
+    - alert: PostgresqlTableNotAutoVacuumed
+      expr: |
+        ((pg_stat_user_tables_n_tup_del + pg_stat_user_tables_n_tup_upd + pg_stat_user_tables_n_tup_hot_upd) > pg_settings_autovacuum_vacuum_threshold)
+        and (time() - pg_stat_user_tables_last_autovacuum) > 60 * 60 * 24 * 10
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL table not auto vacuumed (instance {{ $labels.instance }})"
+        description: "Table {{ $labels.relname }} has not been auto vacuumed for 10 days on {{ $labels.instance }}"
+
+    - alert: PostgresqlUnusedReplicationSlot
+      expr: (pg_replication_slots_active == 0) and (pg_replication_is_replica == 0)
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL unused replication slot (instance {{ $labels.instance }})"
+        description: "Inactive replication slot on {{ $labels.instance }} — will prevent WAL cleanup and may fill disk"
+
+    - alert: PostgresqlBloatIndexHigh
+      expr: pg_bloat_btree_bloat_pct > 80 and on (idxname) (pg_bloat_btree_real_size > 100000000)
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL bloat index high (instance {{ $labels.instance }})"
+        description: "Index {{ $labels.idxname }} bloat > 80% on {{ $labels.instance }} — run: REINDEX INDEX CONCURRENTLY {{ $labels.idxname }}"
+
+    - alert: PostgresqlBloatTableHigh
+      expr: pg_bloat_table_bloat_pct > 80 and on (relname) (pg_bloat_table_real_size > 200000000)
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL bloat table high (instance {{ $labels.instance }})"
+        description: "Table {{ $labels.relname }} bloat > 80% on {{ $labels.instance }} — run: VACUUM {{ $labels.relname }}"
+
+    - alert: PostgresqlInvalidIndex
+      expr: pg_general_index_info_pg_relation_size{indexrelname=~".*ccnew.*"}
+      for: 6h
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL invalid index (instance {{ $labels.instance }})"
+        description: "Table {{ $labels.relname }} has invalid index {{ $labels.indexrelname }} on {{ $labels.instance }} — run: DROP INDEX {{ $labels.indexrelname }}"
+
