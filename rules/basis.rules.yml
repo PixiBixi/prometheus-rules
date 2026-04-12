@@ -383,3 +383,136 @@
       annotations:
         summary: "Host high CPU load for {{ $labels.servertype }} @ {{ $labels.pop }} : {{ $value }}"
         description: "The CPU load reported from {{ $labels.servertype }} on {{ $labels.pop }} has exceeded 80% for more than 15 minutes."
+
+    # ── Filesystem (inodes, predictive) ───────────────────────────────────────
+
+    - alert: NodeFilesystemFilesFillingUp
+      expr: |
+        (
+          node_filesystem_files_free{fstype!="",mountpoint!=""} / node_filesystem_files{fstype!="",mountpoint!=""} * 100 < 40
+          and predict_linear(node_filesystem_files_free{fstype!="",mountpoint!=""}[6h], 24*60*60) < 0
+          and node_filesystem_readonly{fstype!="",mountpoint!=""} == 0
+        )
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "Filesystem inodes filling up on {{ $labels.instance }} ({{ $labels.mountpoint }})"
+        description: "Filesystem {{ $labels.device }} mounted on {{ $labels.mountpoint }} at {{ $labels.instance }} is predicted to run out of inodes within 24 hours ({{ printf \"%.2f\" $value }}% free)."
+    - alert: NodeFilesystemFilesFillingUp
+      expr: |
+        (
+          node_filesystem_files_free{fstype!="",mountpoint!=""} / node_filesystem_files{fstype!="",mountpoint!=""} * 100 < 20
+          and predict_linear(node_filesystem_files_free{fstype!="",mountpoint!=""}[6h], 4*60*60) < 0
+          and node_filesystem_readonly{fstype!="",mountpoint!=""} == 0
+        )
+      for: 1h
+      labels:
+        severity: critical
+      annotations:
+        summary: "Filesystem inodes filling up fast on {{ $labels.instance }} ({{ $labels.mountpoint }})"
+        description: "Filesystem {{ $labels.device }} mounted on {{ $labels.mountpoint }} at {{ $labels.instance }} is predicted to run out of inodes within 4 hours ({{ printf \"%.2f\" $value }}% free)."
+
+    # ── Network errors ─────────────────────────────────────────────────────────
+
+    - alert: NodeNetworkReceiveErrs
+      expr: |
+        rate(node_network_receive_errs_total[2m]) / rate(node_network_receive_packets_total[2m]) > 0.01
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "High receive errors on {{ $labels.instance }} ({{ $labels.device }})"
+        description: "Interface {{ $labels.device }} at {{ $labels.instance }} has more than 1% receive errors over the last 2 minutes."
+    - alert: NodeNetworkTransmitErrs
+      expr: |
+        rate(node_network_transmit_errs_total[2m]) / rate(node_network_transmit_packets_total[2m]) > 0.01
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "High transmit errors on {{ $labels.instance }} ({{ $labels.device }})"
+        description: "Interface {{ $labels.device }} at {{ $labels.instance }} has more than 1% transmit errors over the last 2 minutes."
+
+    # ── Clock skew ─────────────────────────────────────────────────────────────
+
+    - alert: NodeClockSkewDetected
+      expr: |
+        (
+          node_timex_offset_seconds > 0.05
+          and deriv(node_timex_offset_seconds[5m]) >= 0
+        )
+        or
+        (
+          node_timex_offset_seconds < -0.05
+          and deriv(node_timex_offset_seconds[5m]) <= 0
+        )
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Clock skew detected on {{ $labels.instance }}"
+        description: "Clock at {{ $labels.instance }} is out of sync by more than 0.05s and diverging. Check NTP configuration."
+
+    # ── File descriptors ───────────────────────────────────────────────────────
+
+    - alert: NodeFileDescriptorLimit
+      expr: node_filefd_allocated * 100 / node_filefd_maximum > 70
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "File descriptor limit approaching on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} is using {{ printf \"%.2f\" $value }}% of available file descriptors (warning threshold: 70%)."
+    - alert: NodeFileDescriptorLimit
+      expr: node_filefd_allocated * 100 / node_filefd_maximum > 90
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: "File descriptor limit critical on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} is using {{ printf \"%.2f\" $value }}% of available file descriptors (critical threshold: 90%)."
+
+    # ── Memory pressure ────────────────────────────────────────────────────────
+
+    - alert: NodeMemoryMajorPagesFaults
+      expr: rate(node_vmstat_pgmajfault[5m]) > 500
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Memory major page faults high on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} is experiencing {{ printf \"%.2f\" $value }} major page faults/sec for 15 minutes — possible memory pressure."
+
+    # ── Disk IO ────────────────────────────────────────────────────────────────
+
+    - alert: NodeDiskIOSaturation
+      expr: rate(node_disk_io_time_weighted_seconds_total{device!=""}[5m]) > 10
+      for: 30m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Disk IO saturation on {{ $labels.instance }} ({{ $labels.device }})"
+        description: "Disk {{ $labels.device }} at {{ $labels.instance }} has an IO queue above 10 for 30 minutes — possible disk saturation."
+
+    # ── Systemd crashloop ──────────────────────────────────────────────────────
+
+    - alert: NodeSystemdServiceCrashlooping
+      expr: increase(node_systemd_service_restart_total[5m]) > 2
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Systemd service crash looping on {{ $labels.instance }}"
+        description: "Service {{ $labels.name }} at {{ $labels.instance }} has restarted more than twice in 5 minutes."
+
+    # ── Bonding ────────────────────────────────────────────────────────────────
+
+    - alert: NodeBondingDegraded
+      expr: (node_bonding_slaves - node_bonding_active) != 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Bonding interface degraded on {{ $labels.instance }}"
+        description: "Bonding interface {{ $labels.master }} at {{ $labels.instance }} has slave failures."
