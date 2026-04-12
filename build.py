@@ -17,6 +17,15 @@ BRANCH      = "main"
 SKIP_EXPORTERS = {"ipsec_exporter"}
 SKIP_RULES     = {".yamllint.yml"}
 
+# Metric prefixes that belong to the exporter process itself (Go runtime,
+# Prometheus client, HTTP handler) — not relevant as "uncovered business metrics"
+EXPORTER_GENERIC_PREFIXES = (
+    "go_",
+    "process_",
+    "promhttp_",
+    "net_conntrack_",
+)
+
 # PromQL keywords to ignore when extracting metric names
 PROMQL_KEYWORDS = {
     "by", "without", "on", "ignoring", "group_left", "group_right",
@@ -63,6 +72,7 @@ def parse_exporter(path):
                     "help": current_help or "",
                     "labels": labels,
                     "example": line,
+                    "generic": name.startswith(EXPORTER_GENERIC_PREFIXES),
                 })
                 current_help = None
                 current_type = None

@@ -628,7 +628,7 @@ function app() {
         this.ruleGroups.flatMap(g => g.rules.flatMap(r => r.metric_refs || []))
       );
       return this.exporters
-        .map(e => ({ exporter: e.name, metrics: e.metrics.filter(m => !allRefs.has(m.name)) }))
+        .map(e => ({ exporter: e.name, metrics: e.metrics.filter(m => !allRefs.has(m.name) && !m.generic) }))
         .filter(g => g.metrics.length > 0);
     },
     get uncoveredMetrics() {
