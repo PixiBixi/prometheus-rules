@@ -134,6 +134,7 @@ def load_rules():
                         "severity": rule.get("labels", {}).get("severity", ""),
                         "summary": rule.get("annotations", {}).get("summary", ""),
                         "description": rule.get("annotations", {}).get("description", ""),
+                        "runbook_url": rule.get("annotations", {}).get("runbook_url", ""),
                         "metric_refs": metric_refs,
                     })
                 elif "record" in rule:
