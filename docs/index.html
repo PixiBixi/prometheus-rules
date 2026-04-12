@@ -49,7 +49,7 @@
       Records <span class="text-xs opacity-70" x-text="'('+totalRecords+')'"></span>
     </button>
     <button @click="setTab('uncovered')" :class="tab==='uncovered' ? 'bg-amber-500 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
-      Uncovered <span class="text-xs opacity-70" x-text="'('+uncoveredMetrics.length+')'"></span>
+      Uncovered <span class="text-xs opacity-70" x-text="'('+uncoveredMetrics+')'"></span>
     </button>
   </div>
 
@@ -167,7 +167,7 @@
         <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
           <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Uncovered metrics</p>
           <div class="flex items-end gap-2">
-            <p class="text-3xl font-bold text-amber-500" x-text="uncoveredMetrics.length"></p>
+            <p class="text-3xl font-bold text-amber-500" x-text="uncoveredMetrics"></p>
             <p class="text-xs text-gray-400 mb-1" x-text="'/ ' + totalMetrics"></p>
           </div>
         </div>
@@ -465,31 +465,49 @@
     <div x-show="tab==='uncovered'" class="max-w-4xl">
       <div class="flex items-center gap-3 mb-2">
         <h1 class="text-xl font-bold">Uncovered metrics</h1>
-        <span class="text-sm text-gray-400" x-text="filteredUncovered.length + ' metrics not referenced in any alert'"></span>
+        <span class="text-sm text-gray-400" x-text="uncoveredMetrics + ' metrics not referenced in any alert'"></span>
       </div>
       <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">These metrics have no associated alerting rules — potential gaps in coverage.</p>
 
       <div class="space-y-2">
-        <template x-for="item in filteredUncovered" :key="item.exporter + item.metric.name">
-          <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3 flex items-start gap-3 hover:border-amber-300 dark:hover:border-amber-700 transition">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <button @click="goToMetric(item.metric.name)"
-                  class="text-sm font-mono font-semibold text-indigo-700 dark:text-indigo-400 hover:underline truncate"
-                  x-text="item.metric.name">
-                </button>
-                <span :class="{
-                  'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': item.metric.type==='gauge',
-                  'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300': item.metric.type==='counter',
-                  'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300': item.metric.type==='histogram',
-                  'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300': item.metric.type==='summary',
-                  'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400': !['gauge','counter','histogram','summary'].includes(item.metric.type)
-                }" class="text-xs px-2 py-0.5 rounded-full font-medium capitalize shrink-0" x-text="item.metric.type">
-                </span>
-              </div>
-              <p x-show="item.metric.help" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate" x-text="item.metric.help"></p>
+        <template x-for="group in filteredUncovered" :key="group.exporter">
+          <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <!-- Exporter row -->
+            <button
+              @click="expandedUncoveredExporter = expandedUncoveredExporter === group.exporter ? null : group.exporter"
+              class="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition text-left">
+              <svg :class="expandedUncoveredExporter === group.exporter ? 'rotate-90' : ''"
+                class="w-4 h-4 text-gray-400 transition-transform shrink-0"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+              <span class="font-mono font-semibold text-sm text-gray-800 dark:text-gray-100 flex-1" x-text="group.exporter"></span>
+              <span class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full font-medium"
+                x-text="group.metrics.length + ' uncovered'"></span>
+            </button>
+            <!-- Expanded metrics list -->
+            <div x-show="expandedUncoveredExporter === group.exporter" x-transition class="border-t border-gray-100 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
+              <template x-for="m in group.metrics" :key="m.name">
+                <div class="flex items-start gap-3 px-5 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <button @click="goToMetric(m.name)"
+                        class="text-sm font-mono text-indigo-700 dark:text-indigo-400 hover:underline truncate"
+                        x-text="m.name">
+                      </button>
+                      <span :class="{
+                        'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': m.type==='gauge',
+                        'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300': m.type==='counter',
+                        'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300': m.type==='histogram',
+                        'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300': m.type==='summary',
+                        'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400': !['gauge','counter','histogram','summary'].includes(m.type)
+                      }" class="text-xs px-2 py-0.5 rounded-full font-medium capitalize shrink-0" x-text="m.type"></span>
+                    </div>
+                    <p x-show="m.help" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate" x-text="m.help"></p>
+                  </div>
+                </div>
+              </template>
             </div>
-            <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0 pt-0.5" x-text="item.exporter"></span>
           </div>
         </template>
       </div>
@@ -521,6 +539,7 @@ function app() {
     grafanaUrl: '',
     showGrafanaInput: false,
     toastMsg: '',
+    expandedUncoveredExporter: null,
 
     filteredExporters: [],
     filteredAlertGroups: [],
@@ -555,22 +574,26 @@ function app() {
         r = r.filter(x => x.severity === this.severityFilter);
       return r;
     },
-    get uncoveredMetrics() {
+    get uncoveredByExporter() {
       const allRefs = new Set(
         this.ruleGroups.flatMap(g => g.rules.flatMap(r => r.metric_refs || []))
       );
-      return this.exporters.flatMap(e =>
-        e.metrics
-          .filter(m => !allRefs.has(m.name))
-          .map(m => ({ exporter: e.name, metric: m }))
-      );
+      return this.exporters
+        .map(e => ({ exporter: e.name, metrics: e.metrics.filter(m => !allRefs.has(m.name)) }))
+        .filter(g => g.metrics.length > 0);
+    },
+    get uncoveredMetrics() {
+      return this.uncoveredByExporter.reduce((s, g) => s + g.metrics.length, 0);
     },
     get filteredUncovered() {
-      if (!this.search) return this.uncoveredMetrics;
+      if (!this.search) return this.uncoveredByExporter;
       const q = this.search.toLowerCase();
-      return this.uncoveredMetrics.filter(i =>
-        i.metric.name.includes(q) || i.metric.help.toLowerCase().includes(q) || i.exporter.includes(q)
-      );
+      return this.uncoveredByExporter
+        .map(g => ({
+          exporter: g.exporter,
+          metrics: g.metrics.filter(m => m.name.includes(q) || m.help.toLowerCase().includes(q)),
+        }))
+        .filter(g => g.metrics.length > 0 || g.exporter.includes(q));
     },
     get stats() {
       const critical = this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='alert'&&r.severity==='critical').length, 0);
