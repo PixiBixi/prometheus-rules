@@ -1,8 +1,18 @@
 # prometheus-rules
 A bunch of Prometheus rules using some exporters
 
-  * In the `exporter` folder, you have the output of some exporters
+  * In the `exporters` folder, you have sample outputs of each exporter (one example per metric)
   * In the `rules` folder, you have the matching rules
+
+### Exporter sample files
+
+The files in `exporters/` are cleaned Prometheus text format samples. They can be used to understand available metrics and develop/test rules.
+
+**Deduplication rules:**
+- One example per unique metric+label combination
+- Histogram buckets: all `le=…` values are preserved
+- Enum/dimension labels (`mode`, `state`, `operation`, `pool`, `gc`, …): all values preserved
+- High-cardinality instance labels: collapsed to one representative value
 
 You'll see not so much warning severity rules. Why would you tell me? Because from my own experience, warning rules are ignored most of the time, so why bother create this kind of rule? :)
 
@@ -91,7 +101,10 @@ frontend prometheus
 ```
 
 **HAproxy link :** [haproxy](https://github.com/haproxy/haproxy)
-**Version used :** 2.8.0
+
+Two sample files are provided to cover both major versions — use `diff exporters/haproxy_exporter_2x exporters/haproxy_exporter_3x` to see what changed between versions:
+- `haproxy_exporter_2x` — **Version used :** 2.7.x
+- `haproxy_exporter_3x` — **Version used :** 3.1.x
 
 #### ipsec_exporter
 
@@ -168,9 +181,39 @@ Please don't forget there's no sense to monitor Prometheus uptime from Prom itse
 
 #### postgres_exporter
 
-
 **postgres_exporter link :** [postgres_exporter](https://github.com/prometheus-community/postgres_exporter)
 
 **Version used :** 0.15.0
 
 If you want running the exporter as a non-super user, please follow [these steps](https://github.com/prometheus-community/postgres_exporter?tab=readme-ov-file#running-as-non-superuser)
+
+#### nvme_exporter
+
+**Exporter link :** [nvme_exporter](https://github.com/example/nvme_exporter)
+**Version used :** —
+
+#### ping_exporter
+
+**Exporter link :** [ping_exporter](https://github.com/czerwonk/ping_exporter)
+**Version used :** —
+
+#### promtail
+
+We're using the internal metrics endpoint exposed by Promtail (Loki agent).
+
+**Promtail link :** [promtail](https://grafana.com/docs/loki/latest/send-data/promtail/)
+**Version used :** —
+
+#### rds_enhanced
+
+RDS Enhanced Monitoring metrics exposed via a custom exporter reading CloudWatch.
+
+**Exporter link :** [rds_exporter](https://github.com/percona/rds_exporter)
+**Version used :** —
+
+#### stackdriver_exporter
+
+Exposes Google Cloud metrics (GCP Load Balancer, Cloud SQL, GKE, etc.) via the Stackdriver/Cloud Monitoring API.
+
+**Exporter link :** [stackdriver_exporter](https://github.com/prometheus-community/stackdriver_exporter)
+**Version used :** —
