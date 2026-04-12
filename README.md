@@ -217,3 +217,10 @@ Exposes Google Cloud metrics (GCP Load Balancer, Cloud SQL, GKE, etc.) via the S
 
 **Exporter link :** [stackdriver_exporter](https://github.com/prometheus-community/stackdriver_exporter)
 **Version used :** —
+
+#### cert-manager
+
+Cert-manager exposes its own metrics endpoint natively (no separate exporter needed).
+
+**Cert-manager link :** [cert-manager](https://cert-manager.io/docs/observability/prometheus-metrics/)
+**Version used :** v1.14.x
