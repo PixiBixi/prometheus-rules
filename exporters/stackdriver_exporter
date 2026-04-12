@@ -1,0 +1,752 @@
+# HELP go_gc_duration_seconds A summary of the wall-time pause (stop-the-world) duration in garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 0.00011517
+go_gc_duration_seconds_sum 0.039345026
+go_gc_duration_seconds_count 42
+# HELP go_gc_gogc_percent Heap size target percentage configured by the user, otherwise 100. This value is set by the GOGC environment variable, and the runtime/debug.SetGCPercent function. Sourced from /gc/gogc:percent
+# TYPE go_gc_gogc_percent gauge
+go_gc_gogc_percent 100
+# HELP go_gc_gomemlimit_bytes Go runtime memory limit configured by the user, otherwise math.MaxInt64. This value is set by the GOMEMLIMIT environment variable, and the runtime/debug.SetMemoryLimit function. Sourced from /gc/gomemlimit:bytes
+# TYPE go_gc_gomemlimit_bytes gauge
+go_gc_gomemlimit_bytes 9.223372036854776e+18
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 24
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.23.5"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated in heap and currently in use. Equals to /memory/classes/heap/objects:bytes.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 3.13188456e+08
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated in heap until now, even if released already. Equals to /gc/heap/allocs:bytes.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 2.793216904e+09
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table. Equals to /memory/classes/profiling/buckets:bytes.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 4593
+# HELP go_memstats_frees_total Total number of heap objects frees. Equals to /gc/heap/frees:objects + /gc/heap/tiny/allocs:objects.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 3.3120688e+07
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata. Equals to /memory/classes/metadata/other:bytes.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 1.0838184e+07
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and currently in use, same as go_memstats_alloc_bytes. Equals to /memory/classes/heap/objects:bytes.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 3.13188456e+08
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used. Equals to /memory/classes/heap/released:bytes + /memory/classes/heap/free:bytes.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 2.57163264e+08
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use. Equals to /memory/classes/heap/objects:bytes + /memory/classes/heap/unused:bytes
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 3.72785152e+08
+# HELP go_memstats_heap_objects Number of currently allocated objects. Equals to /gc/heap/objects:objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 7.011359e+06
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS. Equals to /memory/classes/heap/released:bytes.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 3.997696e+06
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system. Equals to /memory/classes/heap/objects:bytes + /memory/classes/heap/unused:bytes + /memory/classes/heap/released:bytes + /memory/classes/heap/free:bytes.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 6.29948416e+08
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.7749702541222227e+09
+# HELP go_memstats_mallocs_total Total number of heap objects allocated, both live and gc-ed. Semantically a counter version for go_memstats_heap_objects gauge. Equals to /gc/heap/allocs:objects + /gc/heap/tiny/allocs:objects.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 4.0132047e+07
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures. Equals to /memory/classes/metadata/mcache/inuse:bytes.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 19200
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system. Equals to /memory/classes/metadata/mcache/inuse:bytes + /memory/classes/metadata/mcache/free:bytes.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 31200
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures. Equals to /memory/classes/metadata/mspan/inuse:bytes.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 7.18496e+06
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system. Equals to /memory/classes/metadata/mspan/inuse:bytes + /memory/classes/metadata/mspan/free:bytes.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 1.171776e+07
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place. Equals to /gc/heap/goal:bytes.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 5.2537e+08
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations. Equals to /memory/classes/other:bytes.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 3.978151e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes obtained from system for stack allocator in non-CGO environments. Equals to /memory/classes/heap/stacks:bytes.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 7.569408e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator. Equals to /memory/classes/heap/stacks:bytes + /memory/classes/os-stacks:bytes.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 7.569408e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system. Equals to /memory/classes/total:byte.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 6.64087712e+08
+# HELP go_sched_gomaxprocs_threads The current runtime.GOMAXPROCS setting, or the number of operating system threads that can execute user-level Go code simultaneously. Sourced from /sched/gomaxprocs:threads
+# TYPE go_sched_gomaxprocs_threads gauge
+go_sched_gomaxprocs_threads 16
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 19
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 20.96
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_network_receive_bytes_total Number of bytes received by the process over the network.
+# TYPE process_network_receive_bytes_total counter
+process_network_receive_bytes_total 1.4914877e+07
+# HELP process_network_transmit_bytes_total Number of bytes sent by the process over the network.
+# TYPE process_network_transmit_bytes_total counter
+process_network_transmit_bytes_total 4.815245e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 22
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 6.67926528e+08
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.77497013084e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1.898418176e+09
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes 1.8446744073709552e+19
+# HELP promhttp_metric_handler_requests_in_flight Current number of scrapes being served.
+# TYPE promhttp_metric_handler_requests_in_flight gauge
+promhttp_metric_handler_requests_in_flight 1
+# HELP promhttp_metric_handler_requests_total Total number of scrapes by HTTP status code.
+# TYPE promhttp_metric_handler_requests_total counter
+promhttp_metric_handler_requests_total{code="200"} 1
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_reserved_cores Number of cores reserved for the database.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_reserved_cores gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_reserved_cores{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 1 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_usage_time Cumulative CPU usage time in seconds.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_usage_time gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_usage_time{database_id="company-central-k8s-prod:argo-workflows-prod-central-europe-west4-1-01",project_id="company-central-k8s-prod",region="europe-west4",unit="s{CPU}"} 3.6499828670748684 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_utilization Current CPU utilization represented as a percentage of the reserved CPU that is currently in use. Values are typically numbers between 0.0 and 1.0 (but might exceed 1.0). Charts display the values as a percentage between 0% and 100% (or more).
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_utilization gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_utilization{database_id="mydb",project_id="myproject",region="us-east-1",unit="10^2.%"} 0.059897586780092146 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_bytes_used Data utilization in bytes.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_bytes_used gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_bytes_used{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 2.34500096e+08 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_bytes_used_by_data_type Data utilization in bytes.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_bytes_used_by_data_type gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_bytes_used_by_data_type{data_type="Archived_wal_log",database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 0 1774970040000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_quota Maximum data disk size in bytes.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_quota gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_quota{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 1.0464022528e+10 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_read_bytes_count Delta count of data disk read IO bytes.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_read_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_read_bytes_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_read_ops_count Delta count of data disk read IO operations.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_read_ops_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_read_ops_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_utilization The fraction of the disk quota that is currently in use.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_utilization gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_utilization{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0.022410129123147087 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_write_bytes_count Delta count of data disk write IO bytes.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_write_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_write_bytes_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 1.181235e+06 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_write_ops_count Delta count of data disk write IO operations.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_write_ops_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_write_ops_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 141 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_instance_state The current serving state of the Cloud SQL instance.\nBecause there are seven possible states, seven data points are returned.\nEach of them has a different field value representing each state.\nOnly the one that matches the current state of the instance is TRUE. All the others are FALSE.\nThe state can be one of the following:\nRUNNING:  The instance is running, or is ready to run when accessed.\nSUSPENDED: The instance is not available, for example due to problems with billing.\nRUNNABLE: The instance has been stopped by owner. It is not currently running, but it's ready to be restarted.\nPENDING_CREATE: The instance is being created.\nMAINTENANCE: The instance is down for maintenance.\nFAILED: The instance creation failed.\nUNKNOWN_STATE: The state of the instance is unknown.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_instance_state gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_instance_state{database_id="mydb",project_id="myproject",region="us-east-1",state="FAILED",unit=""} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_components Memory stats components in percentage as usage, cache and free memory for the database.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_components gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_components{component="Cache",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 19.617152149321267 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_quota Maximum RAM size in bytes.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_quota gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_quota{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 1.82452224e+09 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_total_usage Total RAM usage in bytes. This metric reports the RAM usage of the database process, including the buffer/cache.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_total_usage gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_total_usage{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 2.68193792e+08 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_usage RAM usage in bytes. This metric reports the RAM usage of the server, excluding the buffer/cache.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_usage gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_usage{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 7.20642048e+08 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_utilization The fraction of the memory quota that is currently in use.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_utilization gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_utilization{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0.3949757543103448 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_connection_attempt_count Total number of connection attempts to the Cloud SQL instance, with information about anomaly detection.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_connection_attempt_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_connection_attempt_count{anomalous_connection_throttled="false",anomaly_detected="no anomaly detected",database_id="mydb",login_status="succeeded",project_id="myproject",region="us-east-1",unit="1"} 1 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_connections Number of connections to databases on the Cloud SQL instance. Only applicable to MySQL and SQL Server.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_connections gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_connections{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 799 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_received_bytes_count Delta count of bytes received through the network.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_received_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_received_bytes_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 607129 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_sent_bytes_count Delta count of bytes sent through the network.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_sent_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_network_sent_bytes_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 2.419933e+06 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_backends_in_wait Number of backends in wait in postgres instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_backends_in_wait gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_backends_in_wait{backend_type="client backend",database_id="mydb",project_id="myproject",region="us-east-1",unit="1",wait_event="CPU",wait_event_type="CPU"} 1 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_blocks_read_count Number of disk blocks read by this database. The source field distingushes actual reads from disk versus reads from buffer cache.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_blocks_read_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_blocks_read_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",source="buffer_cache",unit="1"} 6454 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_checkpoint_count Total checkpoints occurred.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_checkpoint_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_checkpoint_count{checkpoint_type="requested",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_deadlock_count Number of deadlocks detected for this database.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_deadlock_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_deadlock_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_disk_read_bytes_count Delta number of bytes read by PostgreSQL.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_disk_read_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_disk_read_bytes_count{backend_type="autovacuum launcher",context="bulkread",database_id="mydb",object="relation",project_id="myproject",region="us-east-1",unit="By"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_disk_write_bytes_count Delta number of bytes written by PostgreSQL.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_disk_write_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_disk_write_bytes_count{backend_type="autovacuum launcher",context="bulkread",database_id="mydb",object="relation",project_id="myproject",region="us-east-1",unit="By"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_new_connection_count Count of new connections added to the postgres instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_new_connection_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_new_connection_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 4 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends Number of connections to the Cloud SQL PostgreSQL instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 2 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends_by_application Number of connections to the Cloud SQL PostgreSQL instance, grouped by applications.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends_by_application gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends_by_application{application="Unknown",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 3 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends_by_state Number of connections to the Cloud SQL PostgreSQL instance, grouped by its state.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends_by_state gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends_by_state{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",state="active",unit="1"} 1 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_temp_bytes_written_count Total amount of data (in bytes) written to temporary files by the queries per database.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_temp_bytes_written_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_temp_bytes_written_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_temp_files_written_count Total number of temporary files used for writing data while performing algorithms such as join and sort.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_temp_files_written_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_temp_files_written_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_count Delta count of number of transactions.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",transaction_type="commit",unit="1"} 221 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_id_count Delta count of transaction ID.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_id_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_id_count{action="assigned",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 12 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_id_utilization Current utilization represented as a percentage of transaction IDs consumed by the Cloud SQL PostgreSQL instance. Values are typically numbers between 0.0 and 1.0. Charts display the values as a percentage between 0% and 100%.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_id_utilization gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_id_utilization{database_id="mydb",project_id="myproject",region="us-east-1",unit="10^2.%"} 3.2116247471229864e-05 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuple_size Number of tuples (rows) in the database.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuple_size gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuple_size{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",tuple_state="dead",unit="1"} 9 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_fetched_count Total number of rows fetched as a result of queries per database in the PostgreSQL instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_fetched_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_fetched_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 3932 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_processed_count Number of tuples(rows) processed for a given database for operations like  insert, update or delete.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_processed_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_processed_count{database="mydb",database_id="mydb",operation_type="delete",project_id="myproject",region="us-east-1",unit="1"} 0 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_returned_count Total number of rows scanned while processing the queries per database in the PostgreSQL instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_returned_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_tuples_returned_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 9638 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_vacuum_oldest_transaction_age Age of the oldest transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_vacuum_oldest_transaction_age gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_vacuum_oldest_transaction_age{database_id="mydb",oldest_transaction_type="running",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_flushed_bytes_count Total size (bytes) of WAL flushed for this instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_flushed_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_flushed_bytes_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 727 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_inserted_bytes_count Total size (bytes) of WAL inserted for this instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_inserted_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_inserted_bytes_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 727 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_redo_size The size (bytes) of WAL to redo in case of recovery.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_redo_size gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_redo_size{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 6.7108768e+07 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_written_bytes_count Total size (bytes) of WAL written for this instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_written_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_write_ahead_log_written_bytes_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 9263 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_replication_log_archive_failure_count Number of failed attempts for archiving replication log files.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_replication_log_archive_failure_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_replication_log_archive_failure_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_replication_log_archive_success_count Number of successful attempts for archiving replication log files.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_replication_log_archive_success_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_replication_log_archive_success_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_connection_reset_count Total number of logins started from the connection pool since the last restart of SQL Server service.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_connection_reset_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_connection_reset_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 339037 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_login_attempt_count Total number of login attempts since the last restart of SQL Server service. This does not include pooled connections.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_login_attempt_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_login_attempt_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 31 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_logout_count Total number of logout operations since the last restart of SQL Server service.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_logout_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_logout_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 50 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_processes_blocked Current number of blocked processes.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_processes_blocked gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_connections_processes_blocked{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_databases Current number of databases on the instance excluding system databases.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_databases gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_databases{auto_close="false",database_id="mydb",is_cdc_enabled="false",is_published="false",project_id="myproject",recovery_model="SIMPLE",region="us-east-1",state="ONLINE",unit="1"} 12 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_buffer_cache_hit_ratio Current percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_buffer_cache_hit_ratio gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_buffer_cache_hit_ratio{database_id="mydb",project_id="myproject",region="us-east-1",unit="%"} 100 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_checkpoint_page_count Total number of pages flushed to disk by a checkpoint or other operation that requires all dirty pages to be flushed.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_checkpoint_page_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_checkpoint_page_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_free_list_stall_count Total number of requests that had to wait for a free page.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_free_list_stall_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_free_list_stall_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_lazy_write_count Total number of buffers written by the buffer manager's lazy writer. The lazy writer is a system process that flushes out batches of dirty, aged buffers (buffers that contain changes that must be written back to disk before the buffer can be reused for a different page) and makes them available to user processes.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_lazy_write_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_lazy_write_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_memory_grants_pending Current number of processes waiting for a workspace memory grant.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_memory_grants_pending gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_memory_grants_pending{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_page_life_expectancy Current number of seconds a page will stay in the buffer pool without references.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_page_life_expectancy gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_page_life_expectancy{database_id="mydb",project_id="myproject",region="us-east-1",unit="s"} 452181 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_page_operation_count Total number of physical database page reads or writes. This statistic counts physical page reads or writes across all databases.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_page_operation_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_memory_page_operation_count{database_id="mydb",operation="Read",project_id="myproject",region="us-east-1",unit="1"} 8736 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_log_apply_pending_queue Current number of log blocks that are waiting to be applied to all database replicas.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_log_apply_pending_queue gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_log_apply_pending_queue{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_log_bytes_received_count Total amount of log records received by the secondary replica for all databases.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_log_bytes_received_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_log_bytes_received_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_recovery_queue Current amount of log records in kilobytes in the log files of the secondary replica that have not been redone.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_recovery_queue gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_recovery_queue{database_id="mydb",project_id="myproject",region="us-east-1",unit="kBy"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_redone_bytes_count Total amount of log records redone on all secondary databases.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_redone_bytes_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_replication_redone_bytes_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_active_workers Current number of workers that are active. An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_active_workers gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_active_workers{database_id="mydb",project_id="myproject",region="us-east-1",scheduler_id="myscheduler",unit="1"} 2 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_by_status Current number of schedulers reporting a particular status.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_by_status gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_by_status{database_id="mydb",is_internal="false",project_id="myproject",region="us-east-1",status="VISIBLE ONLINE",unit="1"} 32 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_current_tasks Current number of current tasks that are associated with a scheduler. This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_current_tasks gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_current_tasks{database_id="mydb",project_id="myproject",region="us-east-1",scheduler_id="myscheduler",unit="1"} 2 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_current_workers Current number of workers that are associated with a scheduler. It includes workers that are not assigned any task.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_current_workers gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_current_workers{database_id="mydb",project_id="myproject",region="us-east-1",scheduler_id="myscheduler",unit="1"} 11 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_pending_disk_io Current number of pending I/Os that are waiting to be completed. Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. The count is incremented when the request is inserted. This count is decremented when the request is completed. This number does not indicate the state of the I/Os.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_pending_disk_io gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_pending_disk_io{database_id="mydb",project_id="myproject",region="us-east-1",scheduler_id="myscheduler",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_runnable_tasks Current number of workers, with tasks assigned to them, that are waiting to be scheduled on the runnable queue.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_runnable_tasks gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_runnable_tasks{database_id="mydb",project_id="myproject",region="us-east-1",scheduler_id="myscheduler",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_work_queue Current number of tasks in the pending queue. These tasks are waiting for a worker to pick them up.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_work_queue gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_schedulers_work_queue{database_id="mydb",project_id="myproject",region="us-east-1",scheduler_id="myscheduler",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_server_principals Current number of server principals on the instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_server_principals gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_server_principals{database_id="mydb",is_enabled="true",project_id="myproject",region="us-east-1",type="SQL_LOGIN",unit="1"} 29 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_sql_agent_jobs Current number of SQL Server agent jobs on the instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_sql_agent_jobs gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_sql_agent_jobs{database_id="mydb",is_enabled="false",last_run_outcome="Unknown",project_id="myproject",region="us-east-1",unit="1"} 9 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_batch_request_count Total number of Transact-SQL command batches received.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_batch_request_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_batch_request_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 361185 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_deadlock_count Total number of lock requests that resulted in a deadlock.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_deadlock_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_deadlock_count{database_id="mydb",locked_resource="myresource",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_forwarded_record_count Total number of records fetched through forwarded record pointers.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_forwarded_record_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_forwarded_record_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_full_scan_count Total number of unrestricted full scans. These can be either base-table or full-index scans.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_full_scan_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_full_scan_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 86607 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_lock_wait_count Total number of lock requests that required the caller to wait.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_lock_wait_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_lock_wait_count{database_id="mydb",locked_resource="myresource",project_id="myproject",region="us-east-1",unit="1"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_lock_wait_time Total time lock requests were waiting for locks.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_lock_wait_time gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_lock_wait_time{database_id="mydb",locked_resource="myresource",project_id="myproject",region="us-east-1",unit="ms"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_log_bytes_flushed_count Total number of log bytes flushed.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_log_bytes_flushed_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_log_bytes_flushed_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 8193 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_page_split_count Total number of page splits that occur as the result of overflowing index pages.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_page_split_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_page_split_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 39 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_probe_scan_count Total number of probe scans that are used to find at most one single qualified row in an index or base table directly.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_probe_scan_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_probe_scan_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 1.428552e+06 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_sql_compilation_count Total number of SQL compilations.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_sql_compilation_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_sql_compilation_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 926 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_sql_recompilation_count Total number of SQL recompilations.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_sql_recompilation_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_sql_recompilation_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 9 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_transaction_count Total number of transactions started.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_transaction_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_transactions_transaction_count{database="mydb",database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 44 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_xevents_size Tracks the size in bytes of stored SQLServer XEvents files on an instance.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_xevents_size gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_xevents_size{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_xevents_upload_count Counts total number of SQLServer XEvents file uploads to a GCS bucket and whether or not an upload was successful.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_xevents_upload_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_sqlserver_xevents_upload_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="1",upload_status="success"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_bytes_used Swap space used by the database container.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_bytes_used gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_bytes_used{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 5.650432e+07 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_pages_swapped_in_count Total count of pages swapped in of disk since the system was booted.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_pages_swapped_in_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_pages_swapped_in_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 1 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_pages_swapped_out_count Total count of pages swapped out of disk since the system was booted.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_pages_swapped_out_count gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_swap_pages_swapped_out_count{database_id="mydb",project_id="myproject",region="us-east-1",unit="By"} 0 1774970160000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_up Indicates if the server is up or not.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_up gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_up{database_id="mydb",project_id="myproject",region="us-east-1",unit="1"} 1 1774970220000
+# HELP stackdriver_cloudsql_database_cloudsql_googleapis_com_database_uptime Delta count of the time in seconds the instance has been running.
+# TYPE stackdriver_cloudsql_database_cloudsql_googleapis_com_database_uptime gauge
+stackdriver_cloudsql_database_cloudsql_googleapis_com_database_uptime{database_id="mydb",project_id="myproject",region="us-east-1",unit="s"} 60 1774970160000
+# HELP stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_count The count of completed requests.
+# TYPE stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_count gauge
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_count{credential_id="",grpc_status_code="0",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",protocol="https",response_code="200",response_code_class="2xx",service="compute.googleapis.com",unit="1",version="v1"} 1 1774970259000
+# HELP stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_latencies Distribution of latencies in seconds for non-streaming requests.
+# TYPE stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_latencies histogram
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_latencies_bucket{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="s",version="v1",le="1e-06"} 0 1774970008000
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_latencies_sum{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="s",version="v1"} 0.115871 1774970008000
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_latencies_count{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="s",version="v1"} 1 1774970008000
+# HELP stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_sizes Distribution of request sizes in bytes recorded at request completion.
+# TYPE stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_sizes histogram
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_sizes_bucket{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="By",version="v1",le="1"} 0 1774970236000
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_sizes_sum{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="By",version="v1"} 390 1774970236000
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_request_sizes_count{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="By",version="v1"} 1 1774970236000
+# HELP stackdriver_consumed_api_serviceruntime_googleapis_com_api_response_sizes Distribution of response sizes in bytes recorded at request completion.
+# TYPE stackdriver_consumed_api_serviceruntime_googleapis_com_api_response_sizes histogram
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_response_sizes_bucket{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="By",version="v1",le="1"} 0 1774970004000
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_response_sizes_sum{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="By",version="v1"} 142256 1774970004000
+stackdriver_consumed_api_serviceruntime_googleapis_com_api_response_sizes_count{credential_id="",location="europe-west1",method="compute.v1.DisksService.List",project_id="myproject",service="compute.googleapis.com",unit="By",version="v1"} 1 1774970004000
+# HELP stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_allocation_usage The total consumed allocation quota. Values reported more than 1/min are dropped. If no changes are received in quota usage, the last value is repeated at least every 24 hours.
+# TYPE stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_allocation_usage gauge
+stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_allocation_usage{location="europe-west4",project_id="myproject",quota_metric="dataplex.googleapis.com/aspect_types_count",service="dataplex.googleapis.com",unit="1"} 0 1774970040000
+# HELP stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_concurrent_limit The concurrent limit for the quota.
+# TYPE stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_concurrent_limit gauge
+stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_concurrent_limit{limit_name="RegionalConcurrentOperationsPerProject",location="europe-west4",project_id="myproject",quota_metric="compute.googleapis.com/regional_concurrent_operations",service="compute.googleapis.com",time_window="30min",unit="1"} 8000 1774970160000
+# HELP stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_concurrent_usage The concurrent usage of the quota.
+# TYPE stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_concurrent_usage gauge
+stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_concurrent_usage{limit_name="RegionalConcurrentOperationsPerProject",location="europe-west4",project_id="myproject",quota_metric="compute.googleapis.com/regional_concurrent_operations",service="compute.googleapis.com",time_window="30min",unit="1"} 0 1774970160000
+# HELP stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_limit The limit for the quota.
+# TYPE stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_limit gauge
+stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_limit{limit_name="AccessRequestsPerMinutePerProject",location="global",project_id="myproject",quota_metric="secretmanager.googleapis.com/access_requests",service="secretmanager.googleapis.com",unit="1"} 360000 1774970250000
+# HELP stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_rate_net_usage The total consumed rate quota.
+# TYPE stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_rate_net_usage gauge
+stackdriver_consumer_quota_serviceruntime_googleapis_com_quota_rate_net_usage{location="europe-west4",method="",project_id="myproject",quota_metric="cloudkms.googleapis.com/software_usage",service="cloudkms.googleapis.com",unit="1"} 200 1774970100000
+# HELP stackdriver_exporter_build_info A metric with a constant '1' value labeled by version, revision, branch, goversion from which stackdriver_exporter was built, and the goos and goarch for the build.
+# TYPE stackdriver_exporter_build_info gauge
+stackdriver_exporter_build_info{branch="HEAD",goarch="amd64",goos="linux",goversion="go1.23.5",revision="3b1a6e9ebb85a176b8ab48639f8e0a2a4a2f7bcf",tags="unknown",version="0.18.0"} 1
+# HELP stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_bytes_count The number of bytes sent from the internal TCP/UDP load balancer backend to the client (for TCP flows it's counting bytes on application stream only).
+# TYPE stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_bytes_count gauge
+stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_bytes_count{backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_network="CLIENT_IS_EXTERNAL",client_project_id="CLIENT_IS_EXTERNAL",client_subnetwork="CLIENT_IS_EXTERNAL",client_zone="CLIENT_IS_EXTERNAL",forwarding_rule_name="myforwardingrule",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="By"} 3856 1774970220000
+# HELP stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_packets_count The number of packets sent from the internal TCP/UDP load balancer to the client.
+# TYPE stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_packets_count gauge
+stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_packets_count{backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_network="CLIENT_IS_EXTERNAL",client_project_id="CLIENT_IS_EXTERNAL",client_subnetwork="CLIENT_IS_EXTERNAL",client_zone="CLIENT_IS_EXTERNAL",forwarding_rule_name="myforwardingrule",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="1"} 400 1774970160000
+# HELP stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_ingress_bytes_count The number of bytes sent from the client to the internal TCP/UDP load balancer backend (for TCP flows it's counting bytes on application stream only).
+# TYPE stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_ingress_bytes_count gauge
+stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_ingress_bytes_count{backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_network="vpc-hub",client_project_id="company-org-network",client_subnetwork="",client_zone="global",forwarding_rule_name="myforwardingrule",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="By"} 5.2928515e+08 1774970220000
+# HELP stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_ingress_packets_count The number of packets sent from the client to the internal TCP/UDP load balancer backend.
+# TYPE stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_ingress_packets_count gauge
+stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_ingress_packets_count{backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_network="vpc-hub",client_project_id="company-org-network",client_subnetwork="",client_zone="global",forwarding_rule_name="myforwardingrule",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="1"} 407184 1774970160000
+# HELP stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_rtt_latencies A distribution of RTT measured over TCP connections for internal TCP/UDP load balancer flows.
+# TYPE stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_rtt_latencies histogram
+stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_rtt_latencies_bucket{backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_network="vpc-hub",client_project_id="company-org-network",client_subnetwork="",client_zone="global",forwarding_rule_name="myforwardingrule",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="ms",le="1"} 0 1774970220000
+stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_rtt_latencies_sum{backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_network="vpc-hub",client_project_id="company-org-network",client_subnetwork="",client_zone="global",forwarding_rule_name="myforwardingrule",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="ms"} 15494.305910416713 1774970220000
+stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_rtt_latencies_count{backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_network="vpc-hub",client_project_id="company-org-network",client_subnetwork="",client_zone="global",forwarding_rule_name="myforwardingrule",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="ms"} 125 1774970220000
+# HELP stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count The number of bytes sent from the backend of the external network load balancer to the client. For TCP flows, this metric counts the bytes on the application stream only.
+# TYPE stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count gauge
+stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count{backend_group_name="mybackend",backend_group_scope="europe-west4-a",backend_group_type="NETWORK_ENDPOINT_GROUP",backend_network_name="mynetwork",backend_service_name="myservice",backend_subnetwork_name="mysubnet",backend_target_type="BACKEND_SERVICE",backend_zone="europe-west4-a",client_continent="America",client_country="United States",forwarding_rule_name="myforwardingrule",primary_target_pool="mytargetpool",project_id="myproject",protocol="TCP",region="us-east-1",target_pool="mytargetpool",unit="By"} 2.694464e+06 1774970160000
+# HELP stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_egress_packets_count The number of packets sent from the backend of the external network load balancer to the client.
+# TYPE stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_egress_packets_count gauge
+stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_egress_packets_count{backend_group_name="mybackend",backend_group_scope="europe-west4-a",backend_group_type="NETWORK_ENDPOINT_GROUP",backend_network_name="mynetwork",backend_service_name="myservice",backend_subnetwork_name="mysubnet",backend_target_type="BACKEND_SERVICE",backend_zone="europe-west4-a",client_continent="America",client_country="United States",forwarding_rule_name="myforwardingrule",primary_target_pool="mytargetpool",project_id="myproject",protocol="TCP",region="us-east-1",target_pool="mytargetpool",unit="1"} 9952 1774970220000
+# HELP stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_ingress_bytes_count The number of bytes sent from the client to the backend of the external network load balancer. For TCP flows, this metric counts the bytes on the application stream only.
+# TYPE stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_ingress_bytes_count gauge
+stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_ingress_bytes_count{backend_group_name="mybackend",backend_group_scope="europe-west4-a",backend_group_type="NETWORK_ENDPOINT_GROUP",backend_network_name="mynetwork",backend_service_name="myservice",backend_subnetwork_name="mysubnet",backend_target_type="BACKEND_SERVICE",backend_zone="europe-west4-a",client_continent="America",client_country="United States",forwarding_rule_name="myforwardingrule",primary_target_pool="mytargetpool",project_id="myproject",protocol="TCP",region="us-east-1",target_pool="mytargetpool",unit="By"} 1.258784e+06 1774970160000
+# HELP stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_ingress_packets_count The number of packets sent from the client to the backend of the external network load balancer.
+# TYPE stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_ingress_packets_count gauge
+stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_ingress_packets_count{backend_group_name="mybackend",backend_group_scope="europe-west4-a",backend_group_type="NETWORK_ENDPOINT_GROUP",backend_network_name="mynetwork",backend_service_name="myservice",backend_subnetwork_name="mysubnet",backend_target_type="BACKEND_SERVICE",backend_zone="europe-west4-a",client_continent="America",client_country="United States",forwarding_rule_name="myforwardingrule",primary_target_pool="mytargetpool",project_id="myproject",protocol="TCP",region="us-east-1",target_pool="mytargetpool",unit="1"} 128 1774970220000
+# HELP stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies A distribution of the round trip time latency, measured over TCP connections for the external network load balancer.
+# TYPE stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies histogram
+stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies_bucket{backend_group_name="mybackend",backend_group_scope="europe-west4-a",backend_group_type="NETWORK_ENDPOINT_GROUP",backend_network_name="mynetwork",backend_service_name="myservice",backend_subnetwork_name="mysubnet",backend_target_type="BACKEND_SERVICE",backend_zone="europe-west4-a",client_continent="America",client_country="United States",forwarding_rule_name="myforwardingrule",primary_target_pool="mytargetpool",project_id="myproject",protocol="TCP",region="us-east-1",target_pool="mytargetpool",unit="ms",le="1"} 0 1774970220000
+stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies_sum{backend_group_name="mybackend",backend_group_scope="europe-west4-a",backend_group_type="NETWORK_ENDPOINT_GROUP",backend_network_name="mynetwork",backend_service_name="myservice",backend_subnetwork_name="mysubnet",backend_target_type="BACKEND_SERVICE",backend_zone="europe-west4-a",client_continent="America",client_country="United States",forwarding_rule_name="myforwardingrule",primary_target_pool="mytargetpool",project_id="myproject",protocol="TCP",region="us-east-1",target_pool="mytargetpool",unit="ms"} 434.77703995765705 1774970220000
+stackdriver_loadbalancing_googleapis_com_external_network_load_balancer_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies_count{backend_group_name="mybackend",backend_group_scope="europe-west4-a",backend_group_type="NETWORK_ENDPOINT_GROUP",backend_network_name="mynetwork",backend_service_name="myservice",backend_subnetwork_name="mysubnet",backend_target_type="BACKEND_SERVICE",backend_zone="europe-west4-a",client_continent="America",client_country="United States",forwarding_rule_name="myforwardingrule",primary_target_pool="mytargetpool",project_id="myproject",protocol="TCP",region="us-east-1",target_pool="mytargetpool",unit="ms"} 5 1774970220000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_average_connected_clients Mean current number of client connections across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_average_connected_clients gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_average_connected_clients{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_maximum_connected_clients Maximum current number of client connections across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_maximum_connected_clients gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_maximum_connected_clients{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_total_connected_clients Current number of client connections to the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_total_connected_clients gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_clients_total_connected_clients{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_commandstats_total_calls_count Count of Engine commands.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_commandstats_total_calls_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_commandstats_total_calls_count{command="client|setinfo",instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_commandstats_total_usec_count The total time consumed per command.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_commandstats_total_usec_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_commandstats_total_usec_count{command="client|setinfo",instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="us"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_cpu_average_utilization Mean CPU utilization across the instance from 0.0 to 1.0.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_cpu_average_utilization gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_cpu_average_utilization{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="10^2.%"} 0.0037419358444196857 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_cpu_maximum_utilization Maximum CPU utilization across the instance from 0.0 to 1.0.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_cpu_maximum_utilization gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_cpu_maximum_utilization{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="10^2.%"} 0.003779844468469188 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_keyspace_total_keys Number of keys stored in the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_keyspace_total_keys gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_keyspace_total_keys{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 187293 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_average_utilization Mean memory utilization across the instance from 0.0 to 1.0.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_average_utilization gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_average_utilization{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="10^2.%"} 0.5004967191042374 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_maximum_utilization Maximum memory utilization across the instance from 0.0 to 1.0.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_maximum_utilization gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_maximum_utilization{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="10^2.%"} 0.9994551813085858 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_size Memory size of the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_size gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_size{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="By"} 1.3958643712e+10 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_total_used_memory Total memory usage of the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_total_used_memory gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_memory_total_used_memory{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="By"} 5.589032976e+09 1774970100000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_persistence_rdb_saves_count Count of RDB saves across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_persistence_rdb_saves_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_persistence_rdb_saves_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",status_code="0",status_string="ok",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_attributes The number of attributes across all indexes for vector search.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_attributes gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_attributes{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_average_used_memory_bytes The average per-node used memory for all search functionality, in bytes.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_average_used_memory_bytes gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_average_used_memory_bytes{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 37160 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_background_indexing_in_progress Indicates if the background indexing is in progress across any index. When the metric value is true, background indexing is in progress in at least one index.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_background_indexing_in_progress gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_background_indexing_in_progress{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_indexed_keys The number of keys indexed across all indexes.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_indexed_keys gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_indexed_keys{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_indexes The number of indexes created for searching for vector search.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_indexes gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_indexes{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_maximum_used_memory_bytes The maximum per-node used memory for all search functionality, in bytes.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_maximum_used_memory_bytes gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_maximum_used_memory_bytes{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 37160 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_query_requests_count The number of query requests across all indexes.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_query_requests_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_query_requests_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",status="failure",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_total_used_memory_bytes The total used memory in bytes for all search functionality in all nodes, in bytes.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_total_used_memory_bytes gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_search_total_used_memory_bytes{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 74320 1774970100000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_evicted_keys Mean number of evicted keys due to memory capacity.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_evicted_keys gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_evicted_keys{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_expired_keys Mean number of key expiration events.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_expired_keys gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_expired_keys{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_keyspace_hits Mean number of successful lookup of keys across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_keyspace_hits gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_keyspace_hits{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_keyspace_misses Mean number of failed lookup of keys across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_keyspace_misses gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_average_keyspace_misses{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_evicted_keys Maximum number of evicted keys due to memory capacity.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_evicted_keys gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_evicted_keys{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_expired_keys Maximum number of key expiration events.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_expired_keys gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_expired_keys{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_keyspace_hits Maximum number of successful lookup of keys across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_keyspace_hits gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_keyspace_hits{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_keyspace_misses Maximum number of failed lookup of keys across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_keyspace_misses gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_maximum_keyspace_misses{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_connections_received_count Count of client connections created in the last one minute.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_connections_received_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_connections_received_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 3 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_evicted_keys_count Total number of evicted keys due to memory capacity.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_evicted_keys_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_evicted_keys_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_expired_keys_count Total number of key expiration events.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_expired_keys_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_expired_keys_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_keyspace_hits_count Total number of successful lookup of keys across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_keyspace_hits_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_keyspace_hits_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_keyspace_misses_count Total number of failed lookup of keys across the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_keyspace_misses_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_keyspace_misses_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_net_input_bytes_count Count of incoming network bytes received by the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_net_input_bytes_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_net_input_bytes_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="By"} 6867 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_net_output_bytes_count Count of outgoing network bytes sent from the instance.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_net_output_bytes_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_net_output_bytes_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="By"} 312325 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_rejected_connections_count Count of client connections rejected because of maxclients limit.
+# TYPE stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_rejected_connections_count gauge
+stackdriver_memorystore_googleapis_com_instance_memorystore_googleapis_com_instance_stats_total_rejected_connections_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4",project_id="myproject",role="primary",unit="1"} 0 1774970100000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_clients_blocked_clients Number of client connections blocked by the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_clients_blocked_clients gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_clients_blocked_clients{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_clients_connected_clients Number of clients connected to the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_clients_connected_clients gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_clients_connected_clients{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_commandstats_calls_count Total number of calls for this command on the instance node in one minute.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_commandstats_calls_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_commandstats_calls_count{command="client|setinfo",instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_commandstats_usec_count The total time consumed per command in the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_commandstats_usec_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_commandstats_usec_count{command="client|setinfo",instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="us"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_cpu_utilization CPU utilization for the instance node from 0.0 to 1.0.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_cpu_utilization gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_cpu_utilization{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",state="sys",unit="10^2.%"} 0.0008783765221096473 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_cross_instance_replication_role Cross instance replication role of the node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_cross_instance_replication_role gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_cross_instance_replication_role{ccr_role="none",instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 1 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_keyspace_total_keys Number of keys stored in the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_keyspace_total_keys gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_keyspace_total_keys{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-b",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 187293 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_memory_usage Total memory usage of the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_memory_usage gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_memory_usage{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="By"} 8.588792e+06 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_memory_utilization Memory utilization within the instance node from 0.0 to 1.0.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_memory_utilization gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_memory_utilization{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="10^2.%"} 0.0015382568998890222 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_replication_offset Measures the replication offset bytes of the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_replication_offset gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_replication_offset{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="By"} 8238 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_server_healthy Indicates if Instance Node is healthy and available.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_server_healthy gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_server_healthy{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 1 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_server_uptime Measures the uptime of the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_server_uptime gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_server_uptime{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="s"} 1.548237e+06 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_connections_received_count Count of total client connections created in the last one minute on the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_connections_received_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_connections_received_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 2 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_evicted_keys_count Count of evicted keys by the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_evicted_keys_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_evicted_keys_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_expired_keys_count Count of key expiration events in the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_expired_keys_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_expired_keys_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_keyspace_hits_count Count of successful lookup of keys in the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_keyspace_hits_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_keyspace_hits_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_keyspace_misses_count Count of failed lookup of keys in the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_keyspace_misses_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_keyspace_misses_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 0 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_net_input_bytes_count Count of incoming network bytes received by the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_net_input_bytes_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_net_input_bytes_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="By"} 3436 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_net_output_bytes_count Count of outgoing network bytes sent from the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_net_output_bytes_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_net_output_bytes_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="By"} 159754 1774970040000
+# HELP stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_rejected_connections_count Number of connections rejected because of maxclients limit by the instance node.
+# TYPE stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_rejected_connections_count gauge
+stackdriver_memorystore_googleapis_com_instance_node_memorystore_googleapis_com_instance_node_stats_rejected_connections_count{instance_id="myinstance",instance_uid="myinstance",location="europe-west4-a",node_id="mynode",project_id="myproject",role="primary",shard_id="0",unit="1"} 0 1774970040000
+# HELP stackdriver_monitoring_api_calls_total Total number of Google Stackdriver Monitoring API calls made.
+# TYPE stackdriver_monitoring_api_calls_total counter
+stackdriver_monitoring_api_calls_total{project_id="myproject"} 812
+# HELP stackdriver_monitoring_last_scrape_duration_seconds Duration of the last metrics scrape from Google Stackdriver Monitoring.
+# TYPE stackdriver_monitoring_last_scrape_duration_seconds gauge
+stackdriver_monitoring_last_scrape_duration_seconds{project_id="myproject"} 0.778481089
+# HELP stackdriver_monitoring_last_scrape_error Whether the last metrics scrape from Google Stackdriver Monitoring resulted in an error (1 for error, 0 for success).
+# TYPE stackdriver_monitoring_last_scrape_error gauge
+stackdriver_monitoring_last_scrape_error{project_id="myproject"} 0
+# HELP stackdriver_monitoring_last_scrape_timestamp Number of seconds since 1970 since last metrics scrape from Google Stackdriver Monitoring.
+# TYPE stackdriver_monitoring_last_scrape_timestamp gauge
+stackdriver_monitoring_last_scrape_timestamp{project_id="myproject"} 1.774970285e+09
+# HELP stackdriver_monitoring_scrape_errors_total Total number of Google Stackdriver Monitoring metrics scrape errors.
+# TYPE stackdriver_monitoring_scrape_errors_total counter
+stackdriver_monitoring_scrape_errors_total{project_id="myproject"} 0
+# HELP stackdriver_monitoring_scrapes_total Total number of Google Stackdriver Monitoring metrics scrapes.
+# TYPE stackdriver_monitoring_scrapes_total counter
+stackdriver_monitoring_scrapes_total{project_id="myproject"} 2
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_controller_admission_duration_seconds_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_controller_admission_duration_seconds_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_controller_admission_duration_seconds_histogram_bucket{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",name="CertificateApproval",namespace="",operation="UPDATE",project_id="myproject",rejected="false",type="validate",unit="",le="0.005"} 23686 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_controller_admission_duration_seconds_histogram_sum{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",name="CertificateApproval",namespace="",operation="UPDATE",project_id="myproject",rejected="false",type="validate",unit=""} 0.004500625999999953 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_controller_admission_duration_seconds_histogram_count{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",name="CertificateApproval",namespace="",operation="UPDATE",project_id="myproject",rejected="false",type="validate",unit=""} 23686 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_step_admission_duration_seconds_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_step_admission_duration_seconds_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_step_admission_duration_seconds_histogram_bucket{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",namespace="",operation="CREATE",project_id="myproject",rejected="false",type="admit",unit="",le="0.005"} 8071 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_step_admission_duration_seconds_histogram_sum{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",namespace="",operation="CREATE",project_id="myproject",rejected="false",type="admit",unit=""} 1.6107581479999973 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_step_admission_duration_seconds_histogram_count{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",namespace="",operation="CREATE",project_id="myproject",rejected="false",type="admit",unit=""} 8112 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_webhook_admission_duration_seconds_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_webhook_admission_duration_seconds_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_webhook_admission_duration_seconds_histogram_bucket{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",name="flowcontrol-guardrails.common-webhooks.networking.gke.io",namespace="",operation="UPDATE",project_id="myproject",rejected="false",type="validating",unit="",le="0.005"} 0 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_webhook_admission_duration_seconds_histogram_sum{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",name="flowcontrol-guardrails.common-webhooks.networking.gke.io",namespace="",operation="UPDATE",project_id="myproject",rejected="false",type="validating",unit=""} 0 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_admission_webhook_admission_duration_seconds_histogram_count{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",name="flowcontrol-guardrails.common-webhooks.networking.gke.io",namespace="",operation="UPDATE",project_id="myproject",rejected="false",type="validating",unit=""} 0 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_current_inflight_requests_gauge 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_current_inflight_requests_gauge gauge
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_current_inflight_requests_gauge{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",request_kind="mutating",unit=""} 2 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_current_executing_seats_gauge 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_current_executing_seats_gauge gauge
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_current_executing_seats_gauge{cluster="mycluster",flow_schema="catch-all",instance="myinstance",job="apiserver",location="europe-west4",namespace="",priority_level="catch-all",project_id="myproject",unit=""} 0 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_current_inqueue_requests_gauge 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_current_inqueue_requests_gauge gauge
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_current_inqueue_requests_gauge{cluster="mycluster",flow_schema="gcp-controller-manager",instance="myinstance",job="apiserver",location="europe-west4",namespace="",priority_level="workload-high",project_id="myproject",unit=""} 0 1774970235994
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_nominal_limit_seats_gauge 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_nominal_limit_seats_gauge gauge
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_nominal_limit_seats_gauge{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",namespace="",priority_level="catch-all",project_id="myproject",unit=""} 4 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_rejected_requests_total_counter 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_rejected_requests_total_counter counter
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_rejected_requests_total_counter{cluster="mycluster",flow_schema="service-accounts",instance="myinstance",job="apiserver",location="us-west1",namespace="",priority_level="workload-low",project_id="myproject",reason="time-out",unit=""} 0 1774970284257
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_request_wait_duration_seconds_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_request_wait_duration_seconds_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_request_wait_duration_seconds_histogram_bucket{cluster="mycluster",execute="true",flow_schema="catch-all",instance="myinstance",job="apiserver",location="europe-west4",namespace="",priority_level="catch-all",project_id="myproject",unit="",le="0"} 0 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_request_wait_duration_seconds_histogram_sum{cluster="mycluster",execute="true",flow_schema="catch-all",instance="myinstance",job="apiserver",location="europe-west4",namespace="",priority_level="catch-all",project_id="myproject",unit=""} 0 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_flowcontrol_request_wait_duration_seconds_histogram_count{cluster="mycluster",execute="true",flow_schema="catch-all",instance="myinstance",job="apiserver",location="europe-west4",namespace="",priority_level="catch-all",project_id="myproject",unit=""} 0 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_request_duration_seconds_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_request_duration_seconds_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_request_duration_seconds_histogram_bucket{cluster="mycluster",component="",dry_run="",group="",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",resource="",scope="",subresource="/healthz",unit="",verb="GET",version="",le="0.005"} 0 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_request_duration_seconds_histogram_sum{cluster="mycluster",component="",dry_run="",group="",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",resource="",scope="",subresource="/healthz",unit="",verb="GET",version=""} 0 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_request_duration_seconds_histogram_count{cluster="mycluster",component="",dry_run="",group="",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",resource="",scope="",subresource="/healthz",unit="",verb="GET",version=""} 0 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_request_total_counter 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_request_total_counter counter
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_request_total_counter{cluster="mycluster",code="200",component="",dry_run="",group="",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",resource="",scope="",subresource="/healthz",unit="",verb="GET",version=""} 0 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_response_sizes_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_response_sizes_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_response_sizes_histogram_bucket{cluster="mycluster",component="",group="",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",resource="",scope="",subresource="/healthz",unit="",verb="GET",version="",le="1000"} 0 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_response_sizes_histogram_sum{cluster="mycluster",component="",group="",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",resource="",scope="",subresource="/healthz",unit="",verb="GET",version=""} 0 1774970246574
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_response_sizes_histogram_count{cluster="mycluster",component="",group="",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",resource="",scope="",subresource="/healthz",unit="",verb="GET",version=""} 0 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_storage_objects_gauge 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_storage_objects_gauge gauge
+stackdriver_prometheus_target_prometheus_googleapis_com_apiserver_storage_objects_gauge{cluster="mycluster",instance="myinstance",job="apiserver",location="europe-west4",namespace="",project_id="myproject",resource="acraccesstokens.generators.external-secrets.io",unit=""} 0 1774970246574
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_kube_pod_resource_limit_gauge 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_kube_pod_resource_limit_gauge gauge
+stackdriver_prometheus_target_prometheus_googleapis_com_kube_pod_resource_limit_gauge{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="mynamespace",node="mynode",pod="mypod",priority="0",project_id="myproject",resource="cpu",scheduler="gke.io/optimize-utilization-scheduler",unit=""} 1 1774970273021
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_kube_pod_resource_request_gauge 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_kube_pod_resource_request_gauge gauge
+stackdriver_prometheus_target_prometheus_googleapis_com_kube_pod_resource_request_gauge{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="mynamespace",node="mynode",pod="mypod",priority="0",project_id="myproject",resource="cpu",scheduler="gke.io/optimize-utilization-scheduler",unit=""} 0.5 1774970273021
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_pending_pods_gauge 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_pending_pods_gauge gauge
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_pending_pods_gauge{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",project_id="myproject",queue="active",unit=""} 0 1774970229683
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_pod_scheduling_sli_duration_seconds_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_pod_scheduling_sli_duration_seconds_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_pod_scheduling_sli_duration_seconds_histogram_bucket{attempts="1",cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",project_id="myproject",unit="",le="0.01"} 0 1774970229683
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_pod_scheduling_sli_duration_seconds_histogram_sum{attempts="1",cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",project_id="myproject",unit=""} 0.040579709000000005 1774970229683
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_pod_scheduling_sli_duration_seconds_histogram_count{attempts="1",cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",project_id="myproject",unit=""} 1 1774970229683
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_preemption_attempts_total_counter 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_preemption_attempts_total_counter counter
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_preemption_attempts_total_counter{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",project_id="myproject",unit=""} 0 1774970229683
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_preemption_victims_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_preemption_victims_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_preemption_victims_histogram_bucket{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",project_id="myproject",unit="",le="1"} 0 1774970229683
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_preemption_victims_histogram_sum{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",project_id="myproject",unit=""} 0 1774970229683
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_preemption_victims_histogram_count{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",project_id="myproject",unit=""} 0 1774970229683
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_schedule_attempts_total_counter 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_schedule_attempts_total_counter counter
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_schedule_attempts_total_counter{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",profile="gke.io/optimize-utilization-scheduler",project_id="myproject",result="scheduled",unit=""} 1 1774970229683
+# HELP stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_scheduling_attempt_duration_seconds_histogram 
+# TYPE stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_scheduling_attempt_duration_seconds_histogram histogram
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_scheduling_attempt_duration_seconds_histogram_bucket{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",profile="gke.io/optimize-utilization-scheduler",project_id="myproject",result="scheduled",unit="",le="0.001"} 0 1774970229683
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_scheduling_attempt_duration_seconds_histogram_sum{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",profile="gke.io/optimize-utilization-scheduler",project_id="myproject",result="scheduled",unit=""} 0.040506170999999994 1774970229683
+stackdriver_prometheus_target_prometheus_googleapis_com_scheduler_scheduling_attempt_duration_seconds_histogram_count{cluster="mycluster",instance="myinstance",job="scheduler",location="europe-west4",namespace="",profile="gke.io/optimize-utilization-scheduler",project_id="myproject",result="scheduled",unit=""} 1 1774970229683
+# HELP stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count The number of bytes sent from the backend of the external network load balancer to the client. For TCP flows, this metric counts the bytes on the application stream only.
+# TYPE stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count gauge
+stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count{backend_failover_configuration="UNKNOWN",backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_continent="America",client_country="United States",endpoint_zone="europe-west4-a",forwarding_rule_name="myforwardingrule",forwarding_rule_network_tier="PREMIUM",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="By"} 2.746592e+06 1774970220000
+# HELP stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_packets_count The number of packets sent from the backend of the external network load balancer to the client.
+# TYPE stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_packets_count gauge
+stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_packets_count{backend_failover_configuration="UNKNOWN",backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_continent="America",client_country="United States",endpoint_zone="europe-west4-a",forwarding_rule_name="myforwardingrule",forwarding_rule_network_tier="PREMIUM",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="1"} 7648 1774970220000
+# HELP stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_ingress_bytes_count The number of bytes sent from the client to the backend of the external network load balancer. For TCP flows, this metric counts the bytes on the application stream only.
+# TYPE stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_ingress_bytes_count gauge
+stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_ingress_bytes_count{backend_failover_configuration="UNKNOWN",backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_continent="America",client_country="United States",endpoint_zone="europe-west4-a",forwarding_rule_name="myforwardingrule",forwarding_rule_network_tier="STANDARD",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="By"} 5120 1774970220000
+# HELP stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_ingress_packets_count The number of packets sent from the client to the backend of the external network load balancer.
+# TYPE stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_ingress_packets_count gauge
+stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_ingress_packets_count{backend_failover_configuration="UNKNOWN",backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_continent="America",client_country="United States",endpoint_zone="europe-west4-a",forwarding_rule_name="myforwardingrule",forwarding_rule_network_tier="STANDARD",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="1"} 128 1774970220000
+# HELP stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies A distribution of the round trip time latency, measured over TCP connections for the external network load balancer.
+# TYPE stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies histogram
+stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies_bucket{backend_failover_configuration="UNKNOWN",backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_continent="America",client_country="United States",endpoint_zone="europe-west4-a",forwarding_rule_name="myforwardingrule",forwarding_rule_network_tier="PREMIUM",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="ms",le="1"} 0 1774970220000
+stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies_sum{backend_failover_configuration="UNKNOWN",backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_continent="America",client_country="United States",endpoint_zone="europe-west4-a",forwarding_rule_name="myforwardingrule",forwarding_rule_network_tier="PREMIUM",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="ms"} 347.34817531308516 1774970220000
+stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_rtt_latencies_count{backend_failover_configuration="UNKNOWN",backend_name="mybackend",backend_scope="europe-west4-a",backend_scope_type="ZONE",backend_subnetwork_name="mysubnet",backend_target_name="mytarget",backend_target_type="BACKEND_SERVICE",backend_type="NETWORK_ENDPOINT_GROUP",client_continent="America",client_country="United States",endpoint_zone="europe-west4-a",forwarding_rule_name="myforwardingrule",forwarding_rule_network_tier="PREMIUM",load_balancer_name="mylb",network_name="mynetwork",project_id="myproject",region="us-east-1",unit="ms"} 4 1774970220000
