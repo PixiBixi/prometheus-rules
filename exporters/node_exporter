@@ -437,7 +437,7 @@ node_disk_discards_merged_total{device="nvme0n1"} 36
 node_disk_discards_merged_total{device="nvme1n1"} 36
 # HELP node_disk_filesystem_info Info about disk filesystem.
 # TYPE node_disk_filesystem_info gauge
-node_disk_filesystem_info{device="md2",type="ext4",usage="filesystem",uuid="df76f5d5-2f1f-4c55-ae34-7ec9b51f0bd0",version="1.0"} 1
+node_disk_filesystem_info{device="md2",type="ext4",usage="filesystem",uuid="00000000-0000-0000-0000-000000000000",version="1.0"} 1
 # HELP node_disk_flush_requests_time_seconds_total This is the total number of seconds spent by all flush requests.
 # TYPE node_disk_flush_requests_time_seconds_total counter
 node_disk_flush_requests_time_seconds_total{device="md2"} 0
@@ -451,8 +451,8 @@ node_disk_flush_requests_total{device="nvme1n1"} 6.79034e+06
 # HELP node_disk_info Info of /sys/block/<block_device>.
 # TYPE node_disk_info gauge
 node_disk_info{device="md2",major="9",minor="2",model="",path="",revision="",serial="",wwn=""} 1
-node_disk_info{device="nvme0n1",major="259",minor="4",model="SAMSUNG MZVL2512HCJQ-00B07",path="pci-0000:01:00.0-nvme-1",revision="GXA7802Q",serial="S63CNX0RA02761",wwn="eui.002538ba11c149be"} 1
-node_disk_info{device="nvme1n1",major="259",minor="0",model="SAMSUNG MZVL2512HCJQ-00B07",path="pci-0000:02:00.0-nvme-1",revision="GXA7802Q",serial="S63CNX0RA02749",wwn="eui.002538ba11c149b2"} 1
+node_disk_info{device="nvme0n1",major="259",minor="4",model="SAMSUNG MZVL2512HCJQ-00B07",path="pci-0000:01:00.0-nvme-1",revision="GXA7802Q",serial="000000000000",wwn="0x0000000000000000"} 1
+node_disk_info{device="nvme1n1",major="259",minor="0",model="SAMSUNG MZVL2512HCJQ-00B07",path="pci-0000:02:00.0-nvme-1",revision="GXA7802Q",serial="000000000000",wwn="0x0000000000000000"} 1
 # HELP node_disk_io_now The number of I/Os currently in progress.
 # TYPE node_disk_io_now gauge
 node_disk_io_now{device="md2"} 0
@@ -510,7 +510,7 @@ node_disk_written_bytes_total{device="nvme0n1"} 4.9358274632704e+13
 node_disk_written_bytes_total{device="nvme1n1"} 4.9358274632192e+13
 # HELP node_dmi_info A metric with a constant '1' value labeled by bios_date, bios_release, bios_vendor, bios_version, board_asset_tag, board_name, board_serial, board_vendor, board_version, chassis_asset_tag, chassis_serial, chassis_vendor, chassis_version, product_family, product_name, product_serial, product_sku, product_uuid, product_version, system_vendor if provided by DMI.
 # TYPE node_dmi_info gauge
-node_dmi_info{bios_date="09/14/2021",bios_release="5.22",bios_vendor="American Megatrends International, LLC.",bios_version="1.25.OV02",board_asset_tag="",board_name="E3C252D4U-2T/OVH",board_vendor="ASRockRack",board_version="1.01",chassis_asset_tag="To Be Filled By O.E.M.",chassis_vendor="To Be Filled By O.E.M.",chassis_version="To Be Filled By O.E.M.",product_family="To Be Filled By O.E.M.",product_name="To Be Filled By O.E.M.",product_sku="To Be Filled By O.E.M.",product_version="To Be Filled By O.E.M.",system_vendor="To Be Filled By O.E.M."} 1
+node_dmi_info{bios_date="01/01/2020",bios_release="1.0",bios_vendor="ExampleVendor",bios_version="1.0.0",board_asset_tag="",board_name="myboard",board_vendor="ExampleVendor",board_version="1.0",chassis_asset_tag="mychassis",chassis_vendor="ExampleVendor",chassis_version="1.0",product_family="MyFamily",product_name="MyProduct",product_sku="MySKU",product_version="1.0",system_vendor="ExampleVendor"} 1
 # HELP node_entropy_available_bits Bits of available entropy.
 # TYPE node_entropy_available_bits gauge
 node_entropy_available_bits 256
@@ -1202,11 +1202,11 @@ node_nf_conntrack_entries 95891
 node_nf_conntrack_entries_limit 4.096e+06
 # HELP node_nvme_info Non-numeric data from /sys/class/nvme/<device>, value is always 1.
 # TYPE node_nvme_info gauge
-node_nvme_info{device="nvme0",firmware_revision="GXA7802Q",model="SAMSUNG MZVL2512HCJQ-00B07",serial="S63CNX0RA02761",state="live"} 1
-node_nvme_info{device="nvme1",firmware_revision="GXA7802Q",model="SAMSUNG MZVL2512HCJQ-00B07",serial="S63CNX0RA02749",state="live"} 1
+node_nvme_info{device="nvme0",firmware_revision="1.0",model="SAMSUNG MZVL2512HCJQ-00B07",serial="000000000000",state="live"} 1
+node_nvme_info{device="nvme1",firmware_revision="1.0",model="SAMSUNG MZVL2512HCJQ-00B07",serial="000000000000",state="live"} 1
 # HELP node_os_info A metric with a constant '1' value labeled by build_id, id, id_like, image_id, image_version, name, pretty_name, variant, variant_id, version, version_codename, version_id.
 # TYPE node_os_info gauge
-node_os_info{build_id="",id="ubuntu",id_like="debian",image_id="",image_version="",name="Ubuntu",pretty_name="Ubuntu 20.04.6 LTS",variant="",variant_id="",version="20.04.6 LTS (Focal Fossa)",version_codename="focal",version_id="20.04"} 1
+node_os_info{build_id="",id="ubuntu",id_like="debian",image_id="",image_version="",name="Ubuntu",pretty_name="Example Linux 1.0",variant="",variant_id="",version="20.04.6 LTS (Focal Fossa)",version_codename="focal",version_id="20.04"} 1
 # HELP node_os_version Metric containing the major.minor part of the OS version.
 # TYPE node_os_version gauge
 node_os_version{id="ubuntu",id_like="debian",name="Ubuntu"} 20.04
@@ -1605,7 +1605,7 @@ node_udp_queues{ip="v6",queue="rx"} 0
 node_udp_queues{ip="v6",queue="tx"} 0
 # HELP node_uname_info Labeled system information as provided by the uname system call.
 # TYPE node_uname_info gauge
-node_uname_info{domainname="(none)",machine="x86_64",nodename="node-bidder-eu3-7",release="6.2.0-060200-generic",sysname="Linux",version="#202302191831 SMP PREEMPT_DYNAMIC Sun Feb 19 23:37:22 UTC 2023"} 1
+node_uname_info{domainname="example.com",machine="x86_64",nodename="mynode",release="6.2.0-060200-generic",sysname="Linux",version="#202302191831 SMP PREEMPT_DYNAMIC Sun Feb 19 23:37:22 UTC 2023"} 1
 # HELP node_vmstat_oom_kill /proc/vmstat information field oom_kill.
 # TYPE node_vmstat_oom_kill untyped
 node_vmstat_oom_kill 0

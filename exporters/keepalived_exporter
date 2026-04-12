@@ -87,58 +87,58 @@ go_memstats_sys_bytes 2.6999824e+07
 go_threads 12
 # HELP keepalived_address_list_errors_total Address list errors
 # TYPE keepalived_address_list_errors_total counter
-keepalived_address_list_errors_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_address_list_errors_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_advertisements_interval_errors_total Advertisement interval errors
 # TYPE keepalived_advertisements_interval_errors_total counter
-keepalived_advertisements_interval_errors_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_advertisements_interval_errors_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_advertisements_received_total Advertisements received
 # TYPE keepalived_advertisements_received_total counter
-keepalived_advertisements_received_total{iname="vip_lan",intf="eno2",vrid="50"} 3.524803e+06
+keepalived_advertisements_received_total{iname="eth0",intf="eth0",vrid="1"} 3.524803e+06
 # HELP keepalived_advertisements_sent_total Advertisements sent
 # TYPE keepalived_advertisements_sent_total counter
-keepalived_advertisements_sent_total{iname="vip_lan",intf="eno2",vrid="50"} 223240
+keepalived_advertisements_sent_total{iname="eth0",intf="eth0",vrid="1"} 223240
 # HELP keepalived_authentication_failure_total Authentication failure
 # TYPE keepalived_authentication_failure_total counter
-keepalived_authentication_failure_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_authentication_failure_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_authentication_invalid_total Authentication invalid
 # TYPE keepalived_authentication_invalid_total counter
-keepalived_authentication_invalid_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_authentication_invalid_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_authentication_mismatch_total Authentication mismatch
 # TYPE keepalived_authentication_mismatch_total counter
-keepalived_authentication_mismatch_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_authentication_mismatch_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_become_master_total Became master
 # TYPE keepalived_become_master_total counter
-keepalived_become_master_total{iname="vip_lan",intf="eno2",vrid="50"} 2
+keepalived_become_master_total{iname="eth0",intf="eth0",vrid="1"} 2
 # HELP keepalived_exporter_build_info A metric with a constant '1' value labeled by version, revision, branch, goversion from which keepalived_exporter was built, and the goos and goarch for the build.
 # TYPE keepalived_exporter_build_info gauge
 keepalived_exporter_build_info{branch="HEAD",goarch="amd64",goos="linux",goversion="go1.20.6",revision="50b7c520504fd30b48496a2647fd0f41fbabe8a8",tags="unknown",version="1.3.2"} 1
 # HELP keepalived_gratuitous_arp_delay_total Gratuitous ARP delay
 # TYPE keepalived_gratuitous_arp_delay_total counter
-keepalived_gratuitous_arp_delay_total{iname="vip_lan",intf="eno2",vrid="50"} 5
+keepalived_gratuitous_arp_delay_total{iname="eth0",intf="eth0",vrid="1"} 5
 # HELP keepalived_invalid_type_received_total Invalid type errors
 # TYPE keepalived_invalid_type_received_total counter
-keepalived_invalid_type_received_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_invalid_type_received_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_ip_ttl_errors_total TTL errors
 # TYPE keepalived_ip_ttl_errors_total counter
-keepalived_ip_ttl_errors_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_ip_ttl_errors_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_packet_length_errors_total Packet length errors
 # TYPE keepalived_packet_length_errors_total counter
-keepalived_packet_length_errors_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_packet_length_errors_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_priority_zero_received_total Priority zero received
 # TYPE keepalived_priority_zero_received_total counter
-keepalived_priority_zero_received_total{iname="vip_lan",intf="eno2",vrid="50"} 2
+keepalived_priority_zero_received_total{iname="eth0",intf="eth0",vrid="1"} 2
 # HELP keepalived_priority_zero_sent_total Priority zero sent
 # TYPE keepalived_priority_zero_sent_total counter
-keepalived_priority_zero_sent_total{iname="vip_lan",intf="eno2",vrid="50"} 0
+keepalived_priority_zero_sent_total{iname="eth0",intf="eth0",vrid="1"} 0
 # HELP keepalived_release_master_total Released master
 # TYPE keepalived_release_master_total counter
-keepalived_release_master_total{iname="vip_lan",intf="eno2",vrid="50"} 1
+keepalived_release_master_total{iname="eth0",intf="eth0",vrid="1"} 1
 # HELP keepalived_up Status
 # TYPE keepalived_up gauge
 keepalived_up 1
 # HELP keepalived_vrrp_state State of vrrp
 # TYPE keepalived_vrrp_state gauge
-keepalived_vrrp_state{iname="vip_lan",intf="eno2",ip_address="172.17.254.251/16",vrid="50"} 2
+keepalived_vrrp_state{iname="eth0",intf="eth0",ip_address="10.0.0.1/16",vrid="1"} 2
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
 process_cpu_seconds_total 1869.91
