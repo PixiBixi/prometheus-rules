@@ -19,12 +19,21 @@ SKIP_RULES     = {".yamllint.yml"}
 
 # Metric prefixes that belong to the exporter process itself (Go runtime,
 # Prometheus client, HTTP handler) — not relevant as "uncovered business metrics"
+# when the exporter is a proxy (separate process scraping another system).
 EXPORTER_GENERIC_PREFIXES = (
     "go_",
     "process_",
     "promhttp_",
     "net_conntrack_",
 )
+
+# Exporters where the software IS the thing being monitored — their go_*/process_*
+# metrics are legitimate business metrics (GC pressure, goroutine leaks, etc.)
+# and must NOT be filtered out.
+NATIVE_EXPORTERS = {
+    "cert-manager",
+    "promtail_exporter",
+}
 
 # PromQL keywords to ignore when extracting metric names
 PROMQL_KEYWORDS = {
@@ -42,7 +51,7 @@ PROMQL_KEYWORDS = {
 
 # ── Exporters ────────────────────────────────────────────────────────────────
 
-def parse_exporter(path):
+def parse_exporter(path, native=False):
     metrics = []
     current_help = None
     current_type = None
@@ -72,7 +81,7 @@ def parse_exporter(path):
                     "help": current_help or "",
                     "labels": labels,
                     "example": line,
-                    "generic": name.startswith(EXPORTER_GENERIC_PREFIXES),
+                    "generic": not native and name.startswith(EXPORTER_GENERIC_PREFIXES),
                 })
                 current_help = None
                 current_type = None
@@ -92,7 +101,7 @@ def load_exporters():
             first = f.read(50)
         if not re.match(r"^(# HELP|# TYPE|\w+[{ ])", first):
             continue
-        metrics = parse_exporter(fpath)
+        metrics = parse_exporter(fpath, native=fname in NATIVE_EXPORTERS)
         if not metrics:
             continue
         exporters.append({
