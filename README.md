@@ -14,6 +14,12 @@ The files in `exporters/` are cleaned Prometheus text format samples. They can b
 - Enum/dimension labels (`mode`, `state`, `operation`, `pool`, `gc`, …): all values preserved
 - High-cardinality instance labels: collapsed to one representative value
 
+**Native vs proxy exporters:**
+
+Some exporters are *proxy exporters* (a separate Go process scraping another system — e.g. `node_exporter`, `mysqld_exporter`). Their `go_*`, `process_*`, and `promhttp_*` metrics describe the exporter process itself and are excluded from the uncovered metrics view.
+
+Other exporters are *native exporters* (the software exposes its own metrics — e.g. `cert-manager`, `promtail`). Their `go_*` metrics reflect the actual application runtime (GC pressure, goroutine count…) and are kept visible. Native exporters are listed in `NATIVE_EXPORTERS` in `build.py`.
+
 You'll see not so much warning severity rules. Why would you tell me? Because from my own experience, warning rules are ignored most of the time, so why bother create this kind of rule? :)
 
 ## Specifications
