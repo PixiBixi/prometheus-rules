@@ -1,6 +1,14 @@
 repos:
   - repo: local
     hooks:
+      - id: validate-rules
+        name: Validate PromQL rules with promtool
+        language: system
+        entry: python3 validate_rules.py
+        pass_filenames: false
+        files: ^rules/.*\.yml$
+        stages: [pre-commit]
+
       - id: build-docs
         name: Build docs/data.json
         language: system

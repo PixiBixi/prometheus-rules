@@ -19,6 +19,15 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml
 
+      - name: Install promtool
+        run: |
+          PROM_VERSION="3.11.0"
+          curl -sSL "https://github.com/prometheus/prometheus/releases/download/v${PROM_VERSION}/prometheus-${PROM_VERSION}.linux-amd64.tar.gz" \
+            | tar -xz --strip-components=1 -C /usr/local/bin "prometheus-${PROM_VERSION}.linux-amd64/promtool"
+
+      - name: Validate PromQL rules
+        run: python3 validate_rules.py
+
       - name: Build data.json
         run: python3 build.py
 
