@@ -1,0 +1,109 @@
+- name: coredns.rules
+  rules:
+    - alert: CoreDNSDown
+      expr: absent(up{job="kube-dns"} == 1)
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CoreDNS has disappeared from Prometheus target discovery"
+        description: "CoreDNS is down. No DNS resolution is possible for in-cluster traffic."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsdown
+
+    - alert: CoreDNSLatencyHigh
+      expr: |
+        histogram_quantile(0.99,
+          sum(rate(coredns_dns_request_duration_seconds_bucket{job="kube-dns"}[5m])) without (instance, pod)
+        ) > 4
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CoreDNS p99 latency high ({{ $value | humanizeDuration }})"
+        description: "CoreDNS 99th percentile latency is {{ $value | humanizeDuration }} for server {{ $labels.server }} zone {{ $labels.zone }}."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednslatencyhigh
+
+    - alert: CoreDNSErrorsHigh
+      expr: |
+        sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="kube-dns", rcode="SERVFAIL"}[5m]))
+        /
+        sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="kube-dns"}[5m])) > 0.03
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CoreDNS high SERVFAIL rate ({{ $value | humanizePercentage }})"
+        description: "CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of requests."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorshigh
+    - alert: CoreDNSErrorsHigh
+      expr: |
+        sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="kube-dns", rcode="SERVFAIL"}[5m]))
+        /
+        sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="kube-dns"}[5m])) > 0.01
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "CoreDNS elevated SERVFAIL rate ({{ $value | humanizePercentage }})"
+        description: "CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of requests."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorshigh
+
+    - alert: CoreDNSForwardLatencyHigh
+      expr: |
+        histogram_quantile(0.99,
+          sum(rate(coredns_forward_request_duration_seconds_bucket{job="kube-dns"}[5m])) without (pod, instance, rcode)
+        ) > 4
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CoreDNS forward p99 latency high ({{ $value | humanizeDuration }}) to {{ $labels.to }}"
+        description: "CoreDNS 99th percentile latency forwarding to {{ $labels.to }} is {{ $value | humanizeDuration }}."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardlatencyhigh
+
+    - alert: CoreDNSForwardErrorsHigh
+      expr: |
+        sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="kube-dns", rcode="SERVFAIL"}[5m]))
+        /
+        sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="kube-dns"}[5m])) > 0.03
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CoreDNS high forward SERVFAIL rate to {{ $labels.to }} ({{ $value | humanizePercentage }})"
+        description: "CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of forward requests to {{ $labels.to }}."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwarderrorshigh
+    - alert: CoreDNSForwardErrorsHigh
+      expr: |
+        sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="kube-dns", rcode="SERVFAIL"}[5m]))
+        /
+        sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="kube-dns"}[5m])) > 0.01
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "CoreDNS elevated forward SERVFAIL rate to {{ $labels.to }} ({{ $value | humanizePercentage }})"
+        description: "CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of forward requests to {{ $labels.to }}."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwarderrorshigh
+
+    - alert: CoreDNSForwardHealthcheckFailureCount
+      expr: |
+        sum without (pod, instance) (rate(coredns_forward_healthcheck_failures_total{job="kube-dns"}[5m])) > 0
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "CoreDNS healthcheck failures to upstream {{ $labels.to }}"
+        description: "CoreDNS health checks are failing to upstream server {{ $labels.to }}."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardhealthcheckfailurecount
+
+    - alert: CoreDNSForwardHealthcheckBrokenCount
+      expr: |
+        sum without (pod, instance) (rate(coredns_forward_healthcheck_broken_total{job="kube-dns"}[5m])) > 0
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CoreDNS all upstream healthchecks failing"
+        description: "CoreDNS health checks have failed for all upstream DNS servers. Forward resolution is broken."
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardhealthcheckbrokencount

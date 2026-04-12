@@ -1,0 +1,55 @@
+- name: keepalived.rules
+  rules:
+    - alert: KeepalivedDown
+      expr: keepalived_up == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Keepalived down on {{ $labels.instance }}"
+        description: "Keepalived is unreachable on {{ $labels.instance }}. VIP failover may be broken."
+
+    - alert: KeepalivedSplitBrain
+      expr: count by (vrid) (keepalived_vrrp_state == 1) > 1
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Keepalived split-brain detected on VRID {{ $labels.vrid }}"
+        description: "Multiple instances are in MASTER state for VRID {{ $labels.vrid }}. This causes IP conflicts on the network."
+
+    - alert: KeepalivedNoMaster
+      expr: count by (vrid) (keepalived_vrrp_state == 1) == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "No Keepalived master for VRID {{ $labels.vrid }}"
+        description: "No instance is in MASTER state for VRID {{ $labels.vrid }}. The VIP is unreachable."
+
+    - alert: KeepalivedFlapping
+      expr: increase(keepalived_become_master_total[5m]) > 3
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Keepalived VRRP flapping on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} has transitioned to MASTER {{ $value }} times in 5 minutes for VRID {{ $labels.vrid }} — network or configuration instability."
+
+    - alert: KeepalivedAuthFailure
+      expr: increase(keepalived_authentication_failure_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Keepalived authentication failures on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} is receiving VRRP packets with authentication failures — possible misconfiguration or unexpected peer on the network."
+
+    - alert: KeepalivedAdIntervalErrors
+      expr: increase(keepalived_advertisements_interval_errors_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Keepalived advertisement interval errors on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} has {{ $value }} VRRP advertisement interval errors in 5 minutes — risk of spurious master election."
