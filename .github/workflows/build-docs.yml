@@ -1,0 +1,29 @@
+name: Build docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - exporters/**
+      - rules/**
+      - build.py
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Build data.json
+        run: python3 build.py
+
+      - name: Commit updated data.json
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(docs): rebuild data.json [skip ci]"
+          file_pattern: docs/data.json
