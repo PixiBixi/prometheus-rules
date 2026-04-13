@@ -151,13 +151,22 @@
         description: "Frontend {{ $labels.proxy }} is not in OPEN state on {{ $labels.instance }}"
 
     - alert: HAproxyFrontendSessionSaturation
-      expr: haproxy_frontend_current_sessions / haproxy_frontend_limit_sessions > 0.8
+      expr: haproxy_frontend_current_sessions / haproxy_frontend_limit_sessions > 0.7
       for: 5m
       labels:
         severity: warning
       annotations:
         summary: "HAProxy frontend session saturation (instance {{ $labels.instance }})"
-        description: "Frontend {{ $labels.proxy }} session usage above 80%"
+        description: "Frontend {{ $labels.proxy }} session usage above 70%"
+
+    - alert: HAproxyFrontendSessionCritical
+      expr: haproxy_frontend_current_sessions / haproxy_frontend_limit_sessions > 0.85
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy frontend session critical saturation (instance {{ $labels.instance }})"
+        description: "Frontend {{ $labels.proxy }} session usage above 85% — connection refusal imminent"
 
     - alert: HAproxyFrontendRequestErrors
       expr: rate(haproxy_frontend_request_errors_total[5m]) > 10
