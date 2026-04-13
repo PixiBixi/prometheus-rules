@@ -14,7 +14,7 @@ OUT           = os.path.join(ROOT, "docs", "data.json")
 GITHUB_REPO = "https://github.com/PixiBixi/prometheus-rules"
 BRANCH      = "main"
 
-SKIP_EXPORTERS = {"ipsec_exporter"}
+SKIP_EXPORTERS = set()
 SKIP_RULES     = {".yamllint.yml"}
 
 # Metric prefixes that belong to the exporter process itself (Go runtime,
