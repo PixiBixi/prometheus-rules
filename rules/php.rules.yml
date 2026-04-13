@@ -24,3 +24,39 @@
       labels:
         severity: critical
 
+    - alert: PHPFPMQueueSaturation
+      expr: phpfpm_listen_queue / phpfpm_listen_queue_length > 0.8
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "PHP-FPM queue saturation on pool {{ $labels.pool }}"
+        description: "PHP-FPM queue above 80% full on pool {{ $labels.pool }}. New requests will be rejected soon."
+
+    - alert: PHPFPMProcessSaturation
+      expr: phpfpm_active_processes / phpfpm_total_processes > 0.9
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PHP-FPM process saturation on pool {{ $labels.pool }}"
+        description: "90% of PHP-FPM workers busy on pool {{ $labels.pool }}. Pool may become saturated."
+
+    - alert: PHPFPMSlowRequests
+      expr: increase(phpfpm_slow_requests[5m]) > 5
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PHP-FPM slow requests on pool {{ $labels.pool }}"
+        description: "More than 5 slow requests in 5 minutes on pool {{ $labels.pool }}."
+
+    - alert: PHPFPMScrapeFailed
+      expr: increase(phpfpm_scrape_failures[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "PHP-FPM exporter scrape failed for pool {{ $labels.pool }}"
+        description: "PHP-FPM exporter cannot reach pool {{ $labels.pool }}."
+

@@ -141,3 +141,111 @@
         summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
         description: "{{ $value }} healthcheck failures in the last minute on {{ $labels.server }}"
 
+    - alert: HAproxyFrontendDown
+      expr: haproxy_frontend_status{state="OPEN"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy frontend down (instance {{ $labels.instance }})"
+        description: "Frontend {{ $labels.proxy }} is not in OPEN state on {{ $labels.instance }}"
+
+    - alert: HAproxyFrontendSessionSaturation
+      expr: haproxy_frontend_current_sessions / haproxy_frontend_limit_sessions > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy frontend session saturation (instance {{ $labels.instance }})"
+        description: "Frontend {{ $labels.proxy }} session usage above 80%"
+
+    - alert: HAproxyFrontendRequestErrors
+      expr: rate(haproxy_frontend_request_errors_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy frontend request errors (instance {{ $labels.instance }})"
+        description: "More than 10 invalid requests/s on frontend {{ $labels.proxy }}"
+
+    - alert: HAproxyBackendQueueTimeHigh
+      expr: haproxy_backend_queue_time_average_seconds > 0.5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy backend queue time high (instance {{ $labels.instance }})"
+        description: "Backend {{ $labels.proxy }} queue wait time above 500ms ({{ $value | humanizeDuration }})"
+
+    - alert: HAproxyBackendResponseTimeHigh
+      expr: haproxy_backend_response_time_average_seconds > 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy backend response time high (instance {{ $labels.instance }})"
+        description: "Backend {{ $labels.proxy }} average response time above 1s ({{ $value | humanizeDuration }})"
+
+    - alert: HAproxyBackendRedispatch
+      expr: rate(haproxy_backend_redispatch_warnings_total[5m]) > 5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy backend redispatch (instance {{ $labels.instance }})"
+        description: "Backend {{ $labels.proxy }} is redispatching connections frequently — a server is likely flapping"
+
+    - alert: HAproxyServerDown
+      expr: haproxy_server_status{state="UP"} == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy server down (instance {{ $labels.instance }})"
+        description: "Server {{ $labels.server }} in backend {{ $labels.proxy }} is DOWN on {{ $labels.instance }}"
+
+    - alert: HAproxyServerQueueFull
+      expr: haproxy_server_current_queue > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy server queue full (instance {{ $labels.instance }})"
+        description: "Server {{ $labels.server }} in backend {{ $labels.proxy }} has pending queued connections"
+
+    - alert: HAproxyServerDowntimeAccumulating
+      expr: increase(haproxy_server_downtime_seconds_total[1h]) > 300
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy server downtime accumulating (instance {{ $labels.instance }})"
+        description: "Server {{ $labels.server }} accumulated more than 5 minutes of downtime in the last hour"
+
+    - alert: HAproxyProcessIdleLow
+      expr: haproxy_process_idle_time_percent < 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy process idle low (instance {{ $labels.instance }})"
+        description: "HAProxy process idle time below 10% on {{ $labels.instance }} — process is saturated"
+
+    - alert: HAproxyProcessDroppedLogs
+      expr: rate(haproxy_process_dropped_logs_total[5m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy process dropped logs (instance {{ $labels.instance }})"
+        description: "HAProxy is dropping log messages on {{ $labels.instance }} — syslog or log socket overloaded"
+
+    - alert: HAproxyConnectionRateNearLimit
+      expr: haproxy_process_current_connection_rate / haproxy_process_limit_connection_rate > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy connection rate near limit (instance {{ $labels.instance }})"
+        description: "HAProxy connection rate at 80% of limit on {{ $labels.instance }}"
+

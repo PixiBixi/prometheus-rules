@@ -49,4 +49,40 @@
         description: "{{ $labels.instance }} has rebalancing queries for 5 minuts, it could be normal"
         summary: "KSQL queries are rebalancing on {{ $labels.instance }} for 5 minuts"
 
+    - alert: KSQLErrorQueries
+      expr: ksql_ksql_engine_query_stats_error_queries > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "KSQL queries in ERROR state on {{ $labels.ksql_cluster }}"
+        description: "$value KSQL query(ies) are in ERROR state on cluster {{ $labels.ksql_cluster }}. Data processing is stopped for those queries."
+
+    - alert: KSQLPendingErrorQueries
+      expr: ksql_ksql_engine_query_stats_pending_error_queries > 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "KSQL queries in PENDING_ERROR state on {{ $labels.ksql_cluster }}"
+        description: "$value KSQL query(ies) are in PENDING_ERROR state on cluster {{ $labels.ksql_cluster }}."
+
+    - alert: KSQLHighErrorRate
+      expr: ksql_ksql_engine_query_stats_error_rate > 0.05
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "KSQL cluster {{ $labels.ksql_cluster }} high error rate"
+        description: "KSQL cluster {{ $labels.ksql_cluster }} is failing to process more than 5% of consumed messages."
+
+    - alert: KafkaConsumerLagHigh
+      expr: kafka_consumer_consumer_fetch_manager_metrics_records_lag_max > 10000
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka consumer {{ $labels.client_id }} high lag on {{ $labels.topic }}"
+        description: "Kafka consumer {{ $labels.client_id }} has lag above 10000 records on topic {{ $labels.topic }} partition {{ $labels.partition }}."
+
 

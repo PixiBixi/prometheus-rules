@@ -32,3 +32,48 @@
       annotations:
         summary: "Critical NVMe wear level for {{ $labels.device }} on {{ $labels.instance }}"
         description: "NVMe {{ $labels.device }} on {{ $labels.instance }} wear level is above 60% — replace soon."
+
+    - alert: NVMECriticalWarning
+      expr: nvme_critical_warning > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "NVMe critical warning on {{ $labels.device }}"
+        description: "NVMe controller has active critical warnings on {{ $labels.device }}."
+
+    - alert: NVMEAvailSpareLow
+      expr: nvme_avail_spare < nvme_spare_thresh
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "NVMe spare capacity low on {{ $labels.device }}"
+        description: "NVMe spare capacity below manufacturer threshold on {{ $labels.device }} ({{ $value }}%)."
+
+    - alert: NVMEUnsafeShutdowns
+      expr: increase(nvme_unsafe_shutdowns[24h]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "NVMe unsafe shutdown on {{ $labels.device }}"
+        description: "NVMe device {{ $labels.device }} had an unsafe shutdown in the last 24h."
+
+    - alert: NVMEErrorLogEntries
+      expr: increase(nvme_num_err_log_entries[1h]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "NVMe error log entries on {{ $labels.device }}"
+        description: "NVMe device {{ $labels.device }} logged new error entries in the past hour."
+
+    - alert: NVMEHighTemperature
+      expr: nvme_temperature > 158
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "NVMe high temperature on {{ $labels.device }}"
+        description: "NVMe device {{ $labels.device }} temperature above 70C ({{ $value }}F). Check cooling."

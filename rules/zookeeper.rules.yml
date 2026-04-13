@@ -17,4 +17,57 @@
         description: "{{ $labels.instance }} of job {{ $labels.job }} has an unsuciffiient Quorum"
         summary: "{{ $labels.instance }} of job {{ $labels.job }} has an unsuciffiient Quorum"
 
+    - alert: ZookeeperNoLeader
+      expr: sum(zookeeper_Leader) == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "ZooKeeper no leader"
+        description: "No ZooKeeper node is currently the leader. The ensemble is unavailable."
+
+    - alert: ZookeeperHighAvgLatency
+      expr: zookeeper_AvgRequestLatency > 100
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "ZooKeeper high average latency (instance {{ $labels.instance }})"
+        description: "ZooKeeper average request latency above 100ms on {{ $labels.instance }} (replicaId={{ $labels.replicaId }}). Client operations may time out."
+
+    - alert: ZookeeperHighMaxLatency
+      expr: zookeeper_MaxRequestLatency > 500
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "ZooKeeper high max latency (instance {{ $labels.instance }})"
+        description: "ZooKeeper max request latency above 500ms on {{ $labels.instance }}."
+
+    - alert: ZookeeperOutstandingRequests
+      expr: zookeeper_OutstandingRequests > 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "ZooKeeper outstanding requests (instance {{ $labels.instance }})"
+        description: "ZooKeeper has {{ $value }} outstanding requests on {{ $labels.instance }} — node may be overloaded."
+
+    - alert: ZookeeperJVMDeadlock
+      expr: jvm_threads_deadlocked_monitor > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "ZooKeeper JVM deadlock (instance {{ $labels.instance }})"
+        description: "JVM thread deadlock detected in ZooKeeper on {{ $labels.instance }}. Restart required."
+
+    - alert: ZookeeperJMXScrapeFailed
+      expr: jmx_scrape_error != 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "ZooKeeper JMX scrape failed (instance {{ $labels.instance }})"
+        description: "JMX scrape failed on ZooKeeper {{ $labels.instance }}. Metrics are incomplete."
 
