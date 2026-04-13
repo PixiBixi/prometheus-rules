@@ -1,0 +1,37 @@
+- name: ping.rules
+  rules:
+    - alert: PingHighPacketLoss
+      expr: ping_loss_ratio > 0.1
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Ping high packet loss (target {{ $labels.target }})"
+        description: "Packet loss is above 10% for target {{ $labels.target }} on {{ $labels.ip }}\n  VALUE = {{ $value }}"
+
+    - alert: PingPacketLossTotal
+      expr: ping_loss_ratio >= 1
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Ping packet loss total (target {{ $labels.target }})"
+        description: "100% packet loss detected for target {{ $labels.target }} on {{ $labels.ip }}"
+
+    - alert: PingHighLatency
+      expr: ping_rtt_mean_ms > 200
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Ping high latency (target {{ $labels.target }})"
+        description: "Mean RTT is above 200ms for target {{ $labels.target }} on {{ $labels.ip }}\n  VALUE = {{ $value }}ms"
+
+    - alert: PingExporterDown
+      expr: ping_up == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Ping exporter down (instance {{ $labels.instance }})"
+        description: "Ping exporter is down on {{ $labels.instance }}"

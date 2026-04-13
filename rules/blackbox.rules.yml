@@ -62,3 +62,21 @@
       annotations:
         summary: "Blackbox configuration reload failure (instance {{ $labels.instance }})"
         description: "Blackbox configuration reload failed on {{ $labels.instance }}"
+
+    - alert: BlackboxConfigReloadStale
+      expr: time() - blackbox_exporter_config_last_reload_success_timestamp_seconds > 300
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Blackbox configuration reload stale (instance {{ $labels.instance }})"
+        description: "Configuration hasn't been successfully reloaded in 5 minutes on {{ $labels.instance }}"
+
+    - alert: BlackboxUnknownModule
+      expr: increase(blackbox_module_unknown_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Blackbox unknown module (instance {{ $labels.instance }})"
+        description: "Scrape job references a module not defined in blackbox config on {{ $labels.instance }}"
