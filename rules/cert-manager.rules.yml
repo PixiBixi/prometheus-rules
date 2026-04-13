@@ -54,3 +54,21 @@
         summary: "Cert Manager hitting Let's Encrypt rate limits on {{ $labels.host }}"
         description: "Cert Manager is receiving HTTP 429 from Let's Encrypt for {{ $labels.host }}. Rate limit can block certificate issuance for up to 7 days."
         runbook_url: https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagerhittingratelimits
+
+    - alert: CertManagerControllerSyncErrors
+      expr: rate(certmanager_controller_sync_error_count[5m]) / rate(certmanager_controller_sync_call_count[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Cert Manager controller {{ $labels.controller }} sync error rate is high"
+        description: "cert-manager controller {{ $labels.controller }} is failing more than 10% of sync operations. Certificate issuance may be delayed."
+
+    - alert: CertManagerACMEHighErrorRate
+      expr: rate(certmanager_http_acme_client_request_duration_seconds_count{status=~"4..|5.."}[5m]) / rate(certmanager_http_acme_client_request_duration_seconds_count[5m]) > 0.05
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Cert Manager ACME client high error rate on {{ $labels.host }}"
+        description: "cert-manager ACME client has more than 5% error rate ($value | humanizePercentage) talking to {{ $labels.host }}."

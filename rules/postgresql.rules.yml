@@ -224,3 +224,102 @@
         summary: "PostgreSQL invalid index (instance {{ $labels.instance }})"
         description: "Table {{ $labels.relname }} has invalid index {{ $labels.indexrelname }} on {{ $labels.instance }} — run: DROP INDEX {{ $labels.indexrelname }}"
 
+    - alert: PostgresExporterScrapeFailed
+      expr: pg_exporter_last_scrape_error == 1
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "PostgreSQL exporter scrape failed (instance {{ $labels.instance }})"
+        description: "postgres_exporter cannot scrape {{ $labels.instance }}"
+
+    - alert: PostgresReplicationLagHigh
+      expr: pg_replication_lag > 30
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL replication lag high (server {{ $labels.server }})"
+        description: "Replication lag on {{ $labels.server }} is {{ $value | humanizeDuration }}. Replica is falling behind."
+
+    - alert: PostgresReplicationLagCritical
+      expr: pg_replication_lag > 300
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "PostgreSQL replication lag critical (server {{ $labels.server }})"
+        description: "Replication lag on {{ $labels.server }} is {{ $value | humanizeDuration }}. Replica is severely behind."
+
+    - alert: PostgresWALArchiveFailing
+      expr: increase(pg_stat_archiver_failed_count[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "PostgreSQL WAL archive failing (server {{ $labels.server }})"
+        description: "WAL archiving failures on {{ $labels.server }}. PITR recovery may be broken."
+
+    - alert: PostgresWALArchiveStale
+      expr: pg_stat_archiver_last_archive_age > 3600
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL WAL archive stale (server {{ $labels.server }})"
+        description: "Last successful WAL archive on {{ $labels.server }} was {{ $value | humanizeDuration }} ago. Check archive destination."
+
+    - alert: PostgresConnectionsSaturation
+      expr: sum by (server) (pg_stat_database_numbackends) / pg_settings_max_connections > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL connections saturation (server {{ $labels.server }})"
+        description: "PostgreSQL connection usage above 80% of max_connections on {{ $labels.server }}."
+
+    - alert: PostgresDeadlockHigh
+      expr: increase(pg_stat_database_deadlocks[5m]) > 10
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL deadlock high (database {{ $labels.datname }})"
+        description: "More than 10 deadlocks detected in 5 minutes on database {{ $labels.datname }}."
+
+    - alert: PostgresChecksumFailures
+      expr: increase(pg_stat_database_checksum_failures[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "PostgreSQL checksum failures (database {{ $labels.datname }})"
+        description: "Data checksum failure detected on {{ $labels.datname }} — possible disk corruption."
+
+    - alert: PostgresTempFilesHigh
+      expr: rate(pg_stat_database_temp_bytes[5m]) > 100000000
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL temp files high (database {{ $labels.datname }})"
+        description: "Database {{ $labels.datname }} is writing more than 100MB/min to temp files — query memory pressure, check work_mem."
+
+    - alert: PostgresBackendFsyncHigh
+      expr: rate(pg_stat_bgwriter_buffers_backend_fsync_total[5m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL backend fsync high (instance {{ $labels.instance }})"
+        description: "Backend processes are performing fsync themselves on {{ $labels.instance }} — bgwriter cannot keep up."
+
+    - alert: PostgresDatabaseSizeGrowthHigh
+      expr: predict_linear(pg_database_size_bytes[6h], 86400) - pg_database_size_bytes > 10737418240
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL database size growth high (database {{ $labels.datname }})"
+        description: "Database {{ $labels.datname }} projected to grow by more than 10GB in 24h at current rate."
+

@@ -22,3 +22,39 @@
       annotations:
         summary: "Promtail request latency (instance {{ $labels.instance }})"
         description: "{{ $labels.job }} {{ $labels.route }} p99 latency is {{ printf \"%.2f\" $value }}s"
+
+    - alert: PromtailDroppedEntries
+      expr: rate(promtail_dropped_entries_total[5m]) > 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Promtail dropped entries (instance {{ $labels.instance }})"
+        description: "Promtail is dropping log entries that cannot be sent to Loki on {{ $labels.instance }} (reason={{ $labels.reason }})."
+
+    - alert: PromtailBatchRetries
+      expr: rate(promtail_batch_retries_total[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Promtail batch retries (instance {{ $labels.instance }})"
+        description: "Promtail is retrying batches frequently on {{ $labels.instance }}. Loki may be slow or unreachable."
+
+    - alert: PromtailConfigReloadFailed
+      expr: increase(promtail_config_reload_fail_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Promtail config reload failed (instance {{ $labels.instance }})"
+        description: "Promtail config reload failed on {{ $labels.instance }}."
+
+    - alert: PromtailNoActiveScrapeTargets
+      expr: promtail_targets_active_total == 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Promtail no active scrape targets (instance {{ $labels.instance }})"
+        description: "Promtail has no active scrape targets on {{ $labels.instance }}. Log collection may have stopped."

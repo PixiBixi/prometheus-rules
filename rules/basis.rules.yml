@@ -506,6 +506,90 @@
         summary: "Systemd service crash looping on {{ $labels.instance }}"
         description: "Service {{ $labels.name }} at {{ $labels.instance }} has restarted more than twice in 5 minutes."
 
+    # ── Hardware temperature ───────────────────────────────────────────────────
+
+    - alert: NodeHardwareTemperatureTooHigh
+      expr: node_hwmon_temp_celsius >= node_hwmon_temp_crit_celsius
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Critical hardware temperature on {{ $labels.instance }} ({{ $labels.chip }}/{{ $labels.sensor }})"
+        description: Hardware temperature on {{ $labels.instance }} sensor {{ $labels.chip }}/{{ $labels.sensor }} has reached critical threshold ({{ $value }}C).
+
+    - alert: NodeHardwareTemperatureWarning
+      expr: node_hwmon_temp_celsius >= node_hwmon_temp_max_celsius
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High hardware temperature on {{ $labels.instance }} ({{ $labels.chip }}/{{ $labels.sensor }})"
+        description: Hardware temperature on {{ $labels.instance }} sensor {{ $labels.chip }}/{{ $labels.sensor }} above max threshold ({{ $value }}C).
+
+    # ── RAID recovery ──────────────────────────────────────────────────────────
+
+    - alert: NodeRaidRecovering
+      expr: node_md_state{state="recovering"} == 1
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "RAID array recovering on {{ $labels.instance }} ({{ $labels.device }})"
+        description: RAID array {{ $labels.device }} on {{ $labels.instance }} is recovering. Monitor progress.
+
+    # ── Network carrier ────────────────────────────────────────────────────────
+
+    - alert: NodeNetworkLinkDown
+      expr: node_network_carrier{device!~"lo|veth.*|docker.*|br-.*|virbr.*|tun.*"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Network link down on {{ $labels.instance }} ({{ $labels.device }})"
+        description: Network interface {{ $labels.device }} on {{ $labels.instance }} has lost carrier.
+
+    - alert: NodeNetworkInterfaceFlapping
+      expr: changes(node_network_carrier{device!~"lo|veth.*|docker.*|br-.*|virbr.*|tun.*"}[5m]) > 2
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Network interface flapping on {{ $labels.instance }} ({{ $labels.device }})"
+        description: Network interface {{ $labels.device }} on {{ $labels.instance }} is flapping ({{ $value }} carrier changes in 5 minutes).
+
+    # ── Memory corruption ──────────────────────────────────────────────────────
+
+    - alert: NodeMemoryHardwareCorrupted
+      expr: node_memory_HardwareCorrupted_bytes > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Hardware memory corruption detected on {{ $labels.instance }}"
+        description: Hardware memory corruption detected on {{ $labels.instance }} ({{ $value | humanize1024 }}). Schedule hardware replacement.
+
+    # ── TCP sockets ────────────────────────────────────────────────────────────
+
+    - alert: NodeTCPOrphanSockets
+      expr: node_sockstat_TCP_orphan > 10000
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High TCP orphan sockets on {{ $labels.instance }}"
+        description: "{{ $value }} orphaned TCP sockets on {{ $labels.instance }}. Possible TCP connection leak."
+
+    # ── Systemd system status ──────────────────────────────────────────────────
+
+    - alert: NodeSystemdNotRunning
+      expr: node_systemd_system_running == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "systemd not fully operational on {{ $labels.instance }}"
+        description: systemd reports system is not fully operational on {{ $labels.instance }}.
+
     # ── Bonding ────────────────────────────────────────────────────────────────
 
     - alert: NodeBondingDegraded

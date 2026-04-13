@@ -53,3 +53,30 @@
       annotations:
         summary: "Keepalived advertisement interval errors on {{ $labels.instance }}"
         description: "{{ $labels.instance }} has {{ $value }} VRRP advertisement interval errors in 5 minutes — risk of spurious master election."
+
+    - alert: KeepalivedAuthenticationInvalid
+      expr: increase(keepalived_authentication_invalid_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Keepalived authentication invalid on {{ $labels.instance }}"
+        description: "VRRP authentication failures on {{ $labels.instance }} vrid={{ $labels.vrid }} — likely misconfiguration or rogue peer."
+
+    - alert: KeepalivedTTLErrors
+      expr: increase(keepalived_ip_ttl_errors_total[5m]) > 5
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Keepalived TTL errors on {{ $labels.instance }}"
+        description: "VRRP TTL errors on {{ $labels.instance }} — possible routing misconfiguration."
+
+    - alert: KeepalivedPacketErrors
+      expr: increase(keepalived_packet_length_errors_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Keepalived packet length errors on {{ $labels.instance }}"
+        description: "VRRP packet length errors on {{ $labels.instance }} — possible network corruption or incompatible version."

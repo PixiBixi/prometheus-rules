@@ -40,3 +40,99 @@
       annotations:
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
         summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
+    - alert: KafkaNoActiveController
+      expr: kafka_controller_kafkacontroller_activecontrollercount != 1
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        description: "There is no active Kafka controller (or more than one) on {{ $labels.instance }}. Cluster operations are impaired."
+        summary: "No active Kafka controller on {{ $labels.instance }}"
+    - alert: KafkaBrokerFenced
+      expr: kafka_controller_kafkacontroller_fencedbrokercount > 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "$value Kafka broker(s) are fenced (unresponsive to controller heartbeat) on {{ $labels.instance }}."
+        summary: "$value broker(s) fenced on {{ $labels.instance }}"
+    - alert: KafkaUncleanLeaderElection
+      expr: increase(kafka_controller_controllerstats_uncleanleaderelections_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        description: "Unclean leader election detected on {{ $labels.instance }} — potential data loss. Inspect consumer lag immediately."
+        summary: "Unclean leader election on {{ $labels.instance }}"
+    - alert: KafkaOfflineReplicas
+      expr: kafka_server_replicamanager_offlinereplicacount > 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "$value Kafka replica(s) are offline on {{ $labels.instance }}."
+        summary: "$value replica(s) offline on {{ $labels.instance }}"
+    - alert: KafkaPartitionsUnderMinISR
+      expr: kafka_server_replicamanager_underminisrpartitioncount > 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "$value partition(s) are below the minimum ISR on {{ $labels.instance }}. Producer acks=all will fail."
+        summary: "$value partition(s) under min ISR on {{ $labels.instance }}"
+    - alert: KafkaPartitionsAtMinISR
+      expr: kafka_server_replicamanager_atminisrpartitioncount > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "$value partition(s) are exactly at min ISR on {{ $labels.instance }} — one more failure risks under-min-ISR."
+        summary: "$value partition(s) at min ISR on {{ $labels.instance }}"
+    - alert: KafkaOfflineLogDirectory
+      expr: kafka_log_logmanager_offlinelogdirectorycount > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        description: "$value log directory(ies) are offline on {{ $labels.instance }}. Partitions on those dirs are unavailable."
+        summary: "$value log directory(ies) offline on {{ $labels.instance }}"
+    - alert: KafkaRequestHandlerIdleLow
+      expr: kafka_server_kafkarequesthandlerpool_requesthandleravgidle_percent < 0.30
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "Kafka request handler thread pool idle below 30% on {{ $labels.instance }}. Broker may be overloaded."
+        summary: "Request handler idle low on {{ $labels.instance }}"
+    - alert: KafkaNetworkProcessorIdleLow
+      expr: kafka_network_socketserver_networkprocessoravgidlepercent < 0.30
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "Kafka network processor idle below 30% on {{ $labels.instance }}. Consider increasing num.network.threads."
+        summary: "Network processor idle low on {{ $labels.instance }}"
+    - alert: KafkaDeadLogCleanerThread
+      expr: kafka_log_logcleaner_deadthreadcount > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        description: "Dead log cleaner thread on {{ $labels.instance }}. Compacted topics will stop being cleaned."
+        summary: "Dead log cleaner thread on {{ $labels.instance }}"
+    - alert: KafkaJVMDeadlocked
+      expr: jvm_threads_deadlocked_monitor > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        description: "JVM thread deadlock detected on {{ $labels.instance }}. Restart required."
+        summary: "JVM deadlock on {{ $labels.instance }}"
+    - alert: KafkaJMXScrapeFailed
+      expr: jmx_scrape_error != 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        description: "JMX scrape failed on {{ $labels.instance }}. Kafka metrics are incomplete."
+        summary: "JMX scrape failed on {{ $labels.instance }}"
