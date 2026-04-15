@@ -35,7 +35,7 @@
         summary: "CoreDNS high SERVFAIL rate ({{ $value | humanizePercentage }})"
         description: "CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of requests."
         runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorshigh
-    - alert: CoreDNSErrorsHigh
+    - alert: CoreDNSErrorsElevated
       expr: |
         sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="kube-dns", rcode="SERVFAIL"}[5m]))
         /
@@ -73,7 +73,7 @@
         summary: "CoreDNS high forward SERVFAIL rate to {{ $labels.to }} ({{ $value | humanizePercentage }})"
         description: "CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of forward requests to {{ $labels.to }}."
         runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwarderrorshigh
-    - alert: CoreDNSForwardErrorsHigh
+    - alert: CoreDNSForwardErrorsElevated
       expr: |
         sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="kube-dns", rcode="SERVFAIL"}[5m]))
         /
