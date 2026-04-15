@@ -600,3 +600,102 @@
       annotations:
         summary: "Bonding interface degraded on {{ $labels.instance }}"
         description: "Bonding interface {{ $labels.master }} at {{ $labels.instance }} has slave failures."
+
+    # ── Swap ───────────────────────────────────────────────────────────────────
+
+    - alert: NodeSwapSaturation
+      expr: |
+        node_memory_SwapTotal_bytes > 0
+          and
+        (node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes) / node_memory_SwapTotal_bytes > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Swap usage high on {{ $labels.instance }}"
+        description: "Swap is more than 80% used on {{ $labels.instance }} — memory pressure likely."
+
+    - alert: NodeSwapSaturationCritical
+      expr: |
+        node_memory_SwapTotal_bytes > 0
+          and
+        (node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes) / node_memory_SwapTotal_bytes > 0.9
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Swap almost exhausted on {{ $labels.instance }}"
+        description: "Swap is more than 90% used on {{ $labels.instance }} — OOM risk imminent."
+
+    - alert: NodeActiveSwapping
+      expr: rate(node_vmstat_pswpin[5m]) + rate(node_vmstat_pswpout[5m]) > 256
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Active swapping on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} is actively swapping ({{ $value | humanize }} pages/sec) — RAM exhausted, severe performance degradation."
+
+    # ── I/O pressure ───────────────────────────────────────────────────────────
+
+    - alert: NodeProcsBlocked
+      expr: node_procs_blocked > 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Processes blocked on I/O on {{ $labels.instance }}"
+        description: "{{ $value }} processes blocked waiting for I/O on {{ $labels.instance }} — possible disk saturation or hung device."
+
+    # ── TCP kernel drops ───────────────────────────────────────────────────────
+
+    - alert: NodeTCPListenOverflows
+      expr: rate(node_netstat_TcpExt_ListenOverflows[5m]) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "TCP listen queue overflows on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} is dropping connections due to full TCP listen queue — application cannot accept connections fast enough."
+
+    # ── Softnet drops ──────────────────────────────────────────────────────────
+
+    - alert: NodeSoftnetDrops
+      expr: rate(node_softnet_dropped_total[5m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kernel softnet drops on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} is dropping packets at the kernel NIC ring buffer level — possible NIC saturation or insufficient RX buffer."
+
+    # ── Filesystem health ──────────────────────────────────────────────────────
+
+    - alert: NodeFilesystemReadonly
+      expr: node_filesystem_readonly{fstype!~"(tmpfs|iso9660|squashfs)",mountpoint!~"(/boot|/boot/efi)"} == 1
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Filesystem remounted read-only on {{ $labels.instance }}"
+        description: "Filesystem {{ $labels.device }} mounted on {{ $labels.mountpoint }} at {{ $labels.instance }} is read-only — possible disk error or kernel panic."
+
+    - alert: NodeFilesystemDeviceError
+      expr: node_filesystem_device_error{fstype!~"(tmpfs|iso9660|squashfs)"} > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Filesystem device error on {{ $labels.instance }}"
+        description: "Filesystem {{ $labels.device }} mounted on {{ $labels.mountpoint }} at {{ $labels.instance }} reports a device error."
+
+    # ── UDP buffer errors ──────────────────────────────────────────────────────
+
+    - alert: NodeUDPReceiveBufferErrors
+      expr: rate(node_netstat_Udp_RcvbufErrors[5m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "UDP receive buffer errors on {{ $labels.instance }}"
+        description: "{{ $labels.instance }} is dropping UDP packets due to full receive buffers — consider increasing net.core.rmem_max."
