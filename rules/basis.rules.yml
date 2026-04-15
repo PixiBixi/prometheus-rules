@@ -24,7 +24,7 @@
         severity: info
       annotations:
         summary: "CPU Throttled on {{ $labels.instance }}"
-        description: "CPU has been throttled on {{ $labels.instance }} for at least 5 minuts, it directly impact performances because it reduces frequency. Please check T° of your processor"
+        description: "CPU has been throttled on {{ $labels.instance }} for at least 5 minutes, it directly impact performances because it reduces frequency. Please check T° of your processor"
     - alert: SlowCPU
       expr: avg(node_cpu_scaling_frequency_hertz) by (instance) < avg(node_cpu_frequency_max_hertz) by (instance)*0.30
       for: 5m
@@ -32,7 +32,7 @@
         severity: info
       annotations:
         summary: "Slow CPU on {{ $labels.instance }}"
-        description: "Slow CPU on {{ $labels.instance }} ({{ $value }}) for at least 5 minuts (< 30% of maximum frequency). It directly impact performances because it reduces frequency."
+        description: "Slow CPU on {{ $labels.instance }} ({{ $value }}) for at least 5 minutes (< 30% of maximum frequency). It directly impact performances because it reduces frequency."
 
     - alert: CantScrapeTextfile
       expr: node_textfile_scrape_error > 0
@@ -41,7 +41,7 @@
         severity: critical
       annotations:
         summary: "Cant scrape {{ $labels.instance }} file"
-        description: "Cant scrape {{ $labels.instance }} for more than 5 minuts, please check the instance"
+        description: "Cant scrape {{ $labels.instance }} for more than 5 minutes, please check the instance"
     - alert: OldMetricsTextfile
       expr: node_textfile_mtime_seconds{file=~".*bid.*"} < time() - 60
       for: 2m
@@ -49,7 +49,7 @@
         severity: critical
       annotations:
         summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
-        description: "Check why `{{ $labels.file}}` hasn't been scraped on {{ $labels.instance}} for 2 minuts"
+        description: "Check why `{{ $labels.file}}` hasn't been scraped on {{ $labels.instance}} for 2 minutes"
     - alert: OldMetricsTextfile
       expr: node_textfile_mtime_seconds{file=~".*aerospike_backup.*"} < time() - 3700
       for: 2m
@@ -57,7 +57,7 @@
         severity: critical
       annotations:
         summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
-        description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minuts"
+        description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minutes"
     - alert: OldMetricsTextfile
       expr: node_textfile_mtime_seconds{file!~"(.*bid.*|.*server_metrics.*|.*aerospike_backup.*)"} < time() - 60
       for: 2m
@@ -65,7 +65,7 @@
         severity: critical
       annotations:
         summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
-        description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minuts"
+        description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minutes"
 
     - alert: HighDroppedPackages
       expr: (irate(node_network_receive_drop_total{ignoredDroppedPackage=""}[5m])/irate(node_network_receive_packets_total[5m])) > 0.1
@@ -143,7 +143,7 @@
         severity: critical
       annotations:
         summary: "Segfault detected on {{ $labels.instance }}"
-        description: "Segfault has been detected in the last minut, please check `/var/log/kern.log`"
+        description: "Segfault has been detected in the last minute, please check `/var/log/kern.log`"
 
     # Disk
     ## All Servers
@@ -186,15 +186,15 @@
       labels:
         severity: critical
       annotations:
-        summary: "Systemd unit failed for nginx on {{ $labels.instance }}"
-        description: "Systemd failed for nginx, please take a look with `systemctl status {{ $labels.name }}`"
+        summary: "Systemd unit failed for docker on {{ $labels.instance }}"
+        description: "Systemd failed for docker, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdMySQL
       expr: node_systemd_unit_state{state="failed",name="mysql.service",ignoreMysqlDown=""} > 0
       labels:
         severity: critical
       annotations:
-        summary: "Systemd unit failed for nginx on {{ $labels.instance }}"
-        description: "Systemd failed for nginx, please take a look with `systemctl status {{ $labels.name }}`"
+        summary: "Systemd unit failed for MySQL on {{ $labels.instance }}"
+        description: "Systemd failed for MySQL, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdAerospike
       expr: node_systemd_unit_state{state="failed",name="aerospike.service",ignoreAerospikeDown=""} > 0
       labels:
@@ -277,8 +277,8 @@
       labels:
         severity: critical
       annotations:
-        summary: "Systemd unit failed for NTP {{ $labels.instance }}"
-        description: "Systemd failed for NTP, please take a look with `systemctl status {{ $labels.name }}`"
+        summary: "Systemd unit failed for Teleport {{ $labels.instance }}"
+        description: "Systemd failed for Teleport, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdKafkaConnect
       expr: node_systemd_unit_state{state="failed",name="confluent-kafka-connect.service",ignoreKafkaConnectDown=""} > 0
       labels:
@@ -342,13 +342,6 @@
       annotations:
         summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
-    - alert: DownSystemdSquid
-      expr: node_systemd_unit_state{state="failed",name="squid.service",ignoreSquidDown=""} > 0
-      labels:
-        severity: critical
-      annotations:
-        summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
-        description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
 
     # CPU
     - alert: CPULoad
@@ -367,7 +360,7 @@
         severity: critical
       annotations:
         summary: “Host high CPU load (instance RDS {{ $labels.instance }})”
-        description: “The CPU load reported from RDS {{ $labels.instance }} has exceeded 90% for more than 1 minut.”
+        description: “The CPU load reported from RDS {{ $labels.instance }} has exceeded 90% for more than 1 minute.”
     - alert: CPUwaitIO
       expr: instance:node_cpu_utilization:ratio{ignoreCPULoad="",mode="iowait",ignoreSingleCPU=""} > 0.1
       for: 5m
