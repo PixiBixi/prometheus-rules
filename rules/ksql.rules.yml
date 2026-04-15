@@ -16,7 +16,7 @@
       annotations:
         description: "{{ $labels.instance }} of job {{ $labels.job }} has a down connector for {{ $labels.ksql_query }}"
         summary: "Instance {{ $labels.instance }} has a down connector"
-    - alert: KsqlConnectorDown
+    - alert: KsqlConnectorDownV2
       expr: sum(ksql_ksql_metrics_ksql_queries_query_status{query_status!="RUNNING"}) by (ksql_query,job,instance)
       for: 5m
       labels:
@@ -46,8 +46,8 @@
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} has rebalancing queries for 5 minuts, it could be normal"
-        summary: "KSQL queries are rebalancing on {{ $labels.instance }} for 5 minuts"
+        description: "{{ $labels.instance }} has rebalancing queries for 5 minutes, it could be normal"
+        summary: "KSQL queries are rebalancing on {{ $labels.instance }} for 5 minutes"
 
     - alert: KSQLErrorQueries
       expr: ksql_ksql_engine_query_stats_error_queries > 0
@@ -56,7 +56,7 @@
         severity: critical
       annotations:
         summary: "KSQL queries in ERROR state on {{ $labels.ksql_cluster }}"
-        description: "$value KSQL query(ies) are in ERROR state on cluster {{ $labels.ksql_cluster }}. Data processing is stopped for those queries."
+        description: "{{ $value }} KSQL query(ies) are in ERROR state on cluster {{ $labels.ksql_cluster }}. Data processing is stopped for those queries."
 
     - alert: KSQLPendingErrorQueries
       expr: ksql_ksql_engine_query_stats_pending_error_queries > 0
@@ -65,7 +65,7 @@
         severity: warning
       annotations:
         summary: "KSQL queries in PENDING_ERROR state on {{ $labels.ksql_cluster }}"
-        description: "$value KSQL query(ies) are in PENDING_ERROR state on cluster {{ $labels.ksql_cluster }}."
+        description: "{{ $value }} KSQL query(ies) are in PENDING_ERROR state on cluster {{ $labels.ksql_cluster }}."
 
     - alert: KSQLHighErrorRate
       expr: ksql_ksql_engine_query_stats_error_rate > 0.05
