@@ -24,7 +24,7 @@
       annotations:
         summary: "High NVMe wear level for {{ $labels.device }} on {{ $labels.instance }}"
         description: "NVMe {{ $labels.device }} on {{ $labels.instance }} wear level is above 40% — plan for replacement."
-    - alert: NVMEUsage
+    - alert: NVMEUsageCritical
       expr: nvme_percent_used > 60
       for: 1m
       labels:
