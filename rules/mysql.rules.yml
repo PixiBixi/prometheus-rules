@@ -31,7 +31,7 @@
         severity: critical
       annotations:
         description: "{{ $labels.instance }} of job {{ $labels.job }} has connection errors"
-        summary: "{{ $labels.instance }} has connection errors for more than 2 minuts. {{ $value }}"
+        summary: "{{ $labels.instance }} has connection errors for more than 2 minutes. {{ $value }}"
 
     # Galera
     - alert: GaleraWrongSize
