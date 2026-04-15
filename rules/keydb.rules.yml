@@ -7,7 +7,7 @@
         severity: critical
       annotations:
         summary: "Redis is down for {{ $labels.instance }}"
-        description: "Redis is down for {{ $labels.instance }} for more than 5 minuts."
+        description: "Redis is down for {{ $labels.instance }} for more than 5 minutes."
     - alert: RedisOutOfMemory
       expr: (redis_memory_used_bytes / redis_memory_max_bytes * 100) > 90
       for: 5m
