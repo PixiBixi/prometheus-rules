@@ -52,41 +52,21 @@ jvm_memory_bytes_init{area="nonheap",} 7667712.0
 jvm_memory_pool_bytes_used{pool="CodeHeap 'non-nmethods'",} 1472896.0
 jvm_memory_pool_bytes_used{pool="Metaspace",} 5.7221688E7
 jvm_memory_pool_bytes_used{pool="CodeHeap 'profiled nmethods'",} 2.3533184E7
-jvm_memory_pool_bytes_used{pool="Compressed Class Space",} 6563776.0
-jvm_memory_pool_bytes_used{pool="G1 Eden Space",} 6.3438848E8
-jvm_memory_pool_bytes_used{pool="G1 Old Gen",} 1.43344264E8
-jvm_memory_pool_bytes_used{pool="G1 Survivor Space",} 1048576.0
-jvm_memory_pool_bytes_used{pool="CodeHeap 'non-profiled nmethods'",} 1.2818688E7
 # HELP jvm_memory_pool_bytes_committed Committed bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_committed gauge
 jvm_memory_pool_bytes_committed{pool="CodeHeap 'non-nmethods'",} 3276800.0
 jvm_memory_pool_bytes_committed{pool="Metaspace",} 5.9551744E7
 jvm_memory_pool_bytes_committed{pool="CodeHeap 'profiled nmethods'",} 2.359296E7
-jvm_memory_pool_bytes_committed{pool="Compressed Class Space",} 7471104.0
-jvm_memory_pool_bytes_committed{pool="G1 Eden Space",} 1.105199104E9
-jvm_memory_pool_bytes_committed{pool="G1 Old Gen",} 1.00139008E9
-jvm_memory_pool_bytes_committed{pool="G1 Survivor Space",} 1048576.0
-jvm_memory_pool_bytes_committed{pool="CodeHeap 'non-profiled nmethods'",} 1.2845056E7
 # HELP jvm_memory_pool_bytes_max Max bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_max gauge
 jvm_memory_pool_bytes_max{pool="CodeHeap 'non-nmethods'",} 7598080.0
 jvm_memory_pool_bytes_max{pool="Metaspace",} -1.0
 jvm_memory_pool_bytes_max{pool="CodeHeap 'profiled nmethods'",} 1.22028032E8
-jvm_memory_pool_bytes_max{pool="Compressed Class Space",} 1.073741824E9
-jvm_memory_pool_bytes_max{pool="G1 Eden Space",} -1.0
-jvm_memory_pool_bytes_max{pool="G1 Old Gen",} 3.221225472E9
-jvm_memory_pool_bytes_max{pool="G1 Survivor Space",} -1.0
-jvm_memory_pool_bytes_max{pool="CodeHeap 'non-profiled nmethods'",} 1.22032128E8
 # HELP jvm_memory_pool_bytes_init Initial bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_init gauge
 jvm_memory_pool_bytes_init{pool="CodeHeap 'non-nmethods'",} 2555904.0
 jvm_memory_pool_bytes_init{pool="Metaspace",} 0.0
 jvm_memory_pool_bytes_init{pool="CodeHeap 'profiled nmethods'",} 2555904.0
-jvm_memory_pool_bytes_init{pool="Compressed Class Space",} 0.0
-jvm_memory_pool_bytes_init{pool="G1 Eden Space",} 1.10624768E9
-jvm_memory_pool_bytes_init{pool="G1 Old Gen",} 9.99292928E8
-jvm_memory_pool_bytes_init{pool="G1 Survivor Space",} 0.0
-jvm_memory_pool_bytes_init{pool="CodeHeap 'non-profiled nmethods'",} 2555904.0
 # HELP jvm_memory_pool_collection_used_bytes Used bytes after last collection of a given JVM memory pool.
 # TYPE jvm_memory_pool_collection_used_bytes gauge
 jvm_memory_pool_collection_used_bytes{pool="G1 Eden Space",} 0.0
@@ -209,296 +189,6 @@ ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_
 ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
 ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
 ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="unknown",query_plan_type="unknown",query_routing_type="unknown",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="key_lookup",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed",query_plan_type="range_scan",query_routing_type="source_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="non_windowed_stream",query_plan_type="unknown",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.50",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="error-total",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.75",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-max",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.99",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="response-size",} 0.0
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-avg",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",value_type="latency-min",} NaN
-ksql_ksql_metrics_pull_query{ksql_service_id="myservice",query_source="windowed",query_plan_type="table_scan",query_routing_type="remote_node",attribute_name="pull-query-requests",quantile="0.90",} NaN
 # HELP ksql_ksql_engine_query_stats_error_rate The number of messages which were consumed but not processed. Messages may not be processed if, for instance, the message contents could not be deserialized due to an incompatible schema. Alternately, a consumed messages may not have been produced, hence being effectively dropped. Such messages would also be counted toward the error rate. io.confluent.ksql.metrics:name=null,type=_confluent-ksql-default_ksql-engine-query-stats,attribute=error-rate
 # TYPE ksql_ksql_engine_query_stats_error_rate untyped
 ksql_ksql_engine_query_stats_error_rate{ksql_cluster="mycluster",} 0.0
@@ -606,11 +296,6 @@ jvm_info{runtime="OpenJDK Runtime Environment",vendor="Ubuntu",version="11.0.18+
 jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'profiled nmethods'",} 2.7397376E7
 jvm_memory_pool_allocated_bytes_total{pool="G1 Old Gen",} 2.767714E8
 jvm_memory_pool_allocated_bytes_total{pool="G1 Eden Space",} 3.267773857792E12
-jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'non-profiled nmethods'",} 1.3623936E7
-jvm_memory_pool_allocated_bytes_total{pool="G1 Survivor Space",} 1.09051904E8
-jvm_memory_pool_allocated_bytes_total{pool="Compressed Class Space",} 6621184.0
-jvm_memory_pool_allocated_bytes_total{pool="Metaspace",} 5.7371232E7
-jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'non-nmethods'",} 3106048.0
 # HELP jmx_config_reload_failure_created Number of times configuration have failed to be reloaded.
 # TYPE jmx_config_reload_failure_created gauge
 jmx_config_reload_failure_created 1.684251185859E9
@@ -622,8 +307,3 @@ jmx_config_reload_success_created 1.684251185858E9
 jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'profiled nmethods'",} 1.684251186734E9
 jvm_memory_pool_allocated_bytes_created{pool="G1 Old Gen",} 1.684251186739E9
 jvm_memory_pool_allocated_bytes_created{pool="G1 Eden Space",} 1.684251186739E9
-jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-profiled nmethods'",} 1.684251186739E9
-jvm_memory_pool_allocated_bytes_created{pool="G1 Survivor Space",} 1.684251186739E9
-jvm_memory_pool_allocated_bytes_created{pool="Compressed Class Space",} 1.684251186739E9
-jvm_memory_pool_allocated_bytes_created{pool="Metaspace",} 1.684251186739E9
-jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-nmethods'",} 1.684251186739E9
