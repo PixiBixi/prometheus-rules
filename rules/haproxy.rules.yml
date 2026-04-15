@@ -258,3 +258,123 @@
         summary: "HAProxy connection rate near limit (instance {{ $labels.instance }})"
         description: "HAProxy connection rate at 80% of limit on {{ $labels.instance }}"
 
+    - alert: HAproxyProcessConnectionsSaturation
+      expr: |
+        haproxy_process_max_connections > 0
+          and
+        haproxy_process_current_connections / haproxy_process_max_connections > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy process connections near limit (instance {{ $labels.instance }})"
+        description: "HAProxy current connections exceed 80% of max ({{ $labels.instance }}) — risk of connection rejection"
+
+    - alert: HAproxyProcessConnectionsCritical
+      expr: |
+        haproxy_process_max_connections > 0
+          and
+        haproxy_process_current_connections / haproxy_process_max_connections > 0.9
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy process connections critical (instance {{ $labels.instance }})"
+        description: "HAProxy current connections exceed 90% of max ({{ $labels.instance }}) — imminent connection rejection"
+
+    - alert: HAproxyProcessPoolFailures
+      expr: rate(haproxy_process_pool_failures_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy process memory pool failures (instance {{ $labels.instance }})"
+        description: "HAProxy memory pool allocation failing on {{ $labels.instance }} — OOM risk, connections may be rejected"
+
+    - alert: HAproxyProcessStopping
+      expr: haproxy_process_stopping == 1
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy process stopping (instance {{ $labels.instance }})"
+        description: "HAProxy worker process is in stopping/draining state on {{ $labels.instance }} — possible crash or stuck reload"
+
+    - alert: HAproxyProcessFailedResolutions
+      expr: increase(haproxy_process_failed_resolutions[5m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy DNS resolution failures (instance {{ $labels.instance }})"
+        description: "HAProxy is failing DNS resolutions on {{ $labels.instance }} — backends may become unreachable"
+
+    - alert: HAproxyProcessSslConnectionsSaturation
+      expr: |
+        haproxy_process_max_ssl_connections > 0
+          and
+        haproxy_process_current_ssl_connections / haproxy_process_max_ssl_connections > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy SSL connections near limit (instance {{ $labels.instance }})"
+        description: "HAProxy current SSL connections exceed 80% of max ({{ $labels.instance }})"
+
+    - alert: HAproxyProcessSslConnectionsCritical
+      expr: |
+        haproxy_process_max_ssl_connections > 0
+          and
+        haproxy_process_current_ssl_connections / haproxy_process_max_ssl_connections > 0.9
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy SSL connections critical (instance {{ $labels.instance }})"
+        description: "HAProxy current SSL connections exceed 90% of max ({{ $labels.instance }}) — imminent SSL endpoint rejection"
+
+    - alert: HAproxyProcessSessionRateNearLimit
+      expr: |
+        haproxy_process_limit_session_rate > 0
+          and
+        haproxy_process_current_session_rate / haproxy_process_limit_session_rate > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy session rate near limit (instance {{ $labels.instance }})"
+        description: "HAProxy session rate at 80% of limit on {{ $labels.instance }}"
+
+    - alert: HAproxySticktableSaturation
+      expr: |
+        haproxy_sticktable_size > 0
+          and
+        haproxy_sticktable_used / haproxy_sticktable_size > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy stick table near full (instance {{ $labels.instance }})"
+        description: "HAProxy stick table {{ $labels.name }} at 80% capacity on {{ $labels.instance }} — rate limiting and ACLs may malfunction"
+
+    - alert: HAproxySticktableCritical
+      expr: |
+        haproxy_sticktable_size > 0
+          and
+        haproxy_sticktable_used / haproxy_sticktable_size > 0.9
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy stick table critical (instance {{ $labels.instance }})"
+        description: "HAProxy stick table {{ $labels.name }} at 90% capacity on {{ $labels.instance }} — rate limiting and ACLs at risk of failure"
+
+    - alert: HAproxyBackendDown
+      expr: haproxy_backend_status{state!="UP"} == 1
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy backend down (instance {{ $labels.instance }})"
+        description: "HAProxy backend {{ $labels.proxy }} is not UP on {{ $labels.instance }}"
+
