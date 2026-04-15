@@ -240,11 +240,6 @@ jmx_scrape_cached_beans 0.0
 jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'profiled nmethods'",} 1.7238272E7
 jvm_memory_pool_allocated_bytes_total{pool="G1 Old Gen",} 5.7108152E7
 jvm_memory_pool_allocated_bytes_total{pool="G1 Eden Space",} 1.927389642752E12
-jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'non-profiled nmethods'",} 8900480.0
-jvm_memory_pool_allocated_bytes_total{pool="G1 Survivor Space",} 1.2582912E7
-jvm_memory_pool_allocated_bytes_total{pool="Compressed Class Space",} 1698016.0
-jvm_memory_pool_allocated_bytes_total{pool="Metaspace",} 1.7053048E7
-jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'non-nmethods'",} 1281664.0
 # HELP jvm_buffer_pool_used_bytes Used bytes of a given JVM buffer pool.
 # TYPE jvm_buffer_pool_used_bytes gauge
 jvm_buffer_pool_used_bytes{pool="mapped",} 0.0
@@ -317,41 +312,21 @@ jvm_memory_bytes_init{area="nonheap",} 7667712.0
 jvm_memory_pool_bytes_used{pool="CodeHeap 'non-nmethods'",} 1281664.0
 jvm_memory_pool_bytes_used{pool="Metaspace",} 1.7055216E7
 jvm_memory_pool_bytes_used{pool="CodeHeap 'profiled nmethods'",} 1.685504E7
-jvm_memory_pool_bytes_used{pool="Compressed Class Space",} 1698016.0
-jvm_memory_pool_bytes_used{pool="G1 Eden Space",} 2.57949696E8
-jvm_memory_pool_bytes_used{pool="G1 Old Gen",} 1.260424E7
-jvm_memory_pool_bytes_used{pool="G1 Survivor Space",} 2097152.0
-jvm_memory_pool_bytes_used{pool="CodeHeap 'non-profiled nmethods'",} 8900480.0
 # HELP jvm_memory_pool_bytes_committed Committed bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_committed gauge
 jvm_memory_pool_bytes_committed{pool="CodeHeap 'non-nmethods'",} 3080192.0
 jvm_memory_pool_bytes_committed{pool="Metaspace",} 1.8087936E7
 jvm_memory_pool_bytes_committed{pool="CodeHeap 'profiled nmethods'",} 1.6908288E7
-jvm_memory_pool_bytes_committed{pool="Compressed Class Space",} 2097152.0
-jvm_memory_pool_bytes_committed{pool="G1 Eden Space",} 1.325400064E9
-jvm_memory_pool_bytes_committed{pool="G1 Old Gen",} 7.82237696E8
-jvm_memory_pool_bytes_committed{pool="G1 Survivor Space",} 2097152.0
-jvm_memory_pool_bytes_committed{pool="CodeHeap 'non-profiled nmethods'",} 8912896.0
 # HELP jvm_memory_pool_bytes_max Max bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_max gauge
 jvm_memory_pool_bytes_max{pool="CodeHeap 'non-nmethods'",} 7598080.0
 jvm_memory_pool_bytes_max{pool="Metaspace",} -1.0
 jvm_memory_pool_bytes_max{pool="CodeHeap 'profiled nmethods'",} 1.22028032E8
-jvm_memory_pool_bytes_max{pool="Compressed Class Space",} 1.073741824E9
-jvm_memory_pool_bytes_max{pool="G1 Eden Space",} -1.0
-jvm_memory_pool_bytes_max{pool="G1 Old Gen",} 8.589934592E9
-jvm_memory_pool_bytes_max{pool="G1 Survivor Space",} -1.0
-jvm_memory_pool_bytes_max{pool="CodeHeap 'non-profiled nmethods'",} 1.22032128E8
 # HELP jvm_memory_pool_bytes_init Initial bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_init gauge
 jvm_memory_pool_bytes_init{pool="CodeHeap 'non-nmethods'",} 2555904.0
 jvm_memory_pool_bytes_init{pool="Metaspace",} 0.0
 jvm_memory_pool_bytes_init{pool="CodeHeap 'profiled nmethods'",} 2555904.0
-jvm_memory_pool_bytes_init{pool="Compressed Class Space",} 0.0
-jvm_memory_pool_bytes_init{pool="G1 Eden Space",} 1.11149056E8
-jvm_memory_pool_bytes_init{pool="G1 Old Gen",} 1.994391552E9
-jvm_memory_pool_bytes_init{pool="G1 Survivor Space",} 0.0
-jvm_memory_pool_bytes_init{pool="CodeHeap 'non-profiled nmethods'",} 2555904.0
 # HELP jvm_memory_pool_collection_used_bytes Used bytes after last collection of a given JVM memory pool.
 # TYPE jvm_memory_pool_collection_used_bytes gauge
 jvm_memory_pool_collection_used_bytes{pool="G1 Eden Space",} 0.0
@@ -386,8 +361,3 @@ jmx_config_reload_success_created 1.684237054461E9
 jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'profiled nmethods'",} 1.684251063921E9
 jvm_memory_pool_allocated_bytes_created{pool="G1 Old Gen",} 1.6843575264E9
 jvm_memory_pool_allocated_bytes_created{pool="G1 Eden Space",} 1.684251063922E9
-jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-profiled nmethods'",} 1.684251063922E9
-jvm_memory_pool_allocated_bytes_created{pool="G1 Survivor Space",} 1.684251063922E9
-jvm_memory_pool_allocated_bytes_created{pool="Compressed Class Space",} 1.684251063922E9
-jvm_memory_pool_allocated_bytes_created{pool="Metaspace",} 1.684251063922E9
-jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-nmethods'",} 1.684251063922E9
