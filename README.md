@@ -14,6 +14,8 @@ The files in `exporters/` are cleaned Prometheus text format samples. They can b
 - Enum/dimension labels (`mode`, `state`, `operation`, `pool`, `gc`, …): all values preserved
 - High-cardinality instance labels: collapsed to one representative value
 
+> **Note:** Fixture files are trimmed for readability — high-cardinality families (e.g. one series per partition, per process, per request type) are reduced to a few representative samples. The metric *names* are complete, but the number of label combinations is intentionally limited. The uncovered metrics view in the docs may therefore undercount coverage for these families.
+
 **Native vs proxy exporters:**
 
 Some exporters are *proxy exporters* (a separate Go process scraping another system — e.g. `node_exporter`, `mysqld_exporter`). Their `go_*`, `process_*`, and `promhttp_*` metrics describe the exporter process itself and are excluded from the uncovered metrics view.
