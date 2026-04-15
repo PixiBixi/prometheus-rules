@@ -23,5 +23,6 @@
       labels:
         severity: critical
       annotations:
-        mummary: "OCSP for {{ $labels.instance }} is invalid"
+        summary: "OCSP for {{ $labels.instance }} is invalid"
+        description: "OCSP response status for {{ $labels.instance }} is invalid (status > 0)"
 
