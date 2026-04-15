@@ -30,8 +30,8 @@
       labels:
         severity: warning
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} has some reassagning partitions"
-        summary: "{{ $labels.instance }} of job {{ $labels.job }} has some reassagning partitions"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has some reassigning partitions"
+        summary: "{{ $labels.instance }} of job {{ $labels.job }} has some reassigning partitions"
     - alert: KafkaLagExporter
       expr: up{job="consumer"} == 0
       for: 2m
@@ -54,8 +54,8 @@
       labels:
         severity: critical
       annotations:
-        description: "$value Kafka broker(s) are fenced (unresponsive to controller heartbeat) on {{ $labels.instance }}."
-        summary: "$value broker(s) fenced on {{ $labels.instance }}"
+        description: "{{ $value }} Kafka broker(s) are fenced (unresponsive to controller heartbeat) on {{ $labels.instance }}."
+        summary: "{{ $value }} broker(s) fenced on {{ $labels.instance }}"
     - alert: KafkaUncleanLeaderElection
       expr: increase(kafka_controller_controllerstats_uncleanleaderelections_total[5m]) > 0
       for: 0m
@@ -70,32 +70,32 @@
       labels:
         severity: critical
       annotations:
-        description: "$value Kafka replica(s) are offline on {{ $labels.instance }}."
-        summary: "$value replica(s) offline on {{ $labels.instance }}"
+        description: "{{ $value }} Kafka replica(s) are offline on {{ $labels.instance }}."
+        summary: "{{ $value }} replica(s) offline on {{ $labels.instance }}"
     - alert: KafkaPartitionsUnderMinISR
       expr: kafka_server_replicamanager_underminisrpartitioncount > 0
       for: 2m
       labels:
         severity: critical
       annotations:
-        description: "$value partition(s) are below the minimum ISR on {{ $labels.instance }}. Producer acks=all will fail."
-        summary: "$value partition(s) under min ISR on {{ $labels.instance }}"
+        description: "{{ $value }} partition(s) are below the minimum ISR on {{ $labels.instance }}. Producer acks=all will fail."
+        summary: "{{ $value }} partition(s) under min ISR on {{ $labels.instance }}"
     - alert: KafkaPartitionsAtMinISR
       expr: kafka_server_replicamanager_atminisrpartitioncount > 0
       for: 5m
       labels:
         severity: warning
       annotations:
-        description: "$value partition(s) are exactly at min ISR on {{ $labels.instance }} — one more failure risks under-min-ISR."
-        summary: "$value partition(s) at min ISR on {{ $labels.instance }}"
+        description: "{{ $value }} partition(s) are exactly at min ISR on {{ $labels.instance }} — one more failure risks under-min-ISR."
+        summary: "{{ $value }} partition(s) at min ISR on {{ $labels.instance }}"
     - alert: KafkaOfflineLogDirectory
       expr: kafka_log_logmanager_offlinelogdirectorycount > 0
       for: 0m
       labels:
         severity: critical
       annotations:
-        description: "$value log directory(ies) are offline on {{ $labels.instance }}. Partitions on those dirs are unavailable."
-        summary: "$value log directory(ies) offline on {{ $labels.instance }}"
+        description: "{{ $value }} log directory(ies) are offline on {{ $labels.instance }}. Partitions on those dirs are unavailable."
+        summary: "{{ $value }} log directory(ies) offline on {{ $labels.instance }}"
     - alert: KafkaRequestHandlerIdleLow
       expr: kafka_server_kafkarequesthandlerpool_requesthandleravgidle_percent < 0.30
       for: 5m
