@@ -8,14 +8,14 @@
       annotations:
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
         summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
-    - alert: ZookeperWrongQuorum
+    - alert: ZookeeperWrongQuorum
       expr: min(zookeeper_QuorumSize) by (instance) < 3
       for: 2m
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} has an unsuciffiient Quorum"
-        summary: "{{ $labels.instance }} of job {{ $labels.job }} has an unsuciffiient Quorum"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has an insufficient Quorum"
+        summary: "{{ $labels.instance }} of job {{ $labels.job }} has an insufficient Quorum"
 
     - alert: ZookeeperNoLeader
       expr: sum(zookeeper_Leader) == 0
