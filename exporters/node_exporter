@@ -85,11 +85,6 @@ go_memstats_sys_bytes 2.0821256e+07
 # HELP go_threads Number of OS threads created.
 # TYPE go_threads gauge
 go_threads 5
-# HELP nobid Metric read from /home/node_exporter/bid_per_minut.prom
-# TYPE nobid untyped
-nobid{dimension="chkcr"} 0
-nobid{dimension="elicr"} 0
-nobid{dimension="treatment_time"} 0
 # HELP node_arp_entries ARP entries by device
 # TYPE node_arp_entries gauge
 node_arp_entries{device="eno1"} 3
@@ -1420,96 +1415,16 @@ node_systemd_unit_state{name="nginx.service",state="active",type="forking"} 1
 node_systemd_unit_state{name="nginx.service",state="deactivating",type="forking"} 0
 node_systemd_unit_state{name="nginx.service",state="failed",type="forking"} 0
 node_systemd_unit_state{name="nginx.service",state="inactive",type="forking"} 0
-node_systemd_unit_state{name="php8.2-fpm.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="php8.2-fpm.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="php8.2-fpm.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="php8.2-fpm.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="php8.2-fpm.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="promtail.service",state="activating",type="simple"} 0
-node_systemd_unit_state{name="promtail.service",state="active",type="simple"} 1
-node_systemd_unit_state{name="promtail.service",state="deactivating",type="simple"} 0
-node_systemd_unit_state{name="promtail.service",state="failed",type="simple"} 0
-node_systemd_unit_state{name="promtail.service",state="inactive",type="simple"} 0
-node_systemd_unit_state{name="redis_6311.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6311.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6311.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6311.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6311.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6312.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6312.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6312.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6312.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6312.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6313.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6313.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6313.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6313.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6313.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6314.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6314.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6314.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6314.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6314.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6321.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6321.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6321.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6321.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6321.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6322.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6322.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6322.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6322.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6322.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6323.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6323.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6323.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6323.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6323.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6324.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6324.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6324.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6324.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6324.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6386.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6386.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6386.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6386.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6386.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6401.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6401.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6401.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6401.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6401.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6402.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6402.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6402.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6402.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6402.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6403.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6403.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6403.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6403.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6403.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="redis_6404.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="redis_6404.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="redis_6404.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="redis_6404.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="redis_6404.service",state="inactive",type="notify"} 0
+node_systemd_unit_state{name="redis.service",state="activating",type="notify"} 0
+node_systemd_unit_state{name="redis.service",state="active",type="notify"} 0
+node_systemd_unit_state{name="redis.service",state="deactivating",type="notify"} 0
+node_systemd_unit_state{name="redis.service",state="failed",type="notify"} 1
+node_systemd_unit_state{name="redis.service",state="inactive",type="notify"} 0
 node_systemd_unit_state{name="ssh.service",state="activating",type="notify"} 0
 node_systemd_unit_state{name="ssh.service",state="active",type="notify"} 1
 node_systemd_unit_state{name="ssh.service",state="deactivating",type="notify"} 0
 node_systemd_unit_state{name="ssh.service",state="failed",type="notify"} 0
 node_systemd_unit_state{name="ssh.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="systemd-timesyncd.service",state="activating",type="notify"} 0
-node_systemd_unit_state{name="systemd-timesyncd.service",state="active",type="notify"} 1
-node_systemd_unit_state{name="systemd-timesyncd.service",state="deactivating",type="notify"} 0
-node_systemd_unit_state{name="systemd-timesyncd.service",state="failed",type="notify"} 0
-node_systemd_unit_state{name="systemd-timesyncd.service",state="inactive",type="notify"} 0
-node_systemd_unit_state{name="teleport.service",state="activating",type="simple"} 0
-node_systemd_unit_state{name="teleport.service",state="active",type="simple"} 1
-node_systemd_unit_state{name="teleport.service",state="deactivating",type="simple"} 0
-node_systemd_unit_state{name="teleport.service",state="failed",type="simple"} 0
-node_systemd_unit_state{name="teleport.service",state="inactive",type="simple"} 0
 # HELP node_systemd_units Summary of systemd unit states
 # TYPE node_systemd_units gauge
 node_systemd_units{state="activating"} 4
@@ -1522,8 +1437,6 @@ node_systemd_units{state="inactive"} 126
 node_systemd_version{version="245.4-4ubuntu3.22"} 245.4
 # HELP node_textfile_mtime_seconds Unixtime mtime of textfiles successfully read.
 # TYPE node_textfile_mtime_seconds gauge
-node_textfile_mtime_seconds{file="/home/node_exporter/bid_per_minut.prom"} 1.703591964e+09
-node_textfile_mtime_seconds{file="/home/node_exporter/server_metrics.prom"} 1.703591941e+09
 node_textfile_mtime_seconds{file="/home/node_exporter/server_state.prom"} 1.703591963e+09
 # HELP node_textfile_scrape_error 1 if there was an error opening or reading a file, 0 otherwise
 # TYPE node_textfile_scrape_error gauge
@@ -1663,8 +1576,3 @@ promhttp_metric_handler_requests_total{code="503"} 0
 # HELP server_metrics Metric read from /home/node_exporter/server_metrics.prom
 # TYPE server_metrics untyped
 server_metrics{dimension="segfault"} 0
-# HELP state Metric read from /home/node_exporter/server_state.prom
-# TYPE state untyped
-state{dimension="enabled"} 0
-state{dimension="endscrape"} 1.703591963e+09
-state{dimension="services"} 0
