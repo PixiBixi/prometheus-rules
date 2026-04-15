@@ -9,7 +9,7 @@
         summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
 
-    - alert: PostrgreSQLDown
+    - alert: PostgreSQLDown
       expr: sum(pg_up) by (instance,job) == 0
       for: 1m
       labels:
@@ -28,7 +28,7 @@
       annotations:
         description: "{{ $labels.instance }} is exceeding the currently configured maximum Postgres connection limit (current value: {{ $value }}). Services may be degraded - please take immediate action (you probably need to increase max_connections in the configuration)"
         summary: "{{ $labels.instance }} has maxed out Postgres connections."
-    - alert: "PostgreSQLHighConnections"
+    - alert: PostgreSQLHighConnections
       expr: |
         sum by (instance,job) (pg_stat_activity_count) >
         (
@@ -53,41 +53,8 @@
       labels:
         severity: warning
       annotations:
-        description: "PostgreSQL high number of slow queries {{ $labels.instance }} for database {{ $labels.datname }} with a value of {{ $value }} "
-        summary: "PostgreSQL high number of slow on {{ $labels.instance }} for database {{ $labels.datname }} "
-        utility: garbage
-    - alert: PostgreSQLSlowQueries
-      expr: |
-        avg by (datname,instance) (
-          rate (
-            pg_stat_activity_max_tx_duration{datname!~"template.*"}[2m]
-          )
-        ) > 10
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        description: "PostgreSQL high number of slow queries {{ $labels.instance }} for database {{ $labels.datname }} with a value of {{ $value }} "
-        summary: "PostgreSQL high number of slow on {{ $labels.instance }} for database {{ $labels.datname }} "
-        utility: garbage
-    - alert: PostgreSQLHighQPS
-      expr: |
-        avg by (datname,instance) (
-          irate(
-            pg_stat_database_xact_commit{datname!~"template.*"}[5m]
-          )
-          +
-          irate(
-            pg_stat_database_xact_rollback{datname!~"template.*"}[5m]
-          )
-        ) > 10000
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        description: "PostgreSQL high number of queries per second on {{ $labels.datname }}/{{ $labels.instance }} for database {{ $labels.datname }} with a value of {{ $value }}"
-        summary: "PostgreSQL high number of queries per second {{ $labels.datname }}/{{ $labels.instance }} for database {{ $labels.datname }}"
-        utility: garbage
+        description: "PostgreSQL high number of slow queries {{ $labels.instance }} for database {{ $labels.datname }} with a value of {{ $value }}"
+        summary: "PostgreSQL high number of slow queries on {{ $labels.instance }} for database {{ $labels.datname }}"
     - alert: PostgreSQLHighQPS
       expr: |
         avg by (datname,instance) (
@@ -101,11 +68,27 @@
         ) > 8000
       for: 5m
       labels:
-        severity: critical
+        severity: warning
       annotations:
         description: "PostgreSQL high number of queries per second on {{ $labels.instance }} for database {{ $labels.datname }} with a value of {{ $value }}"
-        summary: "PostgreSQL high number of queries per second {{ $labels.instance }} for database {{ $labels.datname }}"
-        utility: garbage
+        summary: "PostgreSQL high number of queries per second on {{ $labels.instance }} for database {{ $labels.datname }}"
+    - alert: PostgreSQLHighQPSCritical
+      expr: |
+        avg by (datname,instance) (
+          irate(
+            pg_stat_database_xact_commit{datname!~"template.*"}[5m]
+          )
+          +
+          irate(
+            pg_stat_database_xact_rollback{datname!~"template.*"}[5m]
+          )
+        ) > 10000
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: "PostgreSQL very high number of queries per second on {{ $labels.instance }} for database {{ $labels.datname }} with a value of {{ $value }}"
+        summary: "PostgreSQL critical number of queries per second on {{ $labels.instance }} for database {{ $labels.datname }}"
     - alert: PostgreSQLRepliDown
       expr: sum(pg_replication_slots_active) by (instance,job,slot_name) < 1
       for: 5m
@@ -118,19 +101,18 @@
       expr: sum(replication_lag) by (instance,job) > 10
       for: 10m
       labels:
-        severity: info
-        utility: garbage
+        severity: warning
       annotations:
-        description: "PostgreSQL replication is high (> 10s) for 10 minuts on {{ $labels.instance }}"
-        summary: "PostgreSQL replication high for {{ $labels.instance }}"
-    - alert: PostgreSQLRepliLag
+        description: "PostgreSQL replication is high (> 10s) for 10 minutes on {{ $labels.instance }}"
+        summary: "PostgreSQL replication lag high for {{ $labels.instance }}"
+    - alert: PostgreSQLRepliLagCritical
       expr: sum(replication_lag) by (instance,job) > 10
       for: 40m
       labels:
         severity: critical
       annotations:
-        description: "PostgreSQL replication is high (> 10s) for 10 minuts on {{ $labels.instance }}"
-        summary: "PostgreSQL replication high for {{ $labels.instance }}"
+        description: "PostgreSQL replication is high (> 10s) for 40 minutes on {{ $labels.instance }}"
+        summary: "PostgreSQL replication lag critical for {{ $labels.instance }}"
 
     - alert: PostgresqlDeadLocks
       expr: increase(pg_stat_database_deadlocks{datname!~"template.*|postgres",datid!="0"}[1m]) > 5
