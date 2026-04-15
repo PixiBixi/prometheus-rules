@@ -161,13 +161,6 @@ loki_log_flushes_bucket{le="2"} 1610
 loki_log_flushes_bucket{le="4"} 1640
 loki_log_flushes_bucket{le="8"} 1641
 loki_log_flushes_bucket{le="16"} 1642
-loki_log_flushes_bucket{le="32"} 1642
-loki_log_flushes_bucket{le="64"} 1642
-loki_log_flushes_bucket{le="128"} 1642
-loki_log_flushes_bucket{le="256"} 1642
-loki_log_flushes_bucket{le="+Inf"} 1642
-loki_log_flushes_sum 1855
-loki_log_flushes_count 1642
 # HELP loki_log_messages_total DEPRECATED. Use internal_log_messages_total for the same functionality. Total number of log messages created by Loki itself.
 # TYPE loki_log_messages_total counter
 loki_log_messages_total{level="debug"} 60791
@@ -253,11 +246,6 @@ prometheus_sd_consul_rpc_duration_seconds{call="service",endpoint="catalog",quan
 prometheus_sd_consul_rpc_duration_seconds{call="service",endpoint="catalog",quantile="0.99"} NaN
 prometheus_sd_consul_rpc_duration_seconds_sum{call="service",endpoint="catalog"} 0
 prometheus_sd_consul_rpc_duration_seconds_count{call="service",endpoint="catalog"} 0
-prometheus_sd_consul_rpc_duration_seconds{call="services",endpoint="catalog",quantile="0.5"} NaN
-prometheus_sd_consul_rpc_duration_seconds{call="services",endpoint="catalog",quantile="0.9"} NaN
-prometheus_sd_consul_rpc_duration_seconds{call="services",endpoint="catalog",quantile="0.99"} NaN
-prometheus_sd_consul_rpc_duration_seconds_sum{call="services",endpoint="catalog"} 0
-prometheus_sd_consul_rpc_duration_seconds_count{call="services",endpoint="catalog"} 0
 # HELP prometheus_sd_consul_rpc_failures_total The number of Consul RPC call failures.
 # TYPE prometheus_sd_consul_rpc_failures_total counter
 prometheus_sd_consul_rpc_failures_total 0
@@ -268,11 +256,6 @@ prometheus_sd_consulagent_rpc_duration_seconds{call="service",endpoint="agent",q
 prometheus_sd_consulagent_rpc_duration_seconds{call="service",endpoint="agent",quantile="0.99"} NaN
 prometheus_sd_consulagent_rpc_duration_seconds_sum{call="service",endpoint="agent"} 0
 prometheus_sd_consulagent_rpc_duration_seconds_count{call="service",endpoint="agent"} 0
-prometheus_sd_consulagent_rpc_duration_seconds{call="services",endpoint="agent",quantile="0.5"} NaN
-prometheus_sd_consulagent_rpc_duration_seconds{call="services",endpoint="agent",quantile="0.9"} NaN
-prometheus_sd_consulagent_rpc_duration_seconds{call="services",endpoint="agent",quantile="0.99"} NaN
-prometheus_sd_consulagent_rpc_duration_seconds_sum{call="services",endpoint="agent"} 0
-prometheus_sd_consulagent_rpc_duration_seconds_count{call="services",endpoint="agent"} 0
 # HELP prometheus_sd_consulagent_rpc_failures_total The number of Consul Agent RPC call failures.
 # TYPE prometheus_sd_consulagent_rpc_failures_total counter
 prometheus_sd_consulagent_rpc_failures_total 0
@@ -300,21 +283,12 @@ prometheus_sd_file_watcher_errors_total 0
 prometheus_sd_kubernetes_events_total{event="add",role="endpoints"} 0
 prometheus_sd_kubernetes_events_total{event="add",role="endpointslice"} 0
 prometheus_sd_kubernetes_events_total{event="add",role="ingress"} 0
-prometheus_sd_kubernetes_events_total{event="add",role="node"} 0
-prometheus_sd_kubernetes_events_total{event="add",role="pod"} 0
-prometheus_sd_kubernetes_events_total{event="add",role="service"} 0
 prometheus_sd_kubernetes_events_total{event="delete",role="endpoints"} 0
 prometheus_sd_kubernetes_events_total{event="delete",role="endpointslice"} 0
 prometheus_sd_kubernetes_events_total{event="delete",role="ingress"} 0
-prometheus_sd_kubernetes_events_total{event="delete",role="node"} 0
-prometheus_sd_kubernetes_events_total{event="delete",role="pod"} 0
-prometheus_sd_kubernetes_events_total{event="delete",role="service"} 0
 prometheus_sd_kubernetes_events_total{event="update",role="endpoints"} 0
 prometheus_sd_kubernetes_events_total{event="update",role="endpointslice"} 0
 prometheus_sd_kubernetes_events_total{event="update",role="ingress"} 0
-prometheus_sd_kubernetes_events_total{event="update",role="node"} 0
-prometheus_sd_kubernetes_events_total{event="update",role="pod"} 0
-prometheus_sd_kubernetes_events_total{event="update",role="service"} 0
 # HELP prometheus_target_scrape_pool_exceeded_label_limits_total Total number of times scrape pools hit the label limits, during sync or config reload.
 # TYPE prometheus_target_scrape_pool_exceeded_label_limits_total counter
 prometheus_target_scrape_pool_exceeded_label_limits_total 0
@@ -429,29 +403,6 @@ promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.01
 promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.025"} 184
 promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.05"} 189
 promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.1"} 1306
-promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.25"} 1309
-promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="0.5"} 1309
-promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="1"} 1310
-promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="2.5"} 1310
-promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="5"} 1310
-promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="10"} 1310
-promtail_request_duration_seconds_bucket{host="myhost",status_code="-1",le="+Inf"} 1332
-promtail_request_duration_seconds_sum{host="myhost",status_code="-1"} 298.97439011299997
-promtail_request_duration_seconds_count{host="myhost",status_code="-1"} 1332
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.005"} 0
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.01"} 0
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.025"} 0
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.05"} 0
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.1"} 329588
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.25"} 332491
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="0.5"} 400833
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="1"} 401705
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="2.5"} 401721
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="5"} 401731
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="10"} 401737
-promtail_request_duration_seconds_bucket{host="myhost",status_code="204",le="+Inf"} 401737
-promtail_request_duration_seconds_sum{host="myhost",status_code="204"} 55837.34348764703
-promtail_request_duration_seconds_count{host="myhost",status_code="204"} 401737
 # HELP promtail_sent_bytes_total Number of bytes sent.
 # TYPE promtail_sent_bytes_total counter
 promtail_sent_bytes_total{host="myhost"} 2.00047437e+08
@@ -468,35 +419,6 @@ request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",w
 request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.025"} 60611
 request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.05"} 60611
 request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.1"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.25"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="0.5"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="1"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="2.5"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="5"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="10"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="25"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="50"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="100"} 60611
-request_duration_seconds_bucket{method="GET",route="metrics",status_code="200",ws="false",le="+Inf"} 60611
-request_duration_seconds_sum{method="GET",route="metrics",status_code="200",ws="false"} 110.1584120280005
-request_duration_seconds_count{method="GET",route="metrics",status_code="200",ws="false"} 60611
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.005"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.01"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.025"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.05"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.1"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.25"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="0.5"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="1"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="2.5"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="5"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="10"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="25"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="50"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="100"} 1
-request_duration_seconds_bucket{method="GET",route="root",status_code="303",ws="false",le="+Inf"} 1
-request_duration_seconds_sum{method="GET",route="root",status_code="303",ws="false"} 0.000186277
-request_duration_seconds_count{method="GET",route="root",status_code="303",ws="false"} 1
 # HELP request_message_bytes Size (in bytes) of messages received in the request.
 # TYPE request_message_bytes histogram
 request_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+06"} 60611
@@ -504,23 +426,6 @@ request_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+06"} 6061
 request_message_bytes_bucket{method="GET",route="metrics",le="5.24288e+06"} 60611
 request_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+07"} 60611
 request_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+07"} 60611
-request_message_bytes_bucket{method="GET",route="metrics",le="5.24288e+07"} 60611
-request_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+08"} 60611
-request_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+08"} 60611
-request_message_bytes_bucket{method="GET",route="metrics",le="+Inf"} 60611
-request_message_bytes_sum{method="GET",route="metrics"} 0
-request_message_bytes_count{method="GET",route="metrics"} 60611
-request_message_bytes_bucket{method="GET",route="root",le="1.048576e+06"} 1
-request_message_bytes_bucket{method="GET",route="root",le="2.62144e+06"} 1
-request_message_bytes_bucket{method="GET",route="root",le="5.24288e+06"} 1
-request_message_bytes_bucket{method="GET",route="root",le="1.048576e+07"} 1
-request_message_bytes_bucket{method="GET",route="root",le="2.62144e+07"} 1
-request_message_bytes_bucket{method="GET",route="root",le="5.24288e+07"} 1
-request_message_bytes_bucket{method="GET",route="root",le="1.048576e+08"} 1
-request_message_bytes_bucket{method="GET",route="root",le="2.62144e+08"} 1
-request_message_bytes_bucket{method="GET",route="root",le="+Inf"} 1
-request_message_bytes_sum{method="GET",route="root"} 0
-request_message_bytes_count{method="GET",route="root"} 1
 # HELP response_message_bytes Size (in bytes) of messages sent in response.
 # TYPE response_message_bytes histogram
 response_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+06"} 60611
@@ -528,23 +433,6 @@ response_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+06"} 606
 response_message_bytes_bucket{method="GET",route="metrics",le="5.24288e+06"} 60611
 response_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+07"} 60611
 response_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+07"} 60611
-response_message_bytes_bucket{method="GET",route="metrics",le="5.24288e+07"} 60611
-response_message_bytes_bucket{method="GET",route="metrics",le="1.048576e+08"} 60611
-response_message_bytes_bucket{method="GET",route="metrics",le="2.62144e+08"} 60611
-response_message_bytes_bucket{method="GET",route="metrics",le="+Inf"} 60611
-response_message_bytes_sum{method="GET",route="metrics"} 3.31409263e+08
-response_message_bytes_count{method="GET",route="metrics"} 60611
-response_message_bytes_bucket{method="GET",route="root",le="1.048576e+06"} 1
-response_message_bytes_bucket{method="GET",route="root",le="2.62144e+06"} 1
-response_message_bytes_bucket{method="GET",route="root",le="5.24288e+06"} 1
-response_message_bytes_bucket{method="GET",route="root",le="1.048576e+07"} 1
-response_message_bytes_bucket{method="GET",route="root",le="2.62144e+07"} 1
-response_message_bytes_bucket{method="GET",route="root",le="5.24288e+07"} 1
-response_message_bytes_bucket{method="GET",route="root",le="1.048576e+08"} 1
-response_message_bytes_bucket{method="GET",route="root",le="2.62144e+08"} 1
-response_message_bytes_bucket{method="GET",route="root",le="+Inf"} 1
-response_message_bytes_sum{method="GET",route="root"} 35
-response_message_bytes_count{method="GET",route="root"} 1
 # HELP tcp_connections Current number of accepted TCP connections.
 # TYPE tcp_connections gauge
 tcp_connections{protocol="grpc"} 0

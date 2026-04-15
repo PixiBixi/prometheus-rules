@@ -23,15 +23,6 @@ go_gc_heap_allocs_by_size_bytes_total_bucket{le="24.999999999999996"} 8.73135437
 go_gc_heap_allocs_by_size_bytes_total_bucket{le="64.99999999999999"} 1.495204124e+09
 go_gc_heap_allocs_by_size_bytes_total_bucket{le="144.99999999999997"} 1.585940734e+09
 go_gc_heap_allocs_by_size_bytes_total_bucket{le="320.99999999999994"} 1.588013141e+09
-go_gc_heap_allocs_by_size_bytes_total_bucket{le="704.9999999999999"} 1.589368621e+09
-go_gc_heap_allocs_by_size_bytes_total_bucket{le="1536.9999999999998"} 1.590228367e+09
-go_gc_heap_allocs_by_size_bytes_total_bucket{le="3200.9999999999995"} 1.591887516e+09
-go_gc_heap_allocs_by_size_bytes_total_bucket{le="6528.999999999999"} 1.592723833e+09
-go_gc_heap_allocs_by_size_bytes_total_bucket{le="13568.999999999998"} 1.593303535e+09
-go_gc_heap_allocs_by_size_bytes_total_bucket{le="27264.999999999996"} 1.59442974e+09
-go_gc_heap_allocs_by_size_bytes_total_bucket{le="+Inf"} 1.594870584e+09
-go_gc_heap_allocs_by_size_bytes_total_sum 1.33285551024e+11
-go_gc_heap_allocs_by_size_bytes_total_count 1.594870584e+09
 # HELP go_gc_heap_allocs_bytes_total Cumulative sum of memory allocated to the heap by the application.
 # TYPE go_gc_heap_allocs_bytes_total counter
 go_gc_heap_allocs_bytes_total 1.33285551024e+11
@@ -45,15 +36,6 @@ go_gc_heap_frees_by_size_bytes_total_bucket{le="24.999999999999996"} 8.73103302e
 go_gc_heap_frees_by_size_bytes_total_bucket{le="64.99999999999999"} 1.495152512e+09
 go_gc_heap_frees_by_size_bytes_total_bucket{le="144.99999999999997"} 1.585884298e+09
 go_gc_heap_frees_by_size_bytes_total_bucket{le="320.99999999999994"} 1.587956425e+09
-go_gc_heap_frees_by_size_bytes_total_bucket{le="704.9999999999999"} 1.589311198e+09
-go_gc_heap_frees_by_size_bytes_total_bucket{le="1536.9999999999998"} 1.590170897e+09
-go_gc_heap_frees_by_size_bytes_total_bucket{le="3200.9999999999995"} 1.591829993e+09
-go_gc_heap_frees_by_size_bytes_total_bucket{le="6528.999999999999"} 1.592666279e+09
-go_gc_heap_frees_by_size_bytes_total_bucket{le="13568.999999999998"} 1.593245953e+09
-go_gc_heap_frees_by_size_bytes_total_bucket{le="27264.999999999996"} 1.594372155e+09
-go_gc_heap_frees_by_size_bytes_total_bucket{le="+Inf"} 1.594812996e+09
-go_gc_heap_frees_by_size_bytes_total_sum 1.33281784728e+11
-go_gc_heap_frees_by_size_bytes_total_count 1.594812996e+09
 # HELP go_gc_heap_frees_bytes_total Cumulative sum of heap memory freed by the garbage collector.
 # TYPE go_gc_heap_frees_bytes_total counter
 go_gc_heap_frees_bytes_total 1.33281784728e+11
@@ -76,14 +58,6 @@ go_gc_pauses_seconds_total_bucket{le="9.999999999999999e-10"} 0
 go_gc_pauses_seconds_total_bucket{le="9.999999999999999e-09"} 0
 go_gc_pauses_seconds_total_bucket{le="9.999999999999998e-08"} 0
 go_gc_pauses_seconds_total_bucket{le="1.0239999999999999e-06"} 0
-go_gc_pauses_seconds_total_bucket{le="1.0239999999999999e-05"} 29082
-go_gc_pauses_seconds_total_bucket{le="0.00010239999999999998"} 136954
-go_gc_pauses_seconds_total_bucket{le="0.0010485759999999998"} 137640
-go_gc_pauses_seconds_total_bucket{le="0.010485759999999998"} 137656
-go_gc_pauses_seconds_total_bucket{le="0.10485759999999998"} 137656
-go_gc_pauses_seconds_total_bucket{le="+Inf"} 137656
-go_gc_pauses_seconds_total_sum NaN
-go_gc_pauses_seconds_total_count 137656
 # HELP go_goroutines Number of goroutines that currently exist.
 # TYPE go_goroutines gauge
 go_goroutines 9
@@ -214,14 +188,6 @@ go_sched_latencies_seconds_bucket{le="9.999999999999999e-10"} 704186
 go_sched_latencies_seconds_bucket{le="9.999999999999999e-09"} 704186
 go_sched_latencies_seconds_bucket{le="9.999999999999998e-08"} 2.469596e+06
 go_sched_latencies_seconds_bucket{le="1.0239999999999999e-06"} 3.82633e+06
-go_sched_latencies_seconds_bucket{le="1.0239999999999999e-05"} 4.622466e+06
-go_sched_latencies_seconds_bucket{le="0.00010239999999999998"} 4.773837e+06
-go_sched_latencies_seconds_bucket{le="0.0010485759999999998"} 4.785024e+06
-go_sched_latencies_seconds_bucket{le="0.010485759999999998"} 4.785272e+06
-go_sched_latencies_seconds_bucket{le="0.10485759999999998"} 4.785274e+06
-go_sched_latencies_seconds_bucket{le="+Inf"} 4.785274e+06
-go_sched_latencies_seconds_sum NaN
-go_sched_latencies_seconds_count 4.785274e+06
 # HELP go_threads Number of OS threads created.
 # TYPE go_threads gauge
 go_threads 23

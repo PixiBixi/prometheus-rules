@@ -47,19 +47,6 @@ aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="1",ns="my
 aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="1024",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
 aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="128",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
 aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="16",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="16384",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="2",ns="mynamespace",service="10.0.0.1:3000"} 1583.96616
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="2048",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="256",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="32",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="32768",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="4",ns="mynamespace",service="10.0.0.1:3000"} 1583.96616
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="4096",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="512",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="64",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="65536",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="8",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
-aerospike_latencies_batch_index_ms_bucket{cluster_name="mycluster",le="8192",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
 # HELP aerospike_latencies_batch_index_ms_count batch index ms count
 # TYPE aerospike_latencies_batch_index_ms_count gauge
 aerospike_latencies_batch_index_ms_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000"} 1584.6
@@ -70,19 +57,6 @@ aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="1",ns="mynamespa
 aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="1024",ns="mynamespace",service="10.0.0.1:3000"} 225.2
 aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="128",ns="mynamespace",service="10.0.0.1:3000"} 225.2
 aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="16",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="16384",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="2",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="2048",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="256",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="32",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="32768",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="4",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="4096",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="512",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="64",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="65536",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="8",ns="mynamespace",service="10.0.0.1:3000"} 225.2
-aerospike_latencies_read_ms_bucket{cluster_name="mycluster",le="8192",ns="mynamespace",service="10.0.0.1:3000"} 225.2
 # HELP aerospike_latencies_read_ms_count read ms count
 # TYPE aerospike_latencies_read_ms_count gauge
 aerospike_latencies_read_ms_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000"} 225.2
@@ -93,19 +67,6 @@ aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="1",ns="mynamesp
 aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="1024",ns="mynamespace",service="10.0.0.1:3000"} 148.8
 aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="128",ns="mynamespace",service="10.0.0.1:3000"} 148.8
 aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="16",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="16384",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="2",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="2048",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="256",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="32",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="32768",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="4",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="4096",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="512",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="64",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="65536",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="8",ns="mynamespace",service="10.0.0.1:3000"} 148.8
-aerospike_latencies_write_ms_bucket{cluster_name="mycluster",le="8192",ns="mynamespace",service="10.0.0.1:3000"} 148.8
 # HELP aerospike_latencies_write_ms_count write ms count
 # TYPE aerospike_latencies_write_ms_count gauge
 aerospike_latencies_write_ms_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000"} 148.8
@@ -1392,181 +1353,51 @@ aerospike_node_up{build="6.2.0.3",cluster_name="mycluster",service="10.0.0.1:300
 aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 3.852887664e+10
 aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 121088
 aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 4.49376e+06
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 1024
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 2.57031072e+08
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 2.63512016e+08
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 3.4694512e+07
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 3.380910752e+09
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 6.609140448e+09
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 2.3745984e+07
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 8.428265968e+09
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 117824
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 127936
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 127744
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 3.77675824e+08
-aerospike_sets_device_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 1.79214544e+08
 # HELP aerospike_sets_disable_eviction disable eviction
 # TYPE aerospike_sets_disable_eviction gauge
 aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 0
 aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 0
 aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 0
-aerospike_sets_disable_eviction{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 0
 # HELP aerospike_sets_enable_index enable index
 # TYPE aerospike_sets_enable_index gauge
 aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 0
 aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 0
 aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 0
-aerospike_sets_enable_index{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 0
 # HELP aerospike_sets_index_populating index populating
 # TYPE aerospike_sets_index_populating gauge
 aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 0
 aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 0
 aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 0
-aerospike_sets_index_populating{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 0
 # HELP aerospike_sets_memory_data_bytes memory data bytes
 # TYPE aerospike_sets_memory_data_bytes gauge
 aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 3.8427830742e+10
 aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 35948
 aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 1.09833e+06
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 208
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 1.40500827e+08
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 2.60447235e+08
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 2.816615e+07
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 3.300036226e+09
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 6.292241771e+09
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 2.3588947e+07
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 7.443703817e+09
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 23933
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 25987
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 25948
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 1.75348564e+08
-aerospike_sets_memory_data_bytes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 1.44156759e+08
 # HELP aerospike_sets_objects objects
 # TYPE aerospike_sets_objects gauge
 aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 2.173033e+06
 aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 1892
 aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 70215
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 16
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 2.290761e+06
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 57308
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 116369
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 1.443991e+06
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 6.663704e+06
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 3477
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 2.0517659e+07
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 1841
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 1999
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 1996
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 4.537438e+06
-aerospike_sets_objects{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 838917
 # HELP aerospike_sets_sindexes sindexes
 # TYPE aerospike_sets_sindexes gauge
 aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 0
 aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 0
 aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 0
-aerospike_sets_sindexes{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 0
 # HELP aerospike_sets_stop_writes_count stop writes count
 # TYPE aerospike_sets_stop_writes_count counter
 aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 0
 aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 0
 aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 0
-aerospike_sets_stop_writes_count{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 0
 # HELP aerospike_sets_tombstones tombstones
 # TYPE aerospike_sets_tombstones gauge
 aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 0
 aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 0
 aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 0
-aerospike_sets_tombstones{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 0
 # HELP aerospike_sets_truncate_lut truncate lut
 # TYPE aerospike_sets_truncate_lut gauge
 aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="bid"} 0
 aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="click"} 0
 aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="compvwb"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="test"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="capping"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="conversion"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-irisid"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eiqi-semantic"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="kpib"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="mb"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="page"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dedup"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu3"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="eu5"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="dp"} 0
-aerospike_sets_truncate_lut{cluster_name="mycluster",ns="mynamespace",service="10.0.0.1:3000",set="rtg"} 0
 # HELP aerospike_xdr_abandoned abandoned
 # TYPE aerospike_xdr_abandoned counter
 aerospike_xdr_abandoned{cluster_name="mycluster",dc="as_bidder_eu5",service="10.0.0.1:3000"} 0

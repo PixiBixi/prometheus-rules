@@ -106,11 +106,6 @@ pg_locks_count{datname="mydb",mode="accessexclusivelock",server="10.0.0.1:5432"}
 pg_locks_count{datname="mydb",mode="accesssharelock",server="10.0.0.1:5432"} 0
 pg_locks_count{datname="mydb",mode="exclusivelock",server="10.0.0.1:5432"} 0
 pg_locks_count{datname="mydb",mode="rowexclusivelock",server="10.0.0.1:5432"} 1
-pg_locks_count{datname="mydb",mode="rowsharelock",server="10.0.0.1:5432"} 0
-pg_locks_count{datname="mydb",mode="sharelock",server="10.0.0.1:5432"} 0
-pg_locks_count{datname="mydb",mode="sharerowexclusivelock",server="10.0.0.1:5432"} 0
-pg_locks_count{datname="mydb",mode="shareupdateexclusivelock",server="10.0.0.1:5432"} 1
-pg_locks_count{datname="mydb",mode="sireadlock",server="10.0.0.1:5432"} 0
 # HELP pg_postmaster_start_time_seconds Time at which postmaster started
 # TYPE pg_postmaster_start_time_seconds gauge
 pg_postmaster_start_time_seconds{server="10.0.0.1:5432"} 1.675988797e+09
@@ -121,13 +116,6 @@ pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="2"
 pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="5"} 20
 pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="15"} 34
 pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="30"} 36
-pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="60"} 38
-pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="90"} 38
-pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="120"} 38
-pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="300"} 44
-pg_process_idle_seconds_bucket{application_name="",server="10.0.0.1:5432",le="+Inf"} 52
-pg_process_idle_seconds_sum{application_name="",server="10.0.0.1:5432"} 9186
-pg_process_idle_seconds_count{application_name="",server="10.0.0.1:5432"} 52
 # HELP pg_replication_lag Replication lag behind master in seconds
 # TYPE pg_replication_lag gauge
 pg_replication_lag{server="10.0.0.1:5432"} 0
@@ -843,8 +831,6 @@ pg_stat_activity_count{application_name="",datname="mydb",server="10.0.0.1:5432"
 pg_stat_activity_count{application_name="",datname="mydb",server="10.0.0.1:5432",state="disabled",usename=""} 0
 pg_stat_activity_count{application_name="",datname="mydb",server="10.0.0.1:5432",state="fastpath function call",usename=""} 0
 pg_stat_activity_count{application_name="",datname="mydb",server="10.0.0.1:5432",state="idle",usename="myuser"} 53
-pg_stat_activity_count{application_name="",datname="mydb",server="10.0.0.1:5432",state="idle in transaction",usename=""} 0
-pg_stat_activity_count{application_name="",datname="mydb",server="10.0.0.1:5432",state="idle in transaction (aborted)",usename=""} 0
 pg_stat_activity_count{application_name="",datname="mydb",server="10.0.0.1:5432",state="active",usename="myuser"} 2
 pg_stat_activity_count{application_name="",datname="mydb",server="10.0.0.1:5432",state="idle",usename=""} 0
 # HELP pg_stat_activity_max_tx_duration max duration in seconds any active transaction has been running
@@ -853,8 +839,6 @@ pg_stat_activity_max_tx_duration{application_name="",datname="mydb",server="10.0
 pg_stat_activity_max_tx_duration{application_name="",datname="mydb",server="10.0.0.1:5432",state="disabled",usename=""} 0
 pg_stat_activity_max_tx_duration{application_name="",datname="mydb",server="10.0.0.1:5432",state="fastpath function call",usename=""} 0
 pg_stat_activity_max_tx_duration{application_name="",datname="mydb",server="10.0.0.1:5432",state="idle",usename="myuser"} 0
-pg_stat_activity_max_tx_duration{application_name="",datname="mydb",server="10.0.0.1:5432",state="idle in transaction",usename=""} 0
-pg_stat_activity_max_tx_duration{application_name="",datname="mydb",server="10.0.0.1:5432",state="idle in transaction (aborted)",usename=""} 0
 pg_stat_activity_max_tx_duration{application_name="",datname="mydb",server="10.0.0.1:5432",state="active",usename="myuser"} 0.004253
 pg_stat_activity_max_tx_duration{application_name="",datname="mydb",server="10.0.0.1:5432",state="idle",usename=""} 0
 # HELP pg_stat_archiver_archived_count Number of WAL files that have been successfully archived
