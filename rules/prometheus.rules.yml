@@ -14,7 +14,7 @@
       labels:
         severity: warning
       annotations:
-        description: "{{$labels.job}} at {{$labels.instance}} has a corrupted write-ahead log (WAL)."
+        description: "{{ $labels.job }} at {{ $labels.instance }} has a corrupted write-ahead log (WAL)."
         summary: "Prometheus write-ahead log is corrupted"
     - alert: PrometheusConfigReloadFailed
       expr: prometheus_config_last_reload_successful == 0
@@ -22,21 +22,21 @@
       labels:
         severity: warning
       annotations:
-        summary: reload of Prometheus configuration has failed for {{$labels.instance}}
+        summary: reload of Prometheus configuration has failed for {{ $labels.instance }}
     - alert: PrometheusErrorSendingAlerts
       expr: rate(prometheus_notifications_errors_total[5m]) / rate(prometheus_notifications_sent_total[5m]) > 0.03
       for: 10m
       labels:
         severity: warning
       annotations:
-        summary: "Errors while sending alerts from Prometheus {{$labels.instance}} to Alertmanager {{$labels.Alertmanager}}"
+        summary: "Errors while sending alerts from Prometheus {{ $labels.instance }} to Alertmanager {{ $labels.Alertmanager }}"
     - alert: PrometheusTSDBReloadsFailing
       expr: increase(prometheus_tsdb_reloads_failures_total[2h]) > 0
       for: 12h
       labels:
         severity: warning
       annotations:
-        description: "{{$labels.job}} at {{$labels.instance}} had {{$value | humanize}} reload failures over the last four hours."
+        description: "{{ $labels.job }} at {{ $labels.instance }} had {{ $value | humanize }} reload failures over the last four hours."
         summary: "Prometheus has issues reloading data blocks from disk"
     - alert: PrometheusJobMissing
       expr: absent(up{job="prometheus"})
