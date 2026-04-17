@@ -8,14 +8,6 @@
       annotations:
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
         summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
-    - alert: PrometheusTSDBWALCorruptions
-      expr: tsdb_wal_corruptions_total > 0
-      for: 4h
-      labels:
-        severity: warning
-      annotations:
-        description: "{{ $labels.job }} at {{ $labels.instance }} has a corrupted write-ahead log (WAL)."
-        summary: "Prometheus write-ahead log is corrupted"
     - alert: PrometheusConfigReloadFailed
       expr: prometheus_config_last_reload_successful == 0
       for: 10m
@@ -30,14 +22,6 @@
         severity: warning
       annotations:
         summary: "Errors while sending alerts from Prometheus {{ $labels.instance }} to Alertmanager {{ $labels.Alertmanager }}"
-    - alert: PrometheusTSDBReloadsFailing
-      expr: increase(prometheus_tsdb_reloads_failures_total[2h]) > 0
-      for: 12h
-      labels:
-        severity: warning
-      annotations:
-        description: "{{ $labels.job }} at {{ $labels.instance }} had {{ $value | humanize }} reload failures over the last four hours."
-        summary: "Prometheus has issues reloading data blocks from disk"
     - alert: PrometheusJobMissing
       expr: absent(up{job="prometheus"})
       labels:
@@ -45,6 +29,29 @@
       annotations:
         summary: "Prometheus job missing (instance {{ $labels.instance }})"
         description: "A Prometheus job has disappeared"
+    - alert: PrometheusTargetMissing
+      expr: up == 0 unless on(job) (sum by (job) (up) == 0)
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus target missing (instance {{ $labels.instance }})"
+        description: "A Prometheus target has disappeared. An exporter might be crashed."
+    - alert: PrometheusAllTargetsMissing
+      expr: sum by (job) (up) == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus all targets missing (job {{ $labels.job }})"
+        description: "A Prometheus job does not have living target anymore."
+    - alert: PrometheusAlertManagerJobMissing
+      expr: absent(up{job="alertmanager"})
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus AlertManager job missing (instance {{ $labels.instance }})"
+        description: "A Prometheus AlertManager job has disappeared"
     - alert: PrometheusTooManyRestarts
       expr: changes(process_start_time_seconds{job=~"prometheus|pushgateway|alertmanager"}[15m]) > 2
       labels:
@@ -103,12 +110,12 @@
         summary: "Prometheus notifications backlog (instance {{ $labels.instance }})"
         description: "The Prometheus notification queue has not been empty for 10 minutes"
     - alert: PrometheusAlertmanagerNotificationFailing
-      expr: rate(alertmanager_notifications_failed_total[1m]) > 0
+      expr: rate(alertmanager_notifications_failed_total[3m]) > 0.05
       labels:
         severity: critical
       annotations:
         summary: "Prometheus AlertManager notification failing (instance {{ $labels.instance }})"
-        description: "Alertmanager is failing sending notifications"
+        description: "Alertmanager is failing sending notifications ({{ $value | humanizePercentage }} failure rate)"
     - alert: PrometheusTargetEmpty
       expr: prometheus_sd_discovered_targets == 0
       labels:
@@ -133,12 +140,12 @@
         summary: "Prometheus large scrape (instance {{ $labels.instance }})"
         description: "Prometheus has many scrapes that exceed the sample limit"
     - alert: PrometheusTargetScrapeDuplicate
-      expr: increase(prometheus_target_scrapes_sample_duplicate_timestamp_total[5m]) > 0
+      expr: increase(prometheus_target_scrapes_sample_duplicate_timestamp_total[5m]) > 3
       labels:
         severity: warning
       annotations:
         summary: "Prometheus target scrape duplicate (instance {{ $labels.instance }})"
-        description: "Prometheus has many samples rejected due to duplicate timestamps but different values"
+        description: "Prometheus has many samples rejected due to duplicate timestamps but different values ({{ $value }} samples)"
     - alert: PrometheusTsdbCheckpointCreationFailures
       expr: increase(prometheus_tsdb_checkpoint_creations_failed_total[1m]) > 0
       labels:
@@ -188,4 +195,77 @@
       annotations:
         summary: "Prometheus TSDB WAL truncations failed (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} TSDB WAL truncation failures"
+    - alert: PrometheusTimeseriesCardinality
+      expr: label_replace(count by(__name__) ({__name__=~".+"}), "name", "$1", "__name__", "(.+)") > 10000
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus timeseries cardinality (instance {{ $labels.instance }})"
+        description: "The \"{{ $labels.name }}\" timeseries cardinality is getting very high: {{ $value }}"
+    - alert: PrometheusRemoteWriteDroppedSamples
+      expr: rate(prometheus_remote_storage_samples_dropped_total[5m]) > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus remote write dropping samples (instance {{ $labels.instance }})"
+        description: "Prometheus is dropping samples for remote_name={{ $labels.remote_name }} ({{ $value | humanize }} samples/s lost)"
+    - alert: PrometheusRemoteWriteFailed
+      expr: rate(prometheus_remote_storage_samples_failed_total[5m]) > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus remote write failing (instance {{ $labels.instance }})"
+        description: "Prometheus failed to send samples to remote_name={{ $labels.remote_name }} ({{ $value | humanize }} failures/s)"
+    - alert: PrometheusRemoteWriteShardsMax
+      expr: prometheus_remote_storage_shards >= prometheus_remote_storage_shards_max
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus remote write shards at max (instance {{ $labels.instance }})"
+        description: "Prometheus remote write queue for remote_name={{ $labels.remote_name }} is running at max shards ({{ $value }}). The queue is saturated and samples may be dropped."
+    - alert: PrometheusQueryEngineBusy
+      expr: prometheus_engine_queries >= prometheus_engine_queries_concurrent_max
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus query engine at concurrency limit (instance {{ $labels.instance }})"
+        description: "Prometheus is running {{ $value }} concurrent queries, which equals the maximum allowed. New queries may be rejected."
+    - alert: PrometheusTsdbOutOfOrderSamples
+      expr: rate(prometheus_tsdb_out_of_order_samples_total[5m]) > 0
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus TSDB out-of-order samples (instance {{ $labels.instance }})"
+        description: "Prometheus is receiving out-of-order samples ({{ $value | humanize }}/s). This usually indicates clock skew or a buggy exporter."
+    - alert: PrometheusTsdbOutOfBoundSamples
+      expr: rate(prometheus_tsdb_out_of_bound_samples_total[5m]) > 0
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus TSDB out-of-bound samples (instance {{ $labels.instance }})"
+        description: "Prometheus is rejecting samples with timestamps too old or too far in the future ({{ $value | humanize }}/s). Check target clocks."
+    - alert: PrometheusTargetLimitExceeded
+      expr: increase(prometheus_target_scrape_pool_exceeded_target_limit_total[5m]) > 0
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus scrape pool target limit exceeded (instance {{ $labels.instance }})"
+        description: "Prometheus is silently dropping targets in job {{ $labels.scrape_job }} because the target limit was exceeded."
+    - alert: PrometheusScrapedBodySizeExceeded
+      expr: rate(prometheus_target_scrapes_exceeded_body_size_limit_total[5m]) > 0
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus scrape body size limit exceeded (instance {{ $labels.instance }})"
+        description: "Prometheus is truncating scrape responses that exceed the body size limit ({{ $value | humanize }} scrapes/s). The exporter may be too verbose."
+    - alert: PrometheusSDFailedConfigs
+      expr: prometheus_sd_failed_configs > 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus service discovery has failed configs (instance {{ $labels.instance }})"
+        description: "{{ $value }} service discovery config(s) are failing (name={{ $labels.name }}). Targets from these configs will not be scraped."
 
