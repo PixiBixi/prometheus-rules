@@ -56,6 +56,18 @@
         summary: "HAProxy DNS resolution failures (instance {{ $labels.instance }})"
         description: "HAProxy is failing DNS resolutions on {{ $labels.instance }} — backends may become unreachable"
 
+    - alert: HAproxyMaxconnConnectionReuseRisk
+      expr: |
+        haproxy_process_max_connections > 0
+          and
+        haproxy_process_current_connections / haproxy_process_max_connections > 0.5
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy maxconn saturation disabling connection reuse (instance {{ $labels.instance }})"
+        description: "HAProxy connections at {{ $value | humanizePercentage }} of maxconn on {{ $labels.instance }}. Above ~50%, HAProxy stops pooling idle backend connections to keep FD usage under the global limit (tune.pool-low-fd-ratio / tune.pool-high-fd-ratio). Increase maxconn and FD limits (ulimit -n), tune pool FD ratios, or reduce frontend session count."
+
     - alert: HAproxyProcessConnectionsCritical
       expr: |
         haproxy_process_max_connections > 0
