@@ -369,6 +369,38 @@
         summary: "HAProxy stick table critical (instance {{ $labels.instance }})"
         description: "HAProxy stick table {{ $labels.name }} at 90% capacity on {{ $labels.instance }} — rate limiting and ACLs at risk of failure"
 
+    - alert: HAproxyBackendConnectionReuseCollapse
+      expr: |
+        (
+          sum by (proxy, instance, job) (rate(haproxy_backend_connection_reuses_total[5m]))
+          /
+          sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
+        ) * 100 < 20
+        and
+        sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m])) > 10
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy backend connection reuse collapsed on {{ $labels.instance }}/{{ $labels.proxy }}"
+        description: "Backend {{ $labels.proxy }} connection reuse rate is {{ $value | printf \"%.0f\" }}% (< 20%) for the last 10 minutes on {{ $labels.instance }}. Almost no connections are being reused — check keep-alive settings, backend health, or HTTP version negotiation."
+
+    - alert: HAproxyBackendConnectionReuseDrop
+      expr: |
+        (
+          sum by (proxy, instance, job) (rate(haproxy_backend_connection_reuses_total[5m]))
+          /
+          sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
+        ) * 100 < 50
+        and
+        sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m])) > 10
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy backend connection reuse dropped on {{ $labels.instance }}/{{ $labels.proxy }}"
+        description: "Backend {{ $labels.proxy }} connection reuse rate is {{ $value | printf \"%.0f\" }}% (< 50%) for the last 10 minutes on {{ $labels.instance }}. This may indicate misconfigured keep-alive, backend restarts, or HTTP/1.0 fallback."
+
     - alert: HAproxyBackendStatusDown
       expr: haproxy_backend_status{state!="UP"} == 1
       for: 0m
