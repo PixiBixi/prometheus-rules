@@ -427,6 +427,53 @@
         summary: "High transmit errors on {{ $labels.instance }} ({{ $labels.device }})"
         description: "Interface {{ $labels.device }} at {{ $labels.instance }} has more than 1% transmit errors over the last 2 minutes."
 
+    # ── NIC bandwidth saturation ───────────────────────────────────────────────
+
+    - alert: NodeNICReceiveBandwidthSaturation
+      expr: |
+        rate(node_network_receive_bytes_total{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"}[5m])
+        / (node_network_speed_bytes{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"} > 0)
+        > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "NIC receive saturation on {{ $labels.instance }} ({{ $labels.device }})"
+        description: "Interface {{ $labels.device }} at {{ $labels.instance }} receive utilization is {{ $value | humanizePercentage }} of link capacity (warning threshold: 80%)."
+    - alert: NodeNICReceiveBandwidthSaturation
+      expr: |
+        rate(node_network_receive_bytes_total{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"}[5m])
+        / (node_network_speed_bytes{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"} > 0)
+        > 0.9
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "NIC receive saturation critical on {{ $labels.instance }} ({{ $labels.device }})"
+        description: "Interface {{ $labels.device }} at {{ $labels.instance }} receive utilization is {{ $value | humanizePercentage }} of link capacity (critical threshold: 90%)."
+    - alert: NodeNICTransmitBandwidthSaturation
+      expr: |
+        rate(node_network_transmit_bytes_total{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"}[5m])
+        / (node_network_speed_bytes{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"} > 0)
+        > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "NIC transmit saturation on {{ $labels.instance }} ({{ $labels.device }})"
+        description: "Interface {{ $labels.device }} at {{ $labels.instance }} transmit utilization is {{ $value | humanizePercentage }} of link capacity (warning threshold: 80%)."
+    - alert: NodeNICTransmitBandwidthSaturation
+      expr: |
+        rate(node_network_transmit_bytes_total{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"}[5m])
+        / (node_network_speed_bytes{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"} > 0)
+        > 0.9
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "NIC transmit saturation critical on {{ $labels.instance }} ({{ $labels.device }})"
+        description: "Interface {{ $labels.device }} at {{ $labels.instance }} transmit utilization is {{ $value | humanizePercentage }} of link capacity (critical threshold: 90%)."
+
     # ── Clock skew ─────────────────────────────────────────────────────────────
 
     - alert: NodeClockSkewDetected
