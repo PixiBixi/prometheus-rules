@@ -167,22 +167,36 @@
         description: "Frontend {{ $labels.proxy }} session usage above 70%"
 
     - alert: HAproxyFrontendRequestErrors
-      expr: rate(haproxy_frontend_request_errors_total[5m]) > 10
+      expr: |
+        (
+          sum by (proxy, instance, job) (rate(haproxy_frontend_request_errors_total[5m]))
+          /
+          sum by (proxy, instance, job) (rate(haproxy_frontend_http_requests_total[5m]))
+        ) > 0.01
+        and
+        sum by (proxy, instance, job) (rate(haproxy_frontend_http_requests_total[5m])) > 10
       for: 5m
       labels:
         severity: warning
       annotations:
         summary: "HAProxy frontend request errors (instance {{ $labels.instance }})"
-        description: "More than 10 invalid requests/s on frontend {{ $labels.proxy }}"
+        description: "More than 1% invalid requests on frontend {{ $labels.proxy }} ({{ $value | humanizePercentage }})"
 
     - alert: HAproxyFrontendSecurityBlockedRequests
-      expr: sum by (proxy) (rate(haproxy_frontend_denied_connections_total[2m])) > 10
+      expr: |
+        (
+          sum by (proxy, instance, job) (rate(haproxy_frontend_denied_connections_total[2m]))
+          /
+          sum by (proxy, instance, job) (rate(haproxy_frontend_connections_total[2m]))
+        ) > 0.05
+        and
+        sum by (proxy, instance, job) (rate(haproxy_frontend_connections_total[2m])) > 10
       for: 2m
       labels:
         severity: warning
       annotations:
         summary: "HAProxy frontend security blocked requests (instance {{ $labels.instance }})"
-        description: "HAProxy is blocking requests for security reasons on {{ $labels.proxy }} ({{ $value }} req/s)"
+        description: "More than 5% of connections blocked by ACL on frontend {{ $labels.proxy }} ({{ $value | humanizePercentage }})"
 
     # ── Backend ──────────────────────────────────────────────
 
@@ -214,13 +228,20 @@
         description: "HAProxy has no alive active or backup backends for {{ $labels.proxy }}"
 
     - alert: HAproxyBackendConnectionErrors
-      expr: (sum by (proxy,instance,job) (rate(haproxy_backend_connection_errors_total[5m]))) > 100
+      expr: |
+        (
+          sum by (proxy, instance, job) (rate(haproxy_backend_connection_errors_total[5m]))
+          /
+          sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
+        ) > 0.05
+        and
+        sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m])) > 10
       for: 5m
       labels:
         severity: critical
       annotations:
         summary: "HAProxy backend connection errors (instance {{ $labels.instance }})"
-        description: "Too many connection errors to {{ $labels.instance }}/{{ $labels.proxy }} backend (> 100 req/s). Request throughput may be too high."
+        description: "More than 5% of connection attempts failing on backend {{ $labels.proxy }} ({{ $value | humanizePercentage }}) — check backend health or network connectivity"
 
     - alert: HAproxyHighHttp5xxErrorRateBackend
       expr: ((sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
@@ -309,13 +330,20 @@
         description: "Backend {{ $labels.proxy }} average response time above 1s ({{ $value | humanizeDuration }})"
 
     - alert: HAproxyBackendRedispatch
-      expr: rate(haproxy_backend_redispatch_warnings_total[5m]) > 5
+      expr: |
+        (
+          sum by (proxy, instance, job) (rate(haproxy_backend_redispatch_warnings_total[5m]))
+          /
+          sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
+        ) > 0.05
+        and
+        sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m])) > 10
       for: 5m
       labels:
         severity: warning
       annotations:
         summary: "HAProxy backend redispatch (instance {{ $labels.instance }})"
-        description: "Backend {{ $labels.proxy }} is redispatching connections frequently — a server is likely flapping"
+        description: "More than 5% of connections redispatched on backend {{ $labels.proxy }} ({{ $value | humanizePercentage }}) — a server is likely flapping"
 
     - alert: HAproxyPendingRequests
       expr: sum by (proxy,job,instance) (rate(haproxy_backend_current_queue[5m])) > 0
@@ -351,13 +379,20 @@
         description: "Server {{ $labels.server }} in backend {{ $labels.proxy }} is DOWN on {{ $labels.instance }}"
 
     - alert: HAproxyServerConnectionErrors
-      expr: (sum by (proxy,job,instance,server) (rate(haproxy_server_connection_errors_total[5m]))) > 100
+      expr: |
+        (
+          sum by (proxy, job, instance, server) (rate(haproxy_server_connection_errors_total[5m]))
+          /
+          sum by (proxy, job, instance, server) (rate(haproxy_server_connection_attempts_total[5m]))
+        ) > 0.05
+        and
+        sum by (proxy, job, instance, server) (rate(haproxy_server_connection_attempts_total[5m])) > 10
       for: 5m
       labels:
         severity: critical
       annotations:
         summary: "HAProxy server connection errors (instance {{ $labels.instance }})"
-        description: "Too many connection errors to {{ $labels.server }} server (> 100 req/s). Request throughput may be too high."
+        description: "More than 5% of connection attempts failing on server {{ $labels.server }} in backend {{ $labels.proxy }} ({{ $value | humanizePercentage }})"
 
     - alert: HAproxyServerResponseErrors
       expr: ((sum by (server,instance,job) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
