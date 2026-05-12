@@ -64,5 +64,12 @@
         max without (fqdn,instance,node,pod) (
           instance:node_cpu_utilization:ratio
         )
-
-
+    # NIC bandwidth saturation
+    - record: instance_device:node_nic_receive_saturation:ratio
+      expr: >
+        rate(node_network_receive_bytes_total{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"}[5m])
+        / (node_network_speed_bytes{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"} > 0)
+    - record: instance_device:node_nic_transmit_saturation:ratio
+      expr: >
+        rate(node_network_transmit_bytes_total{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"}[5m])
+        / (node_network_speed_bytes{device!~"lo|veth.*|cali.*|cilium.*|docker.*|virbr.*"} > 0)
