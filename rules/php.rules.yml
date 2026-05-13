@@ -1,7 +1,10 @@
 - name: php.rules
   rules:
     - alert: PHPFPMExporter
-      expr: sum(up{job="phpfpm"}) by (job,instance) == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job="phpfpm"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job="phpfpm"}[5m]))
       for: 2m
       labels:
         severity: critical

@@ -1,7 +1,10 @@
 - name: aerospike.rules
   rules:
     - alert: AerospikeExporterDown
-      expr: sum(up{job=~".*aerospike.*"}) by (job,instance) == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job=~".*aerospike.*"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job=~".*aerospike.*"}[5m]))
       for: 2m
       labels:
         severity: critical

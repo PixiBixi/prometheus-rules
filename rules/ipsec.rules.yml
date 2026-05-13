@@ -1,7 +1,10 @@
 - name: ipsec.rules
   rules:
     - alert: ExporterIPSECDown
-      expr: up{job="vpn-ipsec"} == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job="vpn-ipsec"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job="vpn-ipsec"}[5m]))
       for: 1m
       labels:
         severity: critical

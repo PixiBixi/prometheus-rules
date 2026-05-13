@@ -1,7 +1,10 @@
 - name: kafka.rules
   rules:
     - alert: KafkaExporter
-      expr: up{job="kafka"} == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job="kafka"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job="kafka"}[5m]))
       for: 2m
       labels:
         severity: critical
@@ -33,7 +36,10 @@
         description: "{{ $labels.instance }} of job {{ $labels.job }} has some reassigning partitions"
         summary: "{{ $labels.instance }} of job {{ $labels.job }} has some reassigning partitions"
     - alert: KafkaLagExporter
-      expr: up{job="consumer"} == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job="consumer"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job="consumer"}[5m]))
       for: 2m
       labels:
         severity: critical
