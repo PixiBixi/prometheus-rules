@@ -1,7 +1,10 @@
 - name: basis.rules
   rules:
     - alert: HostDown
-      expr: up{job=~".*node-exporter"} == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job=~".*node-exporter"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job=~".*node-exporter"}[5m]))
       for: 2m
       labels:
         severity: critical

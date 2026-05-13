@@ -1,7 +1,10 @@
 - name: postgresql.rules
   rules:
     - alert: PostgresExporter
-      expr: sum(up{job=~".*postgres.*"}) by (job,instance) == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job=~".*postgres.*"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job=~".*postgres.*"}[5m]))
       for: 2m
       labels:
         severity: critical

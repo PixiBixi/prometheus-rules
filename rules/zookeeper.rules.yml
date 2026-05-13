@@ -1,7 +1,10 @@
 - name: zookeeper.rules
   rules:
     - alert: ZookeeperExporter
-      expr: up{job="zookeeper"} == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job="zookeeper"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job="zookeeper"}[5m]))
       for: 2m
       labels:
         severity: critical

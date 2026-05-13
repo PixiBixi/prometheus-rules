@@ -1,7 +1,10 @@
 - name: prometheus.rules
   rules:
     - alert: PushGatewayDown
-      expr: sum(min_over_time(up{job="prometheus-pushgateway"}[2m])) by (job,instance) == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job="prometheus-pushgateway"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job="prometheus-pushgateway"}[2m]))
       for: 2m
       labels:
         severity: critical

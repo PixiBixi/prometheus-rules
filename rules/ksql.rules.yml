@@ -1,7 +1,10 @@
 - name: ksql.rules
   rules:
     - alert: KsqldbExporter
-      expr: up{job="ksqldb"} == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job="ksqldb"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job="ksqldb"}[5m]))
       for: 2m
       labels:
         severity: critical

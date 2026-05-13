@@ -9,7 +9,10 @@
         summary: "MySQL Replication is not running {{$labels.instance}}"
         description: "MySQL replication seems down on {{$labels.instance}}"
     - alert: MysqlExporter
-      expr: sum(up{job=~".*mysql-exporter"}) by (job,instance) == 0
+      expr: |
+        group by (job, instance) (last_over_time(up{job=~".*mysql-exporter"}[1h]))
+        unless
+        group by (job, instance) (last_over_time(up{job=~".*mysql-exporter"}[5m]))
       for: 2m
       labels:
         severity: critical
