@@ -1,14 +1,14 @@
 name: Build docs
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - exporters/**
       - rules/**
       - build.py
-      - docs/index.html
-      - docs/CNAME
+      - docs/**
 
 jobs:
   build:
