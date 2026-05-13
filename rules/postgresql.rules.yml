@@ -115,13 +115,20 @@
         summary: "PostgreSQL replication lag critical for {{ $labels.instance }}"
 
     - alert: PostgresqlDeadLocks
-      expr: increase(pg_stat_database_deadlocks{datname!~"template.*|postgres",datid!="0"}[1m]) > 5
+      expr: |
+        (
+          increase(pg_stat_database_deadlocks{datname!~"template.*|postgres",datid!="0"}[1m])
+          /
+          increase(pg_stat_database_xact_commit{datname!~"template.*|postgres",datid!="0"}[1m])
+        ) > 0.001
+        and
+        increase(pg_stat_database_xact_commit{datname!~"template.*|postgres",datid!="0"}[1m]) > 10
       for: 0m
       labels:
         severity: warning
       annotations:
         summary: "PostgreSQL dead locks (instance {{ $labels.instance }})"
-        description: "PostgreSQL has {{ $value }} dead-locks in the last minute on {{ $labels.instance }}"
+        description: "Deadlock rate above 0.1% of commits on {{ $labels.instance }}/{{ $labels.datname }} ({{ $value | humanizePercentage }})"
 
     - alert: PostgresqlHighRollbackRate
       expr: |
@@ -261,13 +268,20 @@
         description: "PostgreSQL connection usage above 80% of max_connections on {{ $labels.server }}."
 
     - alert: PostgresDeadlockHigh
-      expr: increase(pg_stat_database_deadlocks[5m]) > 10
+      expr: |
+        (
+          increase(pg_stat_database_deadlocks[5m])
+          /
+          increase(pg_stat_database_xact_commit[5m])
+        ) > 0.001
+        and
+        increase(pg_stat_database_xact_commit[5m]) > 50
       for: 0m
       labels:
         severity: warning
       annotations:
         summary: "PostgreSQL deadlock high (database {{ $labels.datname }})"
-        description: "More than 10 deadlocks detected in 5 minutes on database {{ $labels.datname }}."
+        description: "Deadlock rate above 0.1% of commits on database {{ $labels.datname }} ({{ $value | humanizePercentage }})"
 
     - alert: PostgresChecksumFailures
       expr: increase(pg_stat_database_checksum_failures[5m]) > 0
@@ -279,13 +293,17 @@
         description: "Data checksum failure detected on {{ $labels.datname }} — possible disk corruption."
 
     - alert: PostgresTempFilesHigh
-      expr: rate(pg_stat_database_temp_bytes[5m]) > 100000000
+      expr: |
+        (
+          rate(pg_stat_database_temp_bytes[5m]) * 3600
+          / on(datname) group_left() pg_database_size_bytes
+        ) > 0.50
       for: 10m
       labels:
         severity: warning
       annotations:
         summary: "PostgreSQL temp files high (database {{ $labels.datname }})"
-        description: "Database {{ $labels.datname }} is writing more than 100MB/min to temp files — query memory pressure, check work_mem."
+        description: "Database {{ $labels.datname }} projected to write more than 50% of its size in temp files per hour ({{ $value | humanizePercentage }}) — query memory pressure, check work_mem."
 
     - alert: PostgresBackendFsyncHigh
       expr: rate(pg_stat_bgwriter_buffers_backend_fsync_total[5m]) > 0
@@ -297,11 +315,15 @@
         description: "Backend processes are performing fsync themselves on {{ $labels.instance }} — bgwriter cannot keep up."
 
     - alert: PostgresDatabaseSizeGrowthHigh
-      expr: predict_linear(pg_database_size_bytes[6h], 86400) - pg_database_size_bytes > 10737418240
+      expr: |
+        (
+          predict_linear(pg_database_size_bytes[6h], 86400) - pg_database_size_bytes
+        ) / pg_database_size_bytes > 0.20
+        and pg_database_size_bytes > 0
       for: 0m
       labels:
         severity: warning
       annotations:
         summary: "PostgreSQL database size growth high (database {{ $labels.datname }})"
-        description: "Database {{ $labels.datname }} projected to grow by more than 10GB in 24h at current rate."
+        description: "Database {{ $labels.datname }} projected to grow by more than 20% of its current size in 24h ({{ $value | humanizePercentage }})"
 
