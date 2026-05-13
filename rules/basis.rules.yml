@@ -9,14 +9,6 @@
         description: "node_exporter seems down on {{$labels.instance}}, then the host is probably down"
         summary: "Host down {{$labels.instance}} (node_exporter)"
 
-    - alert: TemperatureTooHigh
-      expr: avg(node_hwmon_temp_celsius) by (instance) > 80
-      for: 1h
-      labels:
-        severity: critical
-      annotations:
-        summary: "High Temperature for {{ $labels.instance }}"
-        description: "Temperature has exceeded 80° for more than 30 min on {{ $labels.instance }}. Please open a ticket on OVH/LW/whatever"
     - alert: CPUThrottled
       expr: sum(rate(node_cpu_core_throttles_total[5m]) > 0) by (instance)
       for: 5m
@@ -76,13 +68,20 @@
         summary: "High Drop on {{ $labels.instance }}"
         description: "High drop detected (> 10%) on {{ $labels.device }} @ {{ $labels.instance }}. Misconfiguration or NIC has an issue"
     - alert: HighListenDrop
-      expr: irate(node_netstat_TcpExt_ListenDrops[1m]) > 10
+      expr: |
+        (
+          irate(node_netstat_TcpExt_ListenDrops[1m])
+          /
+          irate(node_netstat_Tcp_PassiveOpens[1m])
+        ) > 0.10
+        and
+        irate(node_netstat_Tcp_PassiveOpens[1m]) > 1
       for: 5m
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} has high listen drops"
-        summary: "{{ $labels.instance }} has high listen drop, that's significate your application could be unstable or drop traffic, please look at your metrics"
+        summary: "High TCP listen drops on {{ $labels.instance }}"
+        description: "More than 10% of incoming TCP connections are being dropped on {{ $labels.instance }} ({{ $value | humanizePercentage }}) — accept queue full, check backlog/somaxconn"
     - alert: ConntrackAlmostFull
       expr: (node_nf_conntrack_entries / node_nf_conntrack_entries_limit) > 0.50
       for: 5m
@@ -516,24 +515,31 @@
     # ── Memory pressure ────────────────────────────────────────────────────────
 
     - alert: NodeMemoryMajorPagesFaults
-      expr: rate(node_vmstat_pgmajfault[5m]) > 500
+      expr: |
+        (
+          rate(node_vmstat_pgmajfault[5m])
+          /
+          rate(node_vmstat_pgfault[5m])
+        ) > 0.05
+        and
+        rate(node_vmstat_pgfault[5m]) > 100
       for: 15m
       labels:
         severity: warning
       annotations:
         summary: "Memory major page faults high on {{ $labels.instance }}"
-        description: "{{ $labels.instance }} is experiencing {{ printf \"%.2f\" $value }} major page faults/sec for 15 minutes — possible memory pressure."
+        description: "More than 5% of page faults require disk I/O on {{ $labels.instance }} ({{ $value | humanizePercentage }}) — possible memory pressure or thrashing"
 
     # ── Disk IO ────────────────────────────────────────────────────────────────
 
     - alert: NodeDiskIOSaturation
-      expr: rate(node_disk_io_time_weighted_seconds_total{device!=""}[5m]) > 10
+      expr: rate(node_disk_io_time_seconds_total{device!=""}[5m]) > 0.9
       for: 30m
       labels:
         severity: warning
       annotations:
         summary: "Disk IO saturation on {{ $labels.instance }} ({{ $labels.device }})"
-        description: "Disk {{ $labels.device }} at {{ $labels.instance }} has an IO queue above 10 for 30 minutes — possible disk saturation."
+        description: "Disk {{ $labels.device }} at {{ $labels.instance }} is busy more than 90% of the time for 30 minutes ({{ $value | humanizePercentage }}) — possible disk saturation."
 
     # ── Systemd crashloop ──────────────────────────────────────────────────────
 
@@ -611,13 +617,15 @@
     # ── TCP sockets ────────────────────────────────────────────────────────────
 
     - alert: NodeTCPOrphanSockets
-      expr: node_sockstat_TCP_orphan > 10000
+      expr: |
+        (node_sockstat_TCP_orphan / node_sockstat_TCP_alloc) > 0.10
+        and node_sockstat_TCP_alloc > 100
       for: 5m
       labels:
         severity: warning
       annotations:
         summary: "High TCP orphan sockets on {{ $labels.instance }}"
-        description: "{{ $value }} orphaned TCP sockets on {{ $labels.instance }}. Possible TCP connection leak."
+        description: "More than 10% of allocated TCP sockets are orphaned on {{ $labels.instance }} ({{ $value | humanizePercentage }}) — possible TCP connection leak"
 
     # ── Systemd system status ──────────────────────────────────────────────────
 
