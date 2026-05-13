@@ -16,7 +16,7 @@
       expr: sum(rate(node_cpu_core_throttles_total[5m]) > 0) by (instance)
       for: 5m
       labels:
-        severity: info
+        severity: warning
       annotations:
         summary: "CPU Throttled on {{ $labels.instance }}"
         description: "CPU has been throttled on {{ $labels.instance }} for at least 5 minutes, it directly impact performances because it reduces frequency. Please check T° of your processor"
