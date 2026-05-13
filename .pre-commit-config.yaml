@@ -12,7 +12,7 @@ repos:
       - id: build-docs
         name: Build docs/data.json
         language: system
-        entry: bash -c 'python3 build.py && git add docs/data.json'
+        entry: python3 build.py
         pass_filenames: false
         always_run: false
         files: ^(exporters/|rules/|build\.py)
