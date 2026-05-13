@@ -43,13 +43,20 @@
         description: "90% of PHP-FPM workers busy on pool {{ $labels.pool }}. Pool may become saturated."
 
     - alert: PHPFPMSlowRequests
-      expr: increase(phpfpm_slow_requests[5m]) > 5
+      expr: |
+        (
+          increase(phpfpm_slow_requests[5m])
+          /
+          increase(phpfpm_accepted_connections[5m])
+        ) > 0.01
+        and
+        increase(phpfpm_accepted_connections[5m]) > 10
       for: 0m
       labels:
         severity: warning
       annotations:
         summary: "PHP-FPM slow requests on pool {{ $labels.pool }}"
-        description: "More than 5 slow requests in 5 minutes on pool {{ $labels.pool }}."
+        description: "More than 1% of requests are slow on pool {{ $labels.pool }} ({{ $value | humanizePercentage }})"
 
     - alert: PHPFPMScrapeFailed
       expr: increase(phpfpm_scrape_failures[5m]) > 0
