@@ -46,13 +46,20 @@
         description: "{{ $labels.instance }} is receiving VRRP packets with authentication failures — possible misconfiguration or unexpected peer on the network."
 
     - alert: KeepalivedAdIntervalErrors
-      expr: increase(keepalived_advertisements_interval_errors_total[5m]) > 10
+      expr: |
+        (
+          increase(keepalived_advertisements_interval_errors_total[5m])
+          /
+          increase(keepalived_advertisements_received_total[5m])
+        ) > 0.05
+        and
+        increase(keepalived_advertisements_received_total[5m]) > 5
       for: 5m
       labels:
         severity: warning
       annotations:
         summary: "Keepalived advertisement interval errors on {{ $labels.instance }}"
-        description: "{{ $labels.instance }} has {{ $value }} VRRP advertisement interval errors in 5 minutes — risk of spurious master election."
+        description: "More than 5% of received VRRP advertisements have interval errors on {{ $labels.instance }} vrid={{ $labels.vrid }} ({{ $value | humanizePercentage }}) — risk of spurious master election."
 
     - alert: KeepalivedAuthenticationInvalid
       expr: increase(keepalived_authentication_invalid_total[5m]) > 0
@@ -64,13 +71,20 @@
         description: "VRRP authentication failures on {{ $labels.instance }} vrid={{ $labels.vrid }} — likely misconfiguration or rogue peer."
 
     - alert: KeepalivedTTLErrors
-      expr: increase(keepalived_ip_ttl_errors_total[5m]) > 5
+      expr: |
+        (
+          increase(keepalived_ip_ttl_errors_total[5m])
+          /
+          increase(keepalived_advertisements_received_total[5m])
+        ) > 0.02
+        and
+        increase(keepalived_advertisements_received_total[5m]) > 5
       for: 0m
       labels:
         severity: warning
       annotations:
         summary: "Keepalived TTL errors on {{ $labels.instance }}"
-        description: "VRRP TTL errors on {{ $labels.instance }} — possible routing misconfiguration."
+        description: "More than 2% of received VRRP advertisements have TTL errors on {{ $labels.instance }} vrid={{ $labels.vrid }} ({{ $value | humanizePercentage }}) — possible routing misconfiguration or rogue peer."
 
     - alert: KeepalivedPacketErrors
       expr: increase(keepalived_packet_length_errors_total[5m]) > 0
