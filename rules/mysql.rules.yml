@@ -75,13 +75,20 @@
         description: "{{$labels.job}} on {{$labels.instance}} is not ready."
         summary: "Galera cluster node not ready"
     - alert: MySQLInnoDBLogWaits
-      expr: rate(mysql_global_status_innodb_log_waits[15m]) > 10
+      expr: |
+        (
+          rate(mysql_global_status_innodb_log_waits[15m])
+          /
+          rate(mysql_global_status_innodb_log_write_requests[15m])
+        ) > 0.01
+        and
+        rate(mysql_global_status_innodb_log_write_requests[15m]) > 1
       for: 5m
       labels:
         severity: warning
       annotations:
-        description: "The innodb logs are waiting for disk at a rate of {{$value}} / second"
-        summary: "MySQL innodb log writes stalling."
+        summary: "MySQL InnoDB log writes stalling (instance {{ $labels.instance }})"
+        description: "More than 1% of InnoDB log write requests are waiting for disk on {{ $labels.instance }} ({{ $value | humanizePercentage }}) — consider increasing innodb_log_buffer_size"
 
     - alert: MysqlTooManyConnections
       expr: max_over_time(mysql_global_status_threads_connected[1m]) / mysql_global_variables_max_connections * 100 > 80 and mysql_global_variables_max_connections > 0
