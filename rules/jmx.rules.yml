@@ -55,13 +55,20 @@
         description: "JVM thread count is {{ $value }} (> 300) on {{ $labels.instance }} — potential thread leak"
 
     - alert: JvmThreadsBlocked
-      expr: jvm_threads_state{state="BLOCKED"} > 50
+      expr: |
+        (
+          jvm_threads_state{state="BLOCKED"}
+          /
+          jvm_threads_current
+        ) > 0.10
+        and
+        jvm_threads_current > 10
       for: 5m
       labels:
         severity: warning
       annotations:
         summary: "JVM threads BLOCKED (instance {{ $labels.instance }})"
-        description: "{{ $value }} BLOCKED threads on {{ $labels.instance }} — lock contention suspected"
+        description: "More than 10% of JVM threads are BLOCKED on {{ $labels.instance }} ({{ $value | humanizePercentage }}) — lock contention suspected"
 
     - alert: JvmDirectBufferPoolFillingUp
       expr: (jvm_buffer_pool_used_bytes / jvm_buffer_pool_capacity_bytes) * 100 > 90 and jvm_buffer_pool_capacity_bytes > 0
