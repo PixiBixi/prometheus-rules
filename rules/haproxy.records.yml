@@ -6,13 +6,13 @@
     # to avoid full server-label scan on every dashboard/alert query.
 
     - record: haproxy:backend_http_responses:rate5m
-      expr: sum by (namespace, proxy, code) (rate(haproxy_server_http_responses_total[5m]))
+      expr: sum by (namespace, proxy, code) (rate(haproxy_backend_http_responses_total[5m]))
 
     - record: haproxy:backend_http_responses_5xx:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_server_http_responses_total{code="5xx"}[5m]))
+      expr: sum by (namespace, proxy) (rate(haproxy_backend_http_responses_total{code="5xx"}[5m]))
 
     - record: haproxy:backend_http_responses_4xx:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_server_http_responses_total{code="4xx"}[5m]))
+      expr: sum by (namespace, proxy) (rate(haproxy_backend_http_responses_total{code="4xx"}[5m]))
 
     - record: haproxy:backend_bytes_in:rate5m
       expr: sum by (namespace, proxy) (rate(haproxy_server_bytes_in_total[5m]))
