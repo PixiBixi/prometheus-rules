@@ -247,7 +247,7 @@
         description: "More than 5% of connection attempts failing on {{ $labels.proxy }} @ {{ $labels.instance }} ({{ $value | humanizePercentage }}) — check backend health or network connectivity"
 
     - alert: HAproxyHighHttp5xxErrorRateBackend
-      expr: ((sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
+      expr: ((sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{code="5xx"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total[5m]))) * 100) > 5
       for: 5m
       labels:
         severity: critical
@@ -256,7 +256,7 @@
         description: "Too many HTTP requests with status 5xx (> 5%) on {{ $labels.proxy }} @ {{ $labels.instance }}"
 
     - alert: HAproxyHighHttp4xxErrorRateBackend
-      expr: ((sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{code="4xx",proxy!~".*default-local-service.*"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{proxy!~".*default-local-service.*"}[5m]))) * 100) > 50
+      expr: ((sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{code="4xx",proxy!~".*default-local-service.*"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{proxy!~".*default-local-service.*"}[5m]))) * 100) > 50
       for: 5m
       labels:
         severity: critical
@@ -265,7 +265,7 @@
         description: "Too many HTTP requests with status 4xx (> 50%) on {{ $labels.proxy }} @ {{ $labels.instance }}"
 
     - alert: HAproxyHighHttp4xxErrorRateBackendWarning
-      expr: ((sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{code="4xx",proxy!~".*default-local-service.*"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_server_http_responses_total{proxy!~".*default-local-service.*"}[5m]))) * 100) > 15
+      expr: ((sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{code="4xx",proxy!~".*default-local-service.*"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{proxy!~".*default-local-service.*"}[5m]))) * 100) > 15
       for: 5m
       labels:
         severity: warning
@@ -373,9 +373,9 @@
     - alert: HAproxyBlackholedTrafficNamespaceWarning
       expr: |
         (
-          sum by (namespace) (rate(haproxy_server_http_responses_total{proxy=~".*default-local-service.*"}[5m]))
+          sum by (namespace) (rate(haproxy_backend_http_responses_total{proxy=~".*default-local-service.*"}[5m]))
           /
-          sum by (namespace) (rate(haproxy_server_http_responses_total[5m]))
+          sum by (namespace) (rate(haproxy_backend_http_responses_total[5m]))
         ) * 100 > 0.5
       for: 5m
       labels:
@@ -387,9 +387,9 @@
     - alert: HAproxyBlackholedTrafficNamespaceCritical
       expr: |
         (
-          sum by (namespace) (rate(haproxy_server_http_responses_total{proxy=~".*default-local-service.*"}[5m]))
+          sum by (namespace) (rate(haproxy_backend_http_responses_total{proxy=~".*default-local-service.*"}[5m]))
           /
-          sum by (namespace) (rate(haproxy_server_http_responses_total[5m]))
+          sum by (namespace) (rate(haproxy_backend_http_responses_total[5m]))
         ) * 100 > 2
       for: 5m
       labels:
