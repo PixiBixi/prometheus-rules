@@ -364,7 +364,7 @@
         summary: “Host high CPU load (instance RDS {{ $labels.instance }})”
         description: “The CPU load reported from RDS {{ $labels.instance }} has exceeded 90% for more than 1 minute.”
     - alert: CPUwaitIO
-      expr: instance:node_cpu_utilization:ratio{ignoreCPULoad="",mode="iowait",ignoreSingleCPU=""} > 0.1
+      expr: instance_mode:node_cpu_seconds:rate1m{ignoreCPULoad="",mode="iowait",ignoreSingleCPU=""} > 0.1
       for: 5m
       labels:
         severity: critical
