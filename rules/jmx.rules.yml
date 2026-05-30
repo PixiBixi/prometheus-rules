@@ -1,14 +1,5 @@
 - name: jmx.rules
   rules:
-    - alert: HighJVMUsage
-      expr: sum(jvm_memory_bytes_max) by (instance,job,server) * 100 > 80
-      for: 20m
-      labels:
-        severity: critical
-      annotations:
-        summary: "JVM Usage of {{ $labels.instance }} @ {{ $labels.job }}  is used more than 80% for 20 minutes"
-        description: "JVM Usage is high (> 80%) for more than 20 minutes, you probably should update -Xmx value for your JVM"
-
     - alert: JvmMemoryFillingUp
       expr: (sum by (instance)(jvm_memory_used_bytes{area="heap"}) / sum by (instance)(jvm_memory_max_bytes{area="heap"})) * 100 > 80 and sum by (instance)(jvm_memory_max_bytes{area="heap"}) > 0
       for: 2m
@@ -17,6 +8,15 @@
       annotations:
         summary: "JVM heap memory filling up (instance {{ $labels.instance }})"
         description: "JVM heap memory is filling up (> 80%) on {{ $labels.instance }}\n  VALUE = {{ $value }}"
+
+    - alert: JvmHeapMemoryCritical
+      expr: (sum by (instance)(jvm_memory_used_bytes{area="heap"}) / sum by (instance)(jvm_memory_max_bytes{area="heap"})) * 100 > 90 and sum by (instance)(jvm_memory_max_bytes{area="heap"}) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "JVM heap memory critical (instance {{ $labels.instance }})"
+        description: "JVM heap memory above 90% on {{ $labels.instance }} — raise -Xmx or investigate a leak\n  VALUE = {{ $value }}"
 
     - alert: JvmGcTimeTooHigh
       expr: sum by (instance)(rate(jvm_gc_collection_seconds_sum[5m])) > 0.05
@@ -59,7 +59,7 @@
         (
           jvm_threads_state{state="BLOCKED"}
           /
-          jvm_threads_current
+          ignoring(state) jvm_threads_current
         ) > 0.10
         and
         jvm_threads_current > 10
