@@ -24,7 +24,7 @@
       expr: avg(node_cpu_scaling_frequency_hertz) by (instance) < avg(node_cpu_frequency_max_hertz) by (instance)*0.30
       for: 5m
       labels:
-        severity: info
+        severity: warning
       annotations:
         summary: "Slow CPU on {{ $labels.instance }}"
         description: "Slow CPU on {{ $labels.instance }} ({{ $value }}) for at least 5 minutes (< 30% of maximum frequency). It directly impact performances because it reduces frequency."
@@ -352,8 +352,8 @@
       labels:
         severity: critical
       annotations:
-        summary: “Host high CPU load (instance {{ $labels.instance }})”
-        description: “The CPU load reported from {{ $labels.instance }} has exceeded 90% for more than 20 minutes.”
+        summary: "Host high CPU load (instance {{ $labels.instance }})"
+        description: "The CPU load reported from {{ $labels.instance }} has exceeded 90% for more than 20 minutes."
     - alert: CPULoadRDS
       # rds-enhanced metric
       expr: node_cpu_average{mode="idle"} < 10
@@ -361,8 +361,8 @@
       labels:
         severity: critical
       annotations:
-        summary: “Host high CPU load (instance RDS {{ $labels.instance }})”
-        description: “The CPU load reported from RDS {{ $labels.instance }} has exceeded 90% for more than 1 minute.”
+        summary: "Host high CPU load (instance RDS {{ $labels.instance }})"
+        description: "The CPU load reported from RDS {{ $labels.instance }} has exceeded 90% for more than 1 minute."
     - alert: CPUwaitIO
       expr: instance_mode:node_cpu_seconds:rate1m{ignoreCPULoad="",mode="iowait",ignoreSingleCPU=""} > 0.1
       for: 5m
