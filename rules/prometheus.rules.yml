@@ -199,7 +199,7 @@
         summary: "Prometheus TSDB WAL truncations failed (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} TSDB WAL truncation failures"
     - alert: PrometheusTimeseriesCardinality
-      expr: label_replace(count by(__name__) ({__name__=~".+"}), "name", "$1", "__name__", "(.+)") > 10000
+      expr: name:tsdb_series:count > 10000
       labels:
         severity: warning
       annotations:

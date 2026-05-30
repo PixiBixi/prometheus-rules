@@ -1,0 +1,8 @@
+- name: prometheus.records
+  # Expensive full-series scan; evaluate infrequently — cardinality moves slowly.
+  interval: 10m
+  rules:
+    # Per-metric series count. label_replace moves __name__ into `name` so the
+    # recorded series stay distinct (record: would otherwise overwrite __name__).
+    - record: name:tsdb_series:count
+      expr: label_replace(count by (__name__) ({__name__=~".+"}), "name", "$1", "__name__", "(.+)")
