@@ -306,7 +306,7 @@
         description: "Backend {{ $labels.proxy }} @ {{ $labels.instance }} connection reuse rate is {{ $value | printf \"%.0f\" }}% (< 50%) for the last 10 minutes. This may indicate misconfigured keep-alive, backend restarts, or HTTP/1.0 fallback."
 
     - alert: HAproxyBackendMaxActiveSessionHigh
-      expr: (haproxy_server_max_sessions > 0 * 100) / (haproxy_server_limit_sessions > 0) > 80
+      expr: (haproxy_server_max_sessions * 100) / (haproxy_server_limit_sessions > 0) > 80
       for: 5m
       labels:
         severity: warning
@@ -424,15 +424,6 @@
       annotations:
         summary: "HAProxy server connection errors — {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
         description: "More than 5% of connection attempts failing on {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }} ({{ $value | humanizePercentage }})"
-
-    - alert: HAproxyServerResponseErrors
-      expr: ((sum by (server,instance,job) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
-      for: 5m
-      labels:
-        severity: critical
-      annotations:
-        summary: "HAProxy server response errors — {{ $labels.server }} @ {{ $labels.instance }}"
-        description: "Too many 5xx response errors on {{ $labels.server }} @ {{ $labels.instance }} (> 5%)"
 
     - alert: HAproxyHighHttp5xxErrorRateServer
       expr: ((sum by (server,instance) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
