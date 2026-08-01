@@ -1,33 +1,55 @@
 - name: haproxy.records
   rules:
 
-    # ── Server-level → Backend aggregations (highest cardinality reduction) ──
-    # haproxy_server_* has labels proxy+server — pre-aggregate to namespace+proxy
-    # to avoid full server-label scan on every dashboard/alert query.
+    # ── Aggregation key ───────────────────────────────────────────────────────
+    # Everything below aggregates to (namespace, proxy, instance, job).
+    #
+    # The cardinality win comes from collapsing `server` -- hundreds of series
+    # per backend on an ingress -- not from collapsing `instance`, of which
+    # there are a handful. Keeping instance+job costs almost nothing and is what
+    # makes these records consumable by the alerts in haproxy.rules.yml, whose
+    # annotations all reference {{ $labels.instance }}.
+    #
+    # Divisions below rely on default vector matching: both operands are
+    # aggregated to the same key, so no on()/group_left() is needed. Using
+    # group_left() here would be worse than redundant -- it masks genuine
+    # matching errors.
+    #
+    # clamp_min floors are 0.01 (one request per 100s), not 1. A 1 req/s floor
+    # silently halves the reported error rate of any backend below 1 rps, which
+    # is most of them.
+
+    # ── Backend-level rates ───────────────────────────────────────────────────
 
     - record: haproxy:backend_http_responses:rate5m
-      expr: sum by (namespace, proxy, code) (rate(haproxy_backend_http_responses_total[5m]))
+      expr: sum by (namespace, proxy, instance, job, code) (rate(haproxy_backend_http_responses_total[5m]))
 
     - record: haproxy:backend_http_responses_5xx:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_backend_http_responses_total{code="5xx"}[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_backend_http_responses_total{code="5xx"}[5m]))
 
     - record: haproxy:backend_http_responses_4xx:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_backend_http_responses_total{code="4xx"}[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_backend_http_responses_total{code="4xx"}[5m]))
 
     - record: haproxy:backend_bytes_in:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_server_bytes_in_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_server_bytes_in_total[5m]))
 
     - record: haproxy:backend_bytes_out:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_server_bytes_out_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_server_bytes_out_total[5m]))
 
     - record: haproxy:backend_sessions:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_server_sessions_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_server_sessions_total[5m]))
 
     - record: haproxy:backend_connection_errors:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_server_connection_errors_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_server_connection_errors_total[5m]))
 
     - record: haproxy:backend_response_errors:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_server_response_errors_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_server_response_errors_total[5m]))
+
+    - record: haproxy:backend_connection_attempts:rate5m
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
+
+    - record: haproxy:backend_connection_reuses:rate5m
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_backend_connection_reuses_total[5m]))
 
     # ── Backend-level derived metrics ─────────────────────────────────────────
 
@@ -35,92 +57,93 @@
     - record: haproxy:backend_5xx_error_rate:ratio5m
       expr: |
         haproxy:backend_http_responses_5xx:rate5m
-        / on(namespace, proxy) group_left()
-        clamp_min(
-          sum by (namespace, proxy) (haproxy:backend_http_responses:rate5m),
-          1
-        ) * 100
+        / clamp_min(
+            sum by (namespace, proxy, instance, job) (haproxy:backend_http_responses:rate5m),
+            0.01
+          ) * 100
 
-    # 4xx error rate % per backend (threshold >10 to ignore default backend noise)
+    # 4xx error rate % per backend.
+    # No volume filter here: a `> 10` guard inside a record makes the series
+    # appear and disappear, which resets any consuming alert's `for:` clock.
+    # Volume guards belong in the alert.
     - record: haproxy:backend_4xx_error_rate:ratio5m
       expr: |
-        (haproxy:backend_http_responses_4xx:rate5m > 10)
-        / on(namespace, proxy) group_left()
-        clamp_min(
-          sum by (namespace, proxy) (haproxy:backend_http_responses:rate5m),
-          1
-        ) * 100
+        haproxy:backend_http_responses_4xx:rate5m
+        / clamp_min(
+            sum by (namespace, proxy, instance, job) (haproxy:backend_http_responses:rate5m),
+            0.01
+          ) * 100
 
-    # Combined 4xx+5xx error rate % per backend.
-    # The previous form did `(4xx_rate > 10) + 5xx_rate`. `>` is a filter, not a
-    # boolean: below 10 4xx/s -- the normal case -- the left operand was an empty
-    # vector and `empty + B` is empty, so backends serving only 5xx never showed
-    # up. Sum the error codes off the base rate instead, and keep volume
-    # thresholds in the consuming alert rather than baked into the record.
+    # Combined 4xx+5xx error rate % per backend
     - record: haproxy:backend_error_rate:ratio5m
       expr: |
-        sum by (namespace, proxy) (haproxy:backend_http_responses:rate5m{code=~"4xx|5xx"})
+        sum by (namespace, proxy, instance, job) (haproxy:backend_http_responses:rate5m{code=~"4xx|5xx"})
         / clamp_min(
-            sum by (namespace, proxy) (haproxy:backend_http_responses:rate5m),
+            sum by (namespace, proxy, instance, job) (haproxy:backend_http_responses:rate5m),
             0.01
           ) * 100
 
     # Session saturation %
-    # Both operands are raw metrics carrying instance+job, so they are NOT unique
-    # per (namespace, proxy): group_left() raised "found duplicate series for the
-    # match group" as soon as two HAProxy instances were scraped. Aggregate both
-    # sides first, then divide 1:1. Guarding with > 0 rather than clamp_min(x, 1)
-    # drops backends with no maxconn instead of pretending their limit is 1.
+    # Guarded with > 0 rather than clamp_min: a backend with no maxconn should
+    # drop out, not be reported as having a limit of one session.
     - record: haproxy:backend_session_saturation:ratio
       expr: |
-        sum by (namespace, proxy) (haproxy_backend_current_sessions)
-        / (sum by (namespace, proxy) (haproxy_backend_limit_sessions) > 0)
+        sum by (namespace, proxy, instance, job) (haproxy_backend_current_sessions)
+        / (sum by (namespace, proxy, instance, job) (haproxy_backend_limit_sessions) > 0)
         * 100
 
-    # Connection reuse ratio — keep-alive efficiency
-    # Same duplicate-match-group failure as above.
-    # NOTE: the denominator is also semantically wrong (reuse rate should be
-    # reuse / (reuse + connect), not reuse / connect) — tracked separately.
+    # Connection reuse ratio -- keep-alive efficiency.
+    # Reuse rate is reuse / (reuse + connect): connection_attempts counts new
+    # connections only, so dividing by it alone reports 900% for a backend
+    # reusing 90% of its connections.
     - record: haproxy:backend_connection_reuse:ratio5m
       expr: |
-        sum by (namespace, proxy) (rate(haproxy_backend_connection_reuses_total[5m]))
+        haproxy:backend_connection_reuses:rate5m
         / clamp_min(
-            sum by (namespace, proxy) (rate(haproxy_backend_connection_attempts_total[5m])),
+            haproxy:backend_connection_reuses:rate5m + haproxy:backend_connection_attempts:rate5m,
             0.01
-          )
+          ) * 100
 
-    # Abort rate (client + server) per backend
+    # Abort rate (client + server) per backend.
+    # Summed separately so a backend missing one of the two metrics still
+    # reports the other half instead of dropping out entirely.
     - record: haproxy:backend_aborts:rate5m
       expr: |
-        sum by (namespace, proxy) (
-          rate(haproxy_backend_client_aborts_total[5m])
-          + rate(haproxy_backend_server_aborts_total[5m])
-        )
+        sum by (namespace, proxy, instance, job) (rate(haproxy_backend_client_aborts_total[5m]))
+        + sum by (namespace, proxy, instance, job) (rate(haproxy_backend_server_aborts_total[5m]))
 
     # Retry rate per backend
     - record: haproxy:backend_retries:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_backend_retry_warnings_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_backend_retry_warnings_total[5m]))
 
     # Downtime accumulation rate per backend — finer signal than binary status
     - record: haproxy:backend_downtime:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_backend_downtime_seconds_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_backend_downtime_seconds_total[5m]))
+
+    # ── Server-level ──────────────────────────────────────────────────────────
+
+    # haproxy_server_http_responses_total is the most cardinal metric in the set
+    # (proxy x server x code). This record does not reduce cardinality -- the
+    # server-level alerts need `server` -- but it computes the rate once instead
+    # of six times across the three 4xx/5xx server alerts.
+    - record: haproxy:server_http_responses:rate5m
+      expr: sum by (namespace, proxy, server, instance, job, code) (rate(haproxy_server_http_responses_total[5m]))
 
     # ── Frontend-level ────────────────────────────────────────────────────────
 
     - record: haproxy:frontend_http_responses_5xx:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_frontend_http_responses_total{code="5xx"}[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_frontend_http_responses_total{code="5xx"}[5m]))
 
     - record: haproxy:frontend_http_responses:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_frontend_http_responses_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_frontend_http_responses_total[5m]))
 
     # Frontend 5xx error rate %
     - record: haproxy:frontend_5xx_error_rate:ratio5m
       expr: |
         haproxy:frontend_http_responses_5xx:rate5m
-        / on(namespace, proxy) group_left()
-        clamp_min(haproxy:frontend_http_responses:rate5m, 1)
+        / clamp_min(haproxy:frontend_http_responses:rate5m, 0.01)
         * 100
 
     # Denied connections rate (security blocks)
     - record: haproxy:frontend_denied_connections:rate5m
-      expr: sum by (namespace, proxy) (rate(haproxy_frontend_denied_connections_total[5m]))
+      expr: sum by (namespace, proxy, instance, job) (rate(haproxy_frontend_denied_connections_total[5m]))

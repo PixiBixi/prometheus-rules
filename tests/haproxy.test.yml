@@ -64,8 +64,11 @@ tests:
   # Both recording rules below divided raw metrics carrying instance+job with
   # group_left(), which is a hard evaluation error once two HAProxy instances
   # are scraped: "found duplicate series for the match group".
+  #
+  # The record keeps instance, so saturation is reported per instance rather
+  # than fleet-wide -- that is the signal an alert naming an instance needs.
   - interval: 1m
-    name: session saturation survives two scraped instances
+    name: session saturation is reported per instance, not fleet-wide
     input_series:
       - series: 'haproxy_backend_current_sessions{namespace="ns",proxy="p",instance="i1",job="hap"}'
         values: '10x5'
@@ -79,8 +82,10 @@ tests:
       - expr: haproxy:backend_session_saturation:ratio
         eval_time: 3m
         exp_samples:
-          - labels: 'haproxy:backend_session_saturation:ratio{namespace="ns",proxy="p"}'
-            value: 20
+          - labels: 'haproxy:backend_session_saturation:ratio{namespace="ns",proxy="p",instance="i1",job="hap"}'
+            value: 10
+          - labels: 'haproxy:backend_session_saturation:ratio{namespace="ns",proxy="p",instance="i2",job="hap"}'
+            value: 30
 
   - interval: 1m
     name: a backend with no maxconn drops out instead of yielding +Inf
@@ -108,5 +113,5 @@ tests:
       - expr: haproxy:backend_error_rate:ratio5m
         eval_time: 8m
         exp_samples:
-          - labels: 'haproxy:backend_error_rate:ratio5m{namespace="ns",proxy="p"}'
+          - labels: 'haproxy:backend_error_rate:ratio5m{namespace="ns",proxy="p",instance="h1",job="hap"}'
             value: 50
