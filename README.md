@@ -222,6 +222,15 @@ RabbitMQ 3.8+ ships the `rabbitmq_prometheus` plugin, enabled by default, servin
 
 Note the metric names differ from the old kbudde/rabbitmq_exporter that most community alert sets were written against: memory is `rabbitmq_process_resident_memory_bytes` over `rabbitmq_resident_memory_limit_bytes`, not `rabbitmq_node_mem_used`.
 
+#### mongodb_exporter
+
+**Exporter link :** [mongodb_exporter](https://github.com/percona/mongodb_exporter)
+**Version used :** 0.52.0 (tested against MongoDB 8)
+
+This exporter names serverStatus metrics `mongodb_ss_*` and carries dimensions as labels. Connections are `mongodb_ss_connections{conn_type="current"}`, **not** `mongodb_connections_current` as most community alert sets assume.
+
+The fixture is trimmed: `--collector.diagnosticdata` emits ~3460 metric names, of which `mongodb_ss_metrics_*`, `mongodb_ss_wt_*` and `mongodb_sys_netstat_*` are ~2800. Those three families are sampled to 50 each; every metric the rules use is kept, and all other families are complete.
+
 #### aerospike-prometheus-exporter
 
 **Exporter link :** [aerospike-prometheus-exporter](https://github.com/aerospike/aerospike-prometheus-exporter)

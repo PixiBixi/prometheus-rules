@@ -1,0 +1,82 @@
+- name: mongodb.rules
+  rules:
+    # percona/mongodb_exporter 0.52 names its serverStatus metrics mongodb_ss_*
+    # and carries dimensions as labels. Several community alert sets still use
+    # the older flat names (mongodb_connections_current,
+    # mongodb_mongod_connections) which this exporter does not emit.
+
+    - alert: MongodbExporterDown
+      expr: |
+        group by (job, instance) (up{job=~".*mongodb.*"} == 0)
+        or
+        (
+          group by (job, instance) (last_over_time(up{job=~".*mongodb.*"}[1h]))
+          unless
+          group by (job, instance) (last_over_time(up{job=~".*mongodb.*"}[5m]))
+        )
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MongoDB exporter down — {{ $labels.job }} @ {{ $labels.instance }}"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+    - alert: MongodbDown
+      expr: mongodb_up == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MongoDB down on {{ $labels.instance }}"
+        description: "The exporter on {{ $labels.instance }} cannot reach mongod."
+
+    - alert: MongodbConnectionsSaturation
+      # current and available are reported as two values of conn_type on the
+      # same metric, so the ratio is current / (current + available).
+      expr: |
+        mongodb_ss_connections{conn_type="current"}
+        / ignoring(conn_type) (
+            mongodb_ss_connections{conn_type="current"}
+            + ignoring(conn_type) mongodb_ss_connections{conn_type="available"}
+            > 0
+          )
+        > 0.80
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MongoDB connections near limit on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "More than 80% of the available connection slots are in use on {{ $labels.instance }}."
+
+    - alert: MongodbHighReadQueue
+      # Readers queueing on the global lock means mongod cannot keep up.
+      expr: mongodb_ss_globalLock_currentQueue{count_type="readers"} > 100
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MongoDB read queue on {{ $labels.instance }} ({{ $value | humanize }} waiting)"
+        description: "{{ $value | humanize }} readers are queued on the global lock on {{ $labels.instance }}."
+
+    - alert: MongodbHighWriteQueue
+      expr: mongodb_ss_globalLock_currentQueue{count_type="writers"} > 100
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MongoDB write queue on {{ $labels.instance }} ({{ $value | humanize }} waiting)"
+        description: "{{ $value | humanize }} writers are queued on the global lock on {{ $labels.instance }}."
+
+    - alert: MongodbWiredTigerCacheSaturation
+      # WiredTiger starts evicting aggressively above 95% of the configured
+      # cache, which shows up as latency long before anything errors.
+      expr: |
+        mongodb_ss_wt_cache_bytes_currently_in_the_cache
+        / (mongodb_ss_wt_cache_maximum_bytes_configured > 0)
+        > 0.95
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MongoDB WiredTiger cache at {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+        description: "The WiredTiger cache on {{ $labels.instance }} is above 95% full. Eviction pressure will show up as read latency."
