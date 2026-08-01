@@ -51,18 +51,19 @@
           1
         ) * 100
 
-    # Combined error ratio — fixes the operator precedence bug from the original
+    # Combined 4xx+5xx error rate % per backend.
+    # The previous form did `(4xx_rate > 10) + 5xx_rate`. `>` is a filter, not a
+    # boolean: below 10 4xx/s -- the normal case -- the left operand was an empty
+    # vector and `empty + B` is empty, so backends serving only 5xx never showed
+    # up. Sum the error codes off the base rate instead, and keep volume
+    # thresholds in the consuming alert rather than baked into the record.
     - record: haproxy:backend_error_rate:ratio5m
       expr: |
-        (
-          (haproxy:backend_http_responses_4xx:rate5m > 10)
-          + haproxy:backend_http_responses_5xx:rate5m
-        )
-        / on(namespace, proxy) group_left()
-        clamp_min(
-          sum by (namespace, proxy) (haproxy:backend_http_responses:rate5m),
-          1
-        )
+        sum by (namespace, proxy) (haproxy:backend_http_responses:rate5m{code=~"4xx|5xx"})
+        / clamp_min(
+            sum by (namespace, proxy) (haproxy:backend_http_responses:rate5m),
+            0.01
+          ) * 100
 
     # Session saturation %
     # Both operands are raw metrics carrying instance+job, so they are NOT unique

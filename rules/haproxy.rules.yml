@@ -351,7 +351,11 @@
         description: "More than 5% of connections redispatched on {{ $labels.proxy }} @ {{ $labels.instance }} ({{ $value | humanizePercentage }}) — a server is likely flapping"
 
     - alert: HAproxyPendingRequests
-      expr: sum by (proxy,job,instance) (rate(haproxy_backend_current_queue[5m])) > 0
+      # current_queue is a gauge, not a counter: rate() returned 0 for a queue
+      # sitting steadily at N -- the worst case -- and misread every drain as a
+      # counter reset. min_over_time keeps the "sustained, not transient" intent
+      # that rate()+for was reaching for.
+      expr: sum by (proxy,job,instance) (min_over_time(haproxy_backend_current_queue[5m])) > 0
       for: 5m
       labels:
         severity: warning
