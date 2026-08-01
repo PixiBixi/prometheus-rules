@@ -1,0 +1,79 @@
+# Tests for rules/varnish.rules.yml
+#
+# Fixture is a real scrape of prometheus_varnish_exporter 1.6.1 against Varnish
+# 9.0.3. Worth noting: varnish_main_sess_dropped, which several community
+# alert collections use, does not exist in Varnish 9 -- checked against the
+# scrape rather than copied.
+rule_files:
+  - varnish.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a dead child process alerts
+    input_series:
+      - series: 'varnish_up{instance="v1",job="varnish"}'
+        values: '0x15'
+    alert_rule_test:
+      - alertname: VarnishDown
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: VarnishDown, instance: v1, job: varnish, severity: critical}
+            exp_annotations:
+              summary: "Varnish down on v1"
+              description: "The exporter on v1 cannot read Varnish's shared memory. The child process is likely dead."
+
+  - interval: 1m
+    name: hitting thread_pool_max alerts
+    input_series:
+      - series: 'varnish_main_threads_limited{instance="v1",job="varnish"}'
+        values: '0+12x20'
+    alert_rule_test:
+      - alertname: VarnishThreadsLimited
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels: {alertname: VarnishThreadsLimited, instance: v1, job: varnish, severity: critical}
+            exp_annotations:
+              summary: "Varnish hitting its thread limit on v1"
+              description: "Varnish on v1 wanted more worker threads than thread_pool_max allows. Requests are queueing."
+
+  - interval: 1m
+    name: a stable thread pool alerts on nothing
+    input_series:
+      - series: 'varnish_main_threads_limited{instance="v1",job="varnish"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: VarnishThreadsLimited
+        eval_time: 15m
+        exp_alerts: []
+
+  # Volume guard: a cold cache with a handful of lookups must stay quiet.
+  - interval: 1m
+    name: a low hit rate on an idle cache stays quiet
+    input_series:
+      - series: 'varnish_main_cache_hit{instance="v1",job="varnish"}'
+        values: '0+6x25'
+      - series: 'varnish_main_cache_miss{instance="v1",job="varnish"}'
+        values: '0+54x25'
+    alert_rule_test:
+      - alertname: VarnishLowCacheHitRate
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a low hit rate at real traffic alerts
+    input_series:
+      # 600 + 3000 per minute = 60 req/s, hit rate 16.7%
+      - series: 'varnish_main_cache_hit{instance="v1",job="varnish"}'
+        values: '0+600x25'
+      - series: 'varnish_main_cache_miss{instance="v1",job="varnish"}'
+        values: '0+3000x25'
+    alert_rule_test:
+      - alertname: VarnishLowCacheHitRate
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels: {alertname: VarnishLowCacheHitRate, instance: v1, job: varnish, severity: warning}
+            exp_annotations:
+              summary: "Varnish cache hit rate low on v1 (16.67%)"
+              description: "Fewer than 60% of lookups are served from cache on v1 at more than 10 req/s. Check TTLs and Vary headers."

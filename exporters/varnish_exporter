@@ -1,0 +1,686 @@
+# HELP varnish_backend_bereq_bodybytes Request body bytes
+# TYPE varnish_backend_bereq_bodybytes counter
+varnish_backend_bereq_bodybytes{backend="default",server="unknown"} 0
+# HELP varnish_backend_bereq_hdrbytes Request header bytes
+# TYPE varnish_backend_bereq_hdrbytes counter
+varnish_backend_bereq_hdrbytes{backend="default",server="unknown"} 0
+# HELP varnish_backend_beresp_bodybytes Response body bytes
+# TYPE varnish_backend_beresp_bodybytes counter
+varnish_backend_beresp_bodybytes{backend="default",server="unknown"} 0
+# HELP varnish_backend_beresp_hdrbytes Response header bytes
+# TYPE varnish_backend_beresp_hdrbytes counter
+varnish_backend_beresp_hdrbytes{backend="default",server="unknown"} 0
+# HELP varnish_backend_busy Fetches not attempted due to backend being busy
+# TYPE varnish_backend_busy counter
+varnish_backend_busy{backend="default",server="unknown"} 0
+# HELP varnish_backend_conn Concurrent connections used
+# TYPE varnish_backend_conn gauge
+varnish_backend_conn{backend="default",server="unknown"} 0
+# HELP varnish_backend_fail Connections failed
+# TYPE varnish_backend_fail counter
+varnish_backend_fail{backend="default",server="unknown"} 0
+# HELP varnish_backend_fail_eacces Connections failed with EACCES or EPERM
+# TYPE varnish_backend_fail_eacces counter
+varnish_backend_fail_eacces{backend="default",server="unknown"} 0
+# HELP varnish_backend_fail_eaddrnotavail Connections failed with EADDRNOTAVAIL
+# TYPE varnish_backend_fail_eaddrnotavail counter
+varnish_backend_fail_eaddrnotavail{backend="default",server="unknown"} 0
+# HELP varnish_backend_fail_econnrefused Connections failed with ECONNREFUSED
+# TYPE varnish_backend_fail_econnrefused counter
+varnish_backend_fail_econnrefused{backend="default",server="unknown"} 0
+# HELP varnish_backend_fail_enetunreach Connections failed with ENETUNREACH
+# TYPE varnish_backend_fail_enetunreach counter
+varnish_backend_fail_enetunreach{backend="default",server="unknown"} 0
+# HELP varnish_backend_fail_etimedout Connections failed ETIMEDOUT
+# TYPE varnish_backend_fail_etimedout counter
+varnish_backend_fail_etimedout{backend="default",server="unknown"} 0
+# HELP varnish_backend_fail_other Connections failed for other reason
+# TYPE varnish_backend_fail_other counter
+varnish_backend_fail_other{backend="default",server="unknown"} 0
+# HELP varnish_backend_happy Happy health probes
+# TYPE varnish_backend_happy gauge
+varnish_backend_happy{backend="default",server="unknown"} 1.8446744073709552e+19
+# HELP varnish_backend_helddown Connection opens not attempted
+# TYPE varnish_backend_helddown counter
+varnish_backend_helddown{backend="default",server="unknown"} 0
+# HELP varnish_backend_pipe_hdrbytes Pipe request header bytes
+# TYPE varnish_backend_pipe_hdrbytes counter
+varnish_backend_pipe_hdrbytes{backend="default",server="unknown"} 0
+# HELP varnish_backend_pipe_in Piped bytes from backend
+# TYPE varnish_backend_pipe_in counter
+varnish_backend_pipe_in{backend="default",server="unknown"} 0
+# HELP varnish_backend_pipe_out Piped bytes to backend
+# TYPE varnish_backend_pipe_out counter
+varnish_backend_pipe_out{backend="default",server="unknown"} 0
+# HELP varnish_backend_req Backend requests sent
+# TYPE varnish_backend_req counter
+varnish_backend_req{backend="default",server="unknown"} 0
+# HELP varnish_backend_unhealthy Fetches not attempted due to backend being unhealthy
+# TYPE varnish_backend_unhealthy counter
+varnish_backend_unhealthy{backend="default",server="unknown"} 0
+# HELP varnish_backend_up Backend up as per the latest health probe
+# TYPE varnish_backend_up gauge
+varnish_backend_up{backend="default",server="unknown"} 1
+# HELP varnish_lck_dbg_busy Contended lock operations
+# TYPE varnish_lck_dbg_busy counter
+varnish_lck_dbg_busy{id="ban"} 0
+# HELP varnish_lck_dbg_try_fail Contended trylock operations
+# TYPE varnish_lck_dbg_try_fail counter
+varnish_lck_dbg_try_fail{id="ban"} 0
+# HELP varnish_lock_created Created locks
+# TYPE varnish_lock_created counter
+varnish_lock_created{target="ban"} 1
+varnish_lock_created{target="busyobj"} 0
+varnish_lock_created{target="cli"} 1
+varnish_lock_created{target="conn_pool"} 2
+varnish_lock_created{target="dead_pool"} 1
+varnish_lock_created{target="director"} 1
+varnish_lock_created{target="exp"} 1
+varnish_lock_created{target="hcb"} 1
+varnish_lock_created{target="lru"} 2
+varnish_lock_created{target="mempool"} 7
+varnish_lock_created{target="objhdr"} 128
+varnish_lock_created{target="perpool"} 2
+varnish_lock_created{target="pipestat"} 1
+varnish_lock_created{target="probe"} 1
+varnish_lock_created{target="sess"} 0
+varnish_lock_created{target="sma"} 2
+varnish_lock_created{target="vbe"} 1
+varnish_lock_created{target="vcapace"} 1
+varnish_lock_created{target="vcashut"} 1
+varnish_lock_created{target="vcl"} 1
+varnish_lock_created{target="vxid"} 1
+varnish_lock_created{target="waiter"} 2
+varnish_lock_created{target="wq"} 1
+varnish_lock_created{target="wstat"} 1
+# HELP varnish_lock_destroyed Destroyed locks
+# TYPE varnish_lock_destroyed counter
+varnish_lock_destroyed{target="ban"} 0
+varnish_lock_destroyed{target="busyobj"} 0
+varnish_lock_destroyed{target="cli"} 0
+varnish_lock_destroyed{target="conn_pool"} 0
+varnish_lock_destroyed{target="dead_pool"} 0
+varnish_lock_destroyed{target="director"} 0
+varnish_lock_destroyed{target="exp"} 0
+varnish_lock_destroyed{target="hcb"} 0
+varnish_lock_destroyed{target="lru"} 0
+varnish_lock_destroyed{target="mempool"} 0
+varnish_lock_destroyed{target="objhdr"} 0
+varnish_lock_destroyed{target="perpool"} 0
+varnish_lock_destroyed{target="pipestat"} 0
+varnish_lock_destroyed{target="probe"} 0
+varnish_lock_destroyed{target="sess"} 0
+varnish_lock_destroyed{target="sma"} 0
+varnish_lock_destroyed{target="vbe"} 0
+varnish_lock_destroyed{target="vcapace"} 0
+varnish_lock_destroyed{target="vcashut"} 0
+varnish_lock_destroyed{target="vcl"} 0
+varnish_lock_destroyed{target="vxid"} 0
+varnish_lock_destroyed{target="waiter"} 0
+varnish_lock_destroyed{target="wq"} 0
+varnish_lock_destroyed{target="wstat"} 0
+# HELP varnish_lock_operations Lock Operations
+# TYPE varnish_lock_operations counter
+varnish_lock_operations{target="ban"} 8
+varnish_lock_operations{target="busyobj"} 0
+varnish_lock_operations{target="cli"} 24
+varnish_lock_operations{target="conn_pool"} 1
+varnish_lock_operations{target="dead_pool"} 12
+varnish_lock_operations{target="director"} 0
+varnish_lock_operations{target="exp"} 10
+varnish_lock_operations{target="hcb"} 1
+varnish_lock_operations{target="lru"} 0
+varnish_lock_operations{target="mempool"} 233
+varnish_lock_operations{target="objhdr"} 0
+varnish_lock_operations{target="perpool"} 210
+varnish_lock_operations{target="pipestat"} 0
+varnish_lock_operations{target="probe"} 1
+varnish_lock_operations{target="sess"} 0
+varnish_lock_operations{target="sma"} 0
+varnish_lock_operations{target="vbe"} 1
+varnish_lock_operations{target="vcapace"} 0
+varnish_lock_operations{target="vcashut"} 0
+varnish_lock_operations{target="vcl"} 4
+varnish_lock_operations{target="vxid"} 0
+varnish_lock_operations{target="waiter"} 2
+varnish_lock_operations{target="wq"} 229
+varnish_lock_operations{target="wstat"} 11
+# HELP varnish_main_backend_busy Backend conn. too many
+# TYPE varnish_main_backend_busy counter
+varnish_main_backend_busy 0
+# HELP varnish_main_backend_conn Backend conn. success
+# TYPE varnish_main_backend_conn counter
+varnish_main_backend_conn 0
+# HELP varnish_main_backend_fail Backend conn. failures
+# TYPE varnish_main_backend_fail counter
+varnish_main_backend_fail 0
+# HELP varnish_main_backend_recycle Backend conn. recycles
+# TYPE varnish_main_backend_recycle counter
+varnish_main_backend_recycle 0
+# HELP varnish_main_backend_req Backend requests made
+# TYPE varnish_main_backend_req counter
+varnish_main_backend_req 0
+# HELP varnish_main_backend_retry Backend conn. retry
+# TYPE varnish_main_backend_retry counter
+varnish_main_backend_retry 0
+# HELP varnish_main_backend_reuse Backend conn. reuses
+# TYPE varnish_main_backend_reuse counter
+varnish_main_backend_reuse 0
+# HELP varnish_main_backend_unhealthy Backend conn. not attempted
+# TYPE varnish_main_backend_unhealthy counter
+varnish_main_backend_unhealthy 0
+# HELP varnish_main_backend_wait Backend conn. waited in queue for a connection
+# TYPE varnish_main_backend_wait counter
+varnish_main_backend_wait 0
+# HELP varnish_main_backend_wait_fail Backend conn. waited in queue and did not get a connection
+# TYPE varnish_main_backend_wait_fail counter
+varnish_main_backend_wait_fail 0
+# HELP varnish_main_bans Count of bans
+# TYPE varnish_main_bans gauge
+varnish_main_bans 1
+# HELP varnish_main_bans_added Bans added
+# TYPE varnish_main_bans_added counter
+varnish_main_bans_added 1
+# HELP varnish_main_bans_completed Number of bans marked 'completed'
+# TYPE varnish_main_bans_completed gauge
+varnish_main_bans_completed 1
+# HELP varnish_main_bans_deleted Bans deleted
+# TYPE varnish_main_bans_deleted counter
+varnish_main_bans_deleted 0
+# HELP varnish_main_bans_dups Bans superseded by other bans
+# TYPE varnish_main_bans_dups counter
+varnish_main_bans_dups 0
+# HELP varnish_main_bans_lurker_contention Lurker gave way for lookup
+# TYPE varnish_main_bans_lurker_contention counter
+varnish_main_bans_lurker_contention 0
+# HELP varnish_main_bans_lurker_obj_killed Objects killed by bans (lurker)
+# TYPE varnish_main_bans_lurker_obj_killed counter
+varnish_main_bans_lurker_obj_killed 0
+# HELP varnish_main_bans_lurker_obj_killed_cutoff Objects killed by bans for cutoff (lurker)
+# TYPE varnish_main_bans_lurker_obj_killed_cutoff counter
+varnish_main_bans_lurker_obj_killed_cutoff 0
+# HELP varnish_main_bans_lurker_tested Bans tested against objects (lurker)
+# TYPE varnish_main_bans_lurker_tested counter
+varnish_main_bans_lurker_tested 0
+# HELP varnish_main_bans_lurker_tests_tested Ban tests tested against objects (lurker)
+# TYPE varnish_main_bans_lurker_tests_tested counter
+varnish_main_bans_lurker_tests_tested 0
+# HELP varnish_main_bans_obj Number of bans using obj.*
+# TYPE varnish_main_bans_obj gauge
+varnish_main_bans_obj 0
+# HELP varnish_main_bans_obj_killed Objects killed by bans (lookup)
+# TYPE varnish_main_bans_obj_killed counter
+varnish_main_bans_obj_killed 0
+# HELP varnish_main_bans_persisted_bytes Bytes used by the persisted ban lists
+# TYPE varnish_main_bans_persisted_bytes gauge
+varnish_main_bans_persisted_bytes 16
+# HELP varnish_main_bans_persisted_fragmentation Extra bytes in persisted ban lists due to fragmentation
+# TYPE varnish_main_bans_persisted_fragmentation gauge
+varnish_main_bans_persisted_fragmentation 0
+# HELP varnish_main_bans_req Number of bans using req.*
+# TYPE varnish_main_bans_req gauge
+varnish_main_bans_req 0
+# HELP varnish_main_bans_tested Bans tested against objects (lookup)
+# TYPE varnish_main_bans_tested counter
+varnish_main_bans_tested 0
+# HELP varnish_main_bans_tests_tested Ban tests tested against objects (lookup)
+# TYPE varnish_main_bans_tests_tested counter
+varnish_main_bans_tests_tested 0
+# HELP varnish_main_beresp_shortlived Shortlived objects
+# TYPE varnish_main_beresp_shortlived counter
+varnish_main_beresp_shortlived 0
+# HELP varnish_main_beresp_uncacheable Uncacheable backend responses
+# TYPE varnish_main_beresp_uncacheable counter
+varnish_main_beresp_uncacheable 0
+# HELP varnish_main_bgfetch_no_thread Background fetch failed (no thread)
+# TYPE varnish_main_bgfetch_no_thread counter
+varnish_main_bgfetch_no_thread 0
+# HELP varnish_main_busy_killed Number of requests killed after sleep on busy objhdr
+# TYPE varnish_main_busy_killed counter
+varnish_main_busy_killed 0
+# HELP varnish_main_busy_sleep Number of requests sent to sleep on busy objhdr
+# TYPE varnish_main_busy_sleep counter
+varnish_main_busy_sleep 0
+# HELP varnish_main_busy_wakeup Number of requests woken after sleep on busy objhdr
+# TYPE varnish_main_busy_wakeup counter
+varnish_main_busy_wakeup 0
+# HELP varnish_main_cache_hit Cache hits
+# TYPE varnish_main_cache_hit counter
+varnish_main_cache_hit 0
+# HELP varnish_main_cache_hit_grace Cache grace hits
+# TYPE varnish_main_cache_hit_grace counter
+varnish_main_cache_hit_grace 0
+# HELP varnish_main_cache_hitmiss Cache hits for miss.
+# TYPE varnish_main_cache_hitmiss counter
+varnish_main_cache_hitmiss 0
+# HELP varnish_main_cache_hitpass Cache hits for pass.
+# TYPE varnish_main_cache_hitpass counter
+varnish_main_cache_hitpass 0
+# HELP varnish_main_cache_miss Cache misses
+# TYPE varnish_main_cache_miss counter
+varnish_main_cache_miss 0
+# HELP varnish_main_client_req Good client requests received
+# TYPE varnish_main_client_req counter
+varnish_main_client_req 0
+# HELP varnish_main_client_req_400 Client requests received, subject to 400 errors
+# TYPE varnish_main_client_req_400 counter
+varnish_main_client_req_400 0
+# HELP varnish_main_client_req_417 Client requests received, subject to 417 errors
+# TYPE varnish_main_client_req_417 counter
+varnish_main_client_req_417 0
+# HELP varnish_main_client_resp_500 Delivery failed due to insufficient workspace.
+# TYPE varnish_main_client_resp_500 counter
+varnish_main_client_resp_500 0
+# HELP varnish_main_esi_errors ESI parse errors (unlock)
+# TYPE varnish_main_esi_errors counter
+varnish_main_esi_errors 0
+# HELP varnish_main_esi_req ESI subrequests
+# TYPE varnish_main_esi_req counter
+varnish_main_esi_req 0
+# HELP varnish_main_esi_warnings ESI parse warnings (unlock)
+# TYPE varnish_main_esi_warnings counter
+varnish_main_esi_warnings 0
+# HELP varnish_main_exp_mailed Number of objects mailed to expiry thread
+# TYPE varnish_main_exp_mailed counter
+varnish_main_exp_mailed 0
+# HELP varnish_main_exp_received Number of objects received by expiry thread
+# TYPE varnish_main_exp_received counter
+varnish_main_exp_received 0
+# HELP varnish_main_fetch Number of fetches
+# TYPE varnish_main_fetch counter
+varnish_main_fetch{type="1xx"} 0
+varnish_main_fetch{type="204"} 0
+varnish_main_fetch{type="304"} 0
+varnish_main_fetch{type="bad"} 0
+varnish_main_fetch{type="chunked"} 0
+varnish_main_fetch{type="eof"} 0
+varnish_main_fetch{type="failed"} 0
+varnish_main_fetch{type="head"} 0
+varnish_main_fetch{type="length"} 0
+varnish_main_fetch{type="none"} 0
+# HELP varnish_main_fetch_total Number of fetches
+# TYPE varnish_main_fetch_total counter
+varnish_main_fetch_total 0
+# HELP varnish_main_hcb_insert HCB Inserts
+# TYPE varnish_main_hcb_insert counter
+varnish_main_hcb_insert 0
+# HELP varnish_main_hcb_lock HCB Lookups with lock
+# TYPE varnish_main_hcb_lock counter
+varnish_main_hcb_lock 0
+# HELP varnish_main_hcb_nolock HCB Lookups without lock
+# TYPE varnish_main_hcb_nolock counter
+varnish_main_hcb_nolock 0
+# HELP varnish_main_http1_absolute_form Requests with absolute form request target
+# TYPE varnish_main_http1_absolute_form counter
+varnish_main_http1_absolute_form 0
+# HELP varnish_main_http1_iovs_flush Premature iovec flushes
+# TYPE varnish_main_http1_iovs_flush counter
+varnish_main_http1_iovs_flush 0
+# HELP varnish_main_losthdr HTTP header overflows
+# TYPE varnish_main_losthdr counter
+varnish_main_losthdr 0
+# HELP varnish_main_n_backend Number of backends
+# TYPE varnish_main_n_backend gauge
+varnish_main_n_backend 1
+# HELP varnish_main_n_expired Number of expired objects
+# TYPE varnish_main_n_expired counter
+varnish_main_n_expired 0
+# HELP varnish_main_n_gunzip Gunzip operations
+# TYPE varnish_main_n_gunzip counter
+varnish_main_n_gunzip 0
+# HELP varnish_main_n_gzip Gzip operations
+# TYPE varnish_main_n_gzip counter
+varnish_main_n_gzip 0
+# HELP varnish_main_n_lru_limited Reached nuke_limit
+# TYPE varnish_main_n_lru_limited counter
+varnish_main_n_lru_limited 0
+# HELP varnish_main_n_lru_moved Number of LRU moved objects
+# TYPE varnish_main_n_lru_moved counter
+varnish_main_n_lru_moved 0
+# HELP varnish_main_n_lru_nuked Number of LRU nuked objects
+# TYPE varnish_main_n_lru_nuked counter
+varnish_main_n_lru_nuked 0
+# HELP varnish_main_n_obj_purged Number of purged objects
+# TYPE varnish_main_n_obj_purged counter
+varnish_main_n_obj_purged 0
+# HELP varnish_main_n_object object structs made
+# TYPE varnish_main_n_object gauge
+varnish_main_n_object 0
+# HELP varnish_main_n_objectcore objectcore structs made
+# TYPE varnish_main_n_objectcore gauge
+varnish_main_n_objectcore 0
+# HELP varnish_main_n_objecthead objecthead structs made
+# TYPE varnish_main_n_objecthead gauge
+varnish_main_n_objecthead 0
+# HELP varnish_main_n_pipe Number of ongoing pipe sessions
+# TYPE varnish_main_n_pipe gauge
+varnish_main_n_pipe 0
+# HELP varnish_main_n_purges Number of purge operations executed
+# TYPE varnish_main_n_purges counter
+varnish_main_n_purges 0
+# HELP varnish_main_n_superseded Number of superseded objects
+# TYPE varnish_main_n_superseded counter
+varnish_main_n_superseded 0
+# HELP varnish_main_n_test_gunzip Test gunzip operations
+# TYPE varnish_main_n_test_gunzip counter
+varnish_main_n_test_gunzip 0
+# HELP varnish_main_n_vampireobject unresurrected objects
+# TYPE varnish_main_n_vampireobject gauge
+varnish_main_n_vampireobject 0
+# HELP varnish_main_n_vcl Number of loaded VCLs in total
+# TYPE varnish_main_n_vcl gauge
+varnish_main_n_vcl 1
+# HELP varnish_main_n_vcl_avail Number of VCLs available
+# TYPE varnish_main_n_vcl_avail gauge
+varnish_main_n_vcl_avail 1
+# HELP varnish_main_n_vcl_discard Number of discarded VCLs
+# TYPE varnish_main_n_vcl_discard gauge
+varnish_main_n_vcl_discard 0
+# HELP varnish_main_pipe_limited Pipes hit pipe_sess_max
+# TYPE varnish_main_pipe_limited counter
+varnish_main_pipe_limited 0
+# HELP varnish_main_pools Number of thread pools
+# TYPE varnish_main_pools gauge
+varnish_main_pools 2
+# HELP varnish_main_req_dropped Requests dropped
+# TYPE varnish_main_req_dropped counter
+varnish_main_req_dropped 0
+# HELP varnish_main_req_reset Requests reset
+# TYPE varnish_main_req_reset counter
+varnish_main_req_reset 0
+# HELP varnish_main_s_bgfetch Total backend background fetches initiated
+# TYPE varnish_main_s_bgfetch counter
+varnish_main_s_bgfetch 0
+# HELP varnish_main_s_pass Total pass-ed requests seen
+# TYPE varnish_main_s_pass counter
+varnish_main_s_pass 0
+# HELP varnish_main_s_pipe Total pipe sessions seen
+# TYPE varnish_main_s_pipe counter
+varnish_main_s_pipe 0
+# HELP varnish_main_s_pipe_hdrbytes Pipe request header bytes
+# TYPE varnish_main_s_pipe_hdrbytes counter
+varnish_main_s_pipe_hdrbytes 0
+# HELP varnish_main_s_pipe_in Piped bytes from client
+# TYPE varnish_main_s_pipe_in counter
+varnish_main_s_pipe_in 0
+# HELP varnish_main_s_pipe_out Piped bytes to client
+# TYPE varnish_main_s_pipe_out counter
+varnish_main_s_pipe_out 0
+# HELP varnish_main_s_req_bodybytes Request body bytes
+# TYPE varnish_main_s_req_bodybytes counter
+varnish_main_s_req_bodybytes 0
+# HELP varnish_main_s_req_hdrbytes Request header bytes
+# TYPE varnish_main_s_req_hdrbytes counter
+varnish_main_s_req_hdrbytes 0
+# HELP varnish_main_s_resp_bodybytes Response body bytes
+# TYPE varnish_main_s_resp_bodybytes counter
+varnish_main_s_resp_bodybytes 0
+# HELP varnish_main_s_resp_hdrbytes Response header bytes
+# TYPE varnish_main_s_resp_hdrbytes counter
+varnish_main_s_resp_hdrbytes 0
+# HELP varnish_main_s_synth Total synthetic responses made
+# TYPE varnish_main_s_synth counter
+varnish_main_s_synth 0
+# HELP varnish_main_sc_bankrupt Session Err BANKRUPT
+# TYPE varnish_main_sc_bankrupt counter
+varnish_main_sc_bankrupt 0
+# HELP varnish_main_sc_overload Session Err OVERLOAD
+# TYPE varnish_main_sc_overload counter
+varnish_main_sc_overload 0
+# HELP varnish_main_sc_pipe_overflow Session Err PIPE_OVERFLOW
+# TYPE varnish_main_sc_pipe_overflow counter
+varnish_main_sc_pipe_overflow 0
+# HELP varnish_main_sc_range_short Session Err RANGE_SHORT
+# TYPE varnish_main_sc_range_short counter
+varnish_main_sc_range_short 0
+# HELP varnish_main_sc_rapid_reset Session Err RAPID_RESET
+# TYPE varnish_main_sc_rapid_reset counter
+varnish_main_sc_rapid_reset 0
+# HELP varnish_main_sc_rem_close Session OK  REM_CLOSE
+# TYPE varnish_main_sc_rem_close counter
+varnish_main_sc_rem_close 0
+# HELP varnish_main_sc_req_close Session OK  REQ_CLOSE
+# TYPE varnish_main_sc_req_close counter
+varnish_main_sc_req_close 0
+# HELP varnish_main_sc_req_http10 Session Err REQ_HTTP10
+# TYPE varnish_main_sc_req_http10 counter
+varnish_main_sc_req_http10 0
+# HELP varnish_main_sc_req_http20 Session Err REQ_HTTP20
+# TYPE varnish_main_sc_req_http20 counter
+varnish_main_sc_req_http20 0
+# HELP varnish_main_sc_resp_close Session OK  RESP_CLOSE
+# TYPE varnish_main_sc_resp_close counter
+varnish_main_sc_resp_close 0
+# HELP varnish_main_sc_rx_bad Session Err RX_BAD
+# TYPE varnish_main_sc_rx_bad counter
+varnish_main_sc_rx_bad 0
+# HELP varnish_main_sc_rx_body Session Err RX_BODY
+# TYPE varnish_main_sc_rx_body counter
+varnish_main_sc_rx_body 0
+# HELP varnish_main_sc_rx_close_idle Session Err RX_CLOSE_IDLE
+# TYPE varnish_main_sc_rx_close_idle counter
+varnish_main_sc_rx_close_idle 0
+# HELP varnish_main_sc_rx_junk Session Err RX_JUNK
+# TYPE varnish_main_sc_rx_junk counter
+varnish_main_sc_rx_junk 0
+# HELP varnish_main_sc_rx_overflow Session Err RX_OVERFLOW
+# TYPE varnish_main_sc_rx_overflow counter
+varnish_main_sc_rx_overflow 0
+# HELP varnish_main_sc_rx_timeout Session Err RX_TIMEOUT
+# TYPE varnish_main_sc_rx_timeout counter
+varnish_main_sc_rx_timeout 0
+# HELP varnish_main_sc_tx_eof Session OK  TX_EOF
+# TYPE varnish_main_sc_tx_eof counter
+varnish_main_sc_tx_eof 0
+# HELP varnish_main_sc_tx_error Session Err TX_ERROR
+# TYPE varnish_main_sc_tx_error counter
+varnish_main_sc_tx_error 0
+# HELP varnish_main_sc_tx_pipe Session OK  TX_PIPE
+# TYPE varnish_main_sc_tx_pipe counter
+varnish_main_sc_tx_pipe 0
+# HELP varnish_main_sc_vcl_failure Session Err VCL_FAILURE
+# TYPE varnish_main_sc_vcl_failure counter
+varnish_main_sc_vcl_failure 0
+# HELP varnish_main_sessions Number of sessions
+# TYPE varnish_main_sessions counter
+varnish_main_sessions{type="closed"} 0
+varnish_main_sessions{type="closed_err"} 0
+varnish_main_sessions{type="conn"} 0
+varnish_main_sessions{type="dropped"} 0
+varnish_main_sessions{type="fail"} 0
+varnish_main_sessions{type="fail_ebadf"} 0
+varnish_main_sessions{type="fail_econnaborted"} 0
+varnish_main_sessions{type="fail_eintr"} 0
+varnish_main_sessions{type="fail_emfile"} 0
+varnish_main_sessions{type="fail_enomem"} 0
+varnish_main_sessions{type="fail_other"} 0
+varnish_main_sessions{type="herd"} 0
+varnish_main_sessions{type="queued"} 0
+varnish_main_sessions{type="readahead"} 0
+# HELP varnish_main_sessions_total Number of sessions
+# TYPE varnish_main_sessions_total counter
+varnish_main_sessions_total 0
+# HELP varnish_main_shm_bytes SHM bytes
+# TYPE varnish_main_shm_bytes counter
+varnish_main_shm_bytes 828
+# HELP varnish_main_shm_cont SHM lock contention
+# TYPE varnish_main_shm_cont counter
+varnish_main_shm_cont 0
+# HELP varnish_main_shm_cycles SHM cycles through VSL space
+# TYPE varnish_main_shm_cycles counter
+varnish_main_shm_cycles 0
+# HELP varnish_main_shm_flushes SHM flushes due to overflow
+# TYPE varnish_main_shm_flushes counter
+varnish_main_shm_flushes 0
+# HELP varnish_main_shm_records SHM records
+# TYPE varnish_main_shm_records counter
+varnish_main_shm_records 24
+# HELP varnish_main_shm_writes SHM writes
+# TYPE varnish_main_shm_writes counter
+varnish_main_shm_writes 24
+# HELP varnish_main_summs stat summ operations
+# TYPE varnish_main_summs counter
+varnish_main_summs 0
+# HELP varnish_main_thread_queue_len Length of session queue
+# TYPE varnish_main_thread_queue_len gauge
+varnish_main_thread_queue_len 0
+# HELP varnish_main_threads Total number of threads
+# TYPE varnish_main_threads gauge
+varnish_main_threads 200
+# HELP varnish_main_threads_created Threads created
+# TYPE varnish_main_threads_created counter
+varnish_main_threads_created 200
+# HELP varnish_main_threads_destroyed Threads destroyed
+# TYPE varnish_main_threads_destroyed counter
+varnish_main_threads_destroyed 0
+# HELP varnish_main_threads_failed Thread creation failed
+# TYPE varnish_main_threads_failed counter
+varnish_main_threads_failed 0
+# HELP varnish_main_threads_limited Threads hit max
+# TYPE varnish_main_threads_limited counter
+varnish_main_threads_limited 0
+# HELP varnish_main_transit_buffered Buffered uncacheable response body bytes
+# TYPE varnish_main_transit_buffered counter
+varnish_main_transit_buffered 0
+# HELP varnish_main_transit_stored Stored uncacheable body bytes
+# TYPE varnish_main_transit_stored counter
+varnish_main_transit_stored 0
+# HELP varnish_main_uptime Child process uptime
+# TYPE varnish_main_uptime counter
+varnish_main_uptime 27
+# HELP varnish_main_vcl_fail VCL failures
+# TYPE varnish_main_vcl_fail counter
+varnish_main_vcl_fail 0
+# HELP varnish_main_vcp_ref_hit Number of times we have found an existing conn. pool
+# TYPE varnish_main_vcp_ref_hit counter
+varnish_main_vcp_ref_hit 0
+# HELP varnish_main_vcp_ref_miss Number of times we have not found an existing conn. pool
+# TYPE varnish_main_vcp_ref_miss counter
+varnish_main_vcp_ref_miss 1
+# HELP varnish_main_vmods Loaded VMODs
+# TYPE varnish_main_vmods gauge
+varnish_main_vmods 0
+# HELP varnish_main_waiter_pool0_action Number of idle connections read events
+# TYPE varnish_main_waiter_pool0_action counter
+varnish_main_waiter_pool0_action{id="waiter.pool0"} 0
+# HELP varnish_main_waiter_pool0_conns Number of idle connections
+# TYPE varnish_main_waiter_pool0_conns gauge
+varnish_main_waiter_pool0_conns{id="waiter.pool0"} 0
+# HELP varnish_main_waiter_pool0_remclose Number of idle connections closed by peer
+# TYPE varnish_main_waiter_pool0_remclose counter
+varnish_main_waiter_pool0_remclose{id="waiter.pool0"} 0
+# HELP varnish_main_waiter_pool0_timeout Number of idle connections timeout
+# TYPE varnish_main_waiter_pool0_timeout counter
+varnish_main_waiter_pool0_timeout{id="waiter.pool0"} 0
+# HELP varnish_main_waiter_pool1_action Number of idle connections read events
+# TYPE varnish_main_waiter_pool1_action counter
+varnish_main_waiter_pool1_action{id="waiter.pool1"} 0
+# HELP varnish_main_waiter_pool1_conns Number of idle connections
+# TYPE varnish_main_waiter_pool1_conns gauge
+varnish_main_waiter_pool1_conns{id="waiter.pool1"} 0
+# HELP varnish_main_waiter_pool1_remclose Number of idle connections closed by peer
+# TYPE varnish_main_waiter_pool1_remclose counter
+varnish_main_waiter_pool1_remclose{id="waiter.pool1"} 0
+# HELP varnish_main_waiter_pool1_timeout Number of idle connections timeout
+# TYPE varnish_main_waiter_pool1_timeout counter
+varnish_main_waiter_pool1_timeout{id="waiter.pool1"} 0
+# HELP varnish_main_ws_backend_overflow workspace_backend overflows
+# TYPE varnish_main_ws_backend_overflow counter
+varnish_main_ws_backend_overflow 0
+# HELP varnish_main_ws_client_overflow workspace_client overflows
+# TYPE varnish_main_ws_client_overflow counter
+varnish_main_ws_client_overflow 0
+# HELP varnish_main_ws_session_overflow workspace_session overflows
+# TYPE varnish_main_ws_session_overflow counter
+varnish_main_ws_session_overflow 0
+# HELP varnish_main_ws_thread_overflow workspace_thread overflows
+# TYPE varnish_main_ws_thread_overflow counter
+varnish_main_ws_thread_overflow 0
+# HELP varnish_mempool_allocs Allocations
+# TYPE varnish_mempool_allocs counter
+varnish_mempool_allocs{id="busyobj"} 0
+# HELP varnish_mempool_frees Frees
+# TYPE varnish_mempool_frees counter
+varnish_mempool_frees{id="busyobj"} 0
+# HELP varnish_mempool_live In use
+# TYPE varnish_mempool_live gauge
+varnish_mempool_live{id="busyobj"} 0
+# HELP varnish_mempool_pool In Pool
+# TYPE varnish_mempool_pool gauge
+varnish_mempool_pool{id="busyobj"} 10
+# HELP varnish_mempool_randry Pool ran dry
+# TYPE varnish_mempool_randry counter
+varnish_mempool_randry{id="busyobj"} 0
+# HELP varnish_mempool_recycle Recycled from pool
+# TYPE varnish_mempool_recycle counter
+varnish_mempool_recycle{id="busyobj"} 0
+# HELP varnish_mempool_surplus Too many for pool
+# TYPE varnish_mempool_surplus counter
+varnish_mempool_surplus{id="busyobj"} 0
+# HELP varnish_mempool_sz_actual Size allocated
+# TYPE varnish_mempool_sz_actual gauge
+varnish_mempool_sz_actual{id="busyobj"} 98272
+# HELP varnish_mempool_sz_wanted Size requested
+# TYPE varnish_mempool_sz_wanted gauge
+varnish_mempool_sz_wanted{id="busyobj"} 98304
+# HELP varnish_mempool_timeout Timed out from pool
+# TYPE varnish_mempool_timeout counter
+varnish_mempool_timeout{id="busyobj"} 0
+# HELP varnish_mempool_toosmall Too small to recycle
+# TYPE varnish_mempool_toosmall counter
+varnish_mempool_toosmall{id="busyobj"} 0
+# HELP varnish_mgt_child_died Child process died (signal)
+# TYPE varnish_mgt_child_died counter
+varnish_mgt_child_died 0
+# HELP varnish_mgt_child_dump Child process core dumped
+# TYPE varnish_mgt_child_dump counter
+varnish_mgt_child_dump 0
+# HELP varnish_mgt_child_exit Child process normal exit
+# TYPE varnish_mgt_child_exit counter
+varnish_mgt_child_exit 0
+# HELP varnish_mgt_child_panic Child process panic
+# TYPE varnish_mgt_child_panic counter
+varnish_mgt_child_panic 0
+# HELP varnish_mgt_child_start Child process started
+# TYPE varnish_mgt_child_start counter
+varnish_mgt_child_start 1
+# HELP varnish_mgt_child_stop Child process unexpected exit
+# TYPE varnish_mgt_child_stop counter
+varnish_mgt_child_stop 0
+# HELP varnish_mgt_uptime Management process uptime
+# TYPE varnish_mgt_uptime counter
+varnish_mgt_uptime 26
+# HELP varnish_sma_c_bytes Bytes allocated
+# TYPE varnish_sma_c_bytes counter
+varnish_sma_c_bytes{type="s0"} 0
+varnish_sma_c_bytes{type="transient"} 0
+# HELP varnish_sma_c_fail Allocator failures
+# TYPE varnish_sma_c_fail counter
+varnish_sma_c_fail{type="s0"} 0
+varnish_sma_c_fail{type="transient"} 0
+# HELP varnish_sma_c_freed Bytes freed
+# TYPE varnish_sma_c_freed counter
+varnish_sma_c_freed{type="s0"} 0
+varnish_sma_c_freed{type="transient"} 0
+# HELP varnish_sma_c_req Allocator requests
+# TYPE varnish_sma_c_req counter
+varnish_sma_c_req{type="s0"} 0
+varnish_sma_c_req{type="transient"} 0
+# HELP varnish_sma_g_alloc Allocations outstanding
+# TYPE varnish_sma_g_alloc gauge
+varnish_sma_g_alloc{type="s0"} 0
+varnish_sma_g_alloc{type="transient"} 0
+# HELP varnish_sma_g_bytes Bytes outstanding
+# TYPE varnish_sma_g_bytes gauge
+varnish_sma_g_bytes{type="s0"} 0
+varnish_sma_g_bytes{type="transient"} 0
+# HELP varnish_sma_g_space Bytes available
+# TYPE varnish_sma_g_space gauge
+varnish_sma_g_space{type="s0"} 6.7108864e+07
+varnish_sma_g_space{type="transient"} 0
+# HELP varnish_up Was the last scrape of varnish successful.
+# TYPE varnish_up gauge
+varnish_up 1
+# HELP varnish_version Varnish version information
+# TYPE varnish_version gauge
+varnish_version{major="9",minor="0",patch="3",revision="0a625649cd40af4b6c10be5e58a2e89a5e275baa",version="9.0.3"} 1

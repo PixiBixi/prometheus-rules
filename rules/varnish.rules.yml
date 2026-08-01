@@ -1,0 +1,90 @@
+- name: varnish.rules
+  rules:
+    - alert: VarnishExporterDown
+      expr: |
+        group by (job, instance) (up{job=~".*varnish.*"} == 0)
+        or
+        (
+          group by (job, instance) (last_over_time(up{job=~".*varnish.*"}[1h]))
+          unless
+          group by (job, instance) (last_over_time(up{job=~".*varnish.*"}[5m]))
+        )
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Varnish exporter down — {{ $labels.job }} @ {{ $labels.instance }}"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+    - alert: VarnishDown
+      # The exporter reads Varnish's shared memory. varnish_up drops to 0 when
+      # varnishstat cannot attach, which means the child process is gone.
+      expr: varnish_up == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Varnish down on {{ $labels.instance }}"
+        description: "The exporter on {{ $labels.instance }} cannot read Varnish's shared memory. The child process is likely dead."
+
+    - alert: VarnishBackendUnhealthy
+      # Backends failing their probe. Varnish stops sending them traffic, so
+      # this is about lost capacity rather than lost requests.
+      expr: increase(varnish_main_backend_unhealthy[5m]) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Varnish backends going unhealthy on {{ $labels.instance }}"
+        description: "{{ $value | humanize }} backend health transitions to unhealthy in 5 minutes on {{ $labels.instance }}."
+
+    - alert: VarnishBackendFailures
+      # A fetch that never reached a backend at all -- connection refused,
+      # timeout, no healthy backend to pick.
+      expr: rate(varnish_main_backend_fail[5m]) > 0.1
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Varnish backend fetch failures on {{ $labels.instance }} ({{ $value | humanize }}/s)"
+        description: "Varnish on {{ $labels.instance }} is failing to reach its backends. Clients are getting errors, not stale cache."
+
+    - alert: VarnishThreadsLimited
+      # Varnish wanted another worker thread and hit thread_pool_max. Requests
+      # queue behind this, so any sustained value is a capacity problem.
+      expr: increase(varnish_main_threads_limited[5m]) > 0
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Varnish hitting its thread limit on {{ $labels.instance }}"
+        description: "Varnish on {{ $labels.instance }} wanted more worker threads than thread_pool_max allows. Requests are queueing."
+
+    - alert: VarnishLowCacheHitRate
+      # Volume-guarded: a low hit rate on an idle cache means nothing.
+      expr: |
+        sum by (instance, job) (rate(varnish_main_cache_hit[5m]))
+        /
+        (
+          sum by (instance, job) (
+            rate(varnish_main_cache_hit[5m]) + rate(varnish_main_cache_miss[5m])
+          ) > 10
+        )
+        < 0.60
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Varnish cache hit rate low on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "Fewer than 60% of lookups are served from cache on {{ $labels.instance }} at more than 10 req/s. Check TTLs and Vary headers."
+
+    - alert: VarnishLRUNuking
+      # Varnish is evicting live objects to make room. Distinct from normal TTL
+      # expiry: it means the storage backend is too small for the working set.
+      expr: rate(varnish_main_n_lru_nuked[5m]) > 1
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Varnish evicting {{ $value | humanize }} objects/s on {{ $labels.instance }}"
+        description: "Varnish on {{ $labels.instance }} is nuking live objects from cache to free space. The working set no longer fits in the configured storage."
