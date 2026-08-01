@@ -120,7 +120,9 @@
         description: "HAProxy current SSL connections exceed 80% of max on {{ $labels.instance }}"
 
     - alert: HAproxyConnectionRateNearLimit
-      expr: haproxy_process_current_connection_rate / haproxy_process_limit_connection_rate > 0.8
+      # global.maxconnrate is unset by default, so the limit is 0 -- guard the
+      # denominator or any traffic at all yields +Inf and fires permanently.
+      expr: haproxy_process_current_connection_rate / (haproxy_process_limit_connection_rate > 0) > 0.8
       for: 5m
       labels:
         severity: warning
