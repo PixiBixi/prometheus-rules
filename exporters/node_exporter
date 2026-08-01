@@ -266,7 +266,7 @@ node_entropy_available_bits 256
 node_entropy_pool_size_bits 256
 # HELP node_exporter_build_info A metric with a constant '1' value labeled by version, revision, branch, and goversion from which node_exporter was built.
 # TYPE node_exporter_build_info gauge
-node_exporter_build_info{branch="HEAD",goversion="go1.19.3",revision="1b48970ffcf5630534fb00bb0687d73c66d1c959",version="1.5.0"} 1
+node_exporter_build_info{branch="HEAD",goversion="go1.21.4",revision="7333465abf9efba81876303bb57e6fadb946041b",version="1.7.0"} 1
 # HELP node_filefd_allocated File descriptor statistics: allocated.
 # TYPE node_filefd_allocated gauge
 node_filefd_allocated 5152
@@ -979,6 +979,21 @@ node_sockstat_UDP_mem_bytes 0
 # HELP node_sockstat_sockets_used Number of IPv4 sockets in use.
 # TYPE node_sockstat_sockets_used gauge
 node_sockstat_sockets_used 425
+# HELP node_cpu_scaling_governor Current enabled CPU frequency governor.
+# TYPE node_cpu_scaling_governor gauge
+node_cpu_scaling_governor{cpu="0",governor="performance"} 1
+# HELP node_softnet_backlog_len Softnet backlog status
+# TYPE node_softnet_backlog_len gauge
+node_softnet_backlog_len{cpu="0"} 0
+# HELP node_softnet_cpu_collision_total Number of collision occurred while obtaining device lock while transmitting
+# TYPE node_softnet_cpu_collision_total counter
+node_softnet_cpu_collision_total{cpu="0"} 0
+# HELP node_softnet_flow_limit_count_total Number of times flow limit has been reached
+# TYPE node_softnet_flow_limit_count_total counter
+node_softnet_flow_limit_count_total{cpu="0"} 0
+# HELP node_softnet_received_rps_total Number of times is was woken up received_rps
+# TYPE node_softnet_received_rps_total counter
+node_softnet_received_rps_total{cpu="0"} 0
 # HELP node_softnet_dropped_total Number of dropped packets
 # TYPE node_softnet_dropped_total counter
 node_softnet_dropped_total{cpu="0"} 0
