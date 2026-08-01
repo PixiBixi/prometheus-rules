@@ -1,0 +1,74 @@
+- name: memcached.rules
+  rules:
+    - alert: MemcachedExporterDown
+      expr: |
+        group by (job, instance) (up{job=~".*memcached.*"} == 0)
+        or
+        (
+          group by (job, instance) (last_over_time(up{job=~".*memcached.*"}[1h]))
+          unless
+          group by (job, instance) (last_over_time(up{job=~".*memcached.*"}[5m]))
+        )
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Memcached exporter down — {{ $labels.job }} @ {{ $labels.instance }}"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+    - alert: MemcachedDown
+      # The exporter is answering but memcached itself is not.
+      expr: memcached_up == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Memcached down on {{ $labels.instance }}"
+        description: "The exporter on {{ $labels.instance }} cannot reach memcached."
+
+    - alert: MemcachedConnectionsSaturation
+      # memcached refuses new connections outright once max_connections is hit;
+      # there is no queue. Guarded against a zero limit.
+      expr: |
+        memcached_current_connections / (memcached_max_connections > 0) > 0.85
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Memcached connections near limit on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "More than 85% of max_connections in use on {{ $labels.instance }}. memcached rejects new connections at the limit rather than queueing them."
+
+    - alert: MemcachedMemorySaturation
+      expr: |
+        memcached_current_bytes / (memcached_limit_bytes > 0) > 0.90
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Memcached memory near limit on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "Stored data is above 90% of the configured limit on {{ $labels.instance }}. Expect evictions."
+
+    - alert: MemcachedEvictionsHigh
+      # Evictions mean the cache is dropping live keys to make room. Some churn
+      # is normal on a full cache; a sustained rate is a sizing problem.
+      expr: rate(memcached_items_evicted_total[5m]) > 10
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Memcached evicting {{ $value | humanize }} items/s on {{ $labels.instance }}"
+        description: "Sustained eviction on {{ $labels.instance }} means the working set no longer fits. Consider raising the memory limit."
+
+    - alert: MemcachedLowHitRate
+      # Volume-guarded: a handful of gets on a cold cache is not a problem.
+      expr: |
+        sum by (instance, job) (rate(memcached_commands_total{command="get",status="hit"}[5m]))
+        /
+        (sum by (instance, job) (rate(memcached_commands_total{command="get"}[5m])) > 10)
+        < 0.50
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Memcached hit rate low on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "Fewer than half of gets are served from cache on {{ $labels.instance }} at more than 10 req/s. The cache is not earning its keep."
