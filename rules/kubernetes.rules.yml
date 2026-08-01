@@ -227,17 +227,18 @@
         summary: "Kubernetes CronJob failing ({{ $labels.namespace }}/{{ $labels.cronjob }})"
         description: "CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} last schedule did not complete successfully"
 
-    - alert: KubernetesCronjobTooLong
+    - alert: KubernetesJobRunningTooLong
+      # `unless` selects jobs that have a start time but no completion time.
+      # absent() would not work here: it is global (empty as soon as any job in
+      # the cluster has completed) and carries no labels to match on.
       expr: |
-        kube_job_status_start_time > 0
-        and absent(kube_job_status_completion_time)
-        and (time() - kube_job_status_start_time) > 3600
+        (time() - (kube_job_status_start_time unless kube_job_status_completion_time)) > 3600
       for: 0m
       labels:
         severity: warning
       annotations:
-        summary: "Kubernetes CronJob running too long ({{ $labels.namespace }}/{{ $labels.cronjob }})"
-        description: "CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} is taking more than 1 hour to complete"
+        summary: "Kubernetes Job running too long ({{ $labels.namespace }}/{{ $labels.job_name }})"
+        description: "Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 1 hour to complete"
 
     # ── Persistent Volumes ────────────────────────────────────────────────────
 
@@ -339,7 +340,7 @@
     - alert: KubernetesClientCertificateExpiresNextWeek
       expr: |
         apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0
-        and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 7*24*60*60
+        and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 7*24*60*60
       for: 0m
       labels:
         severity: warning
@@ -350,7 +351,7 @@
     - alert: KubernetesClientCertificateExpiresSoon
       expr: |
         apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0
-        and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 24*60*60
+        and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 24*60*60
       for: 0m
       labels:
         severity: critical
