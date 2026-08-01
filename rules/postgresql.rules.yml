@@ -98,22 +98,10 @@
       annotations:
         description: "PostgreSQL replication down for {{ $labels.instance }} / {{ $labels.slot_name}} "
         summary: "PostgreSQL replication down for {{ $labels.instance }} / {{ $labels.slot_name}} "
-    - alert: PostgreSQLRepliLag
-      expr: sum(replication_lag) by (instance,job) > 10
-      for: 10m
-      labels:
-        severity: warning
-      annotations:
-        description: "PostgreSQL replication is high (> 10s) for 10 minutes on {{ $labels.instance }}"
-        summary: "PostgreSQL replication lag high for {{ $labels.instance }}"
-    - alert: PostgreSQLRepliLagCritical
-      expr: sum(replication_lag) by (instance,job) > 10
-      for: 40m
-      labels:
-        severity: critical
-      annotations:
-        description: "PostgreSQL replication is high (> 10s) for 40 minutes on {{ $labels.instance }}"
-        summary: "PostgreSQL replication lag critical for {{ $labels.instance }}"
+    # Replication lag is covered by PostgresReplicationLagHigh / ...Critical below.
+    # The former PostgreSQLRepliLag / ...Critical pair queried `replication_lag`,
+    # a metric postgres_exporter does not expose (it is pg_replication_lag), and
+    # was dead. Removed rather than repaired, to avoid a third duplicate.
 
     - alert: PostgresqlDeadLocks
       expr: |
@@ -159,7 +147,12 @@
         description: "Dead tuples ratio >= 10% on {{ $labels.instance }} table {{ $labels.relname }} — VACUUM may be needed"
 
     - alert: PostgresqlTooManyLocksAcquired
-      expr: ((sum by (instance) (pg_locks_count)) / (pg_settings_max_locks_per_transaction * pg_settings_max_connections)) > 0.20 and (pg_settings_max_locks_per_transaction * pg_settings_max_connections) > 0
+      # All pg_* metrics carry `server`; aggregate to the same label set on both
+      # sides or the division matches nothing.
+      expr: |
+        sum by (server, instance, job) (pg_locks_count)
+        / ((pg_settings_max_locks_per_transaction * pg_settings_max_connections) > 0)
+        > 0.20
       for: 2m
       labels:
         severity: critical
@@ -260,7 +253,12 @@
         description: "Last successful WAL archive on {{ $labels.server }} was {{ $value | humanizeDuration }} ago. Check archive destination."
 
     - alert: PostgresConnectionsSaturation
-      expr: sum by (server) (pg_stat_database_numbackends) / pg_settings_max_connections > 0.8
+      # Same label-set requirement as PostgresqlTooManyLocksAcquired: keep
+      # instance and job in the aggregation so the division matches.
+      expr: |
+        sum by (server, instance, job) (pg_stat_database_numbackends)
+        / (pg_settings_max_connections > 0)
+        > 0.8
       for: 5m
       labels:
         severity: warning
