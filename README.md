@@ -78,6 +78,34 @@ rules by plain basename: `rule_files: [basis.rules.yml]`. promtool does not
 report which file a failing test came from, so give every test a descriptive
 `name:`.
 
+### Fixture completeness versus production
+
+Counted 2026-08-01: distinct metric names per family in `exporters/` against the same
+families in the live Prometheus. Exact parity is not the goal — prod aggregates hosts
+running different versions and collector sets — but large gaps mean the docs
+"uncovered metrics" view is misleading for that exporter.
+
+| Family | Fixture | Prod | Gap |
+|---|---|---|---|
+| `pg_*` | 285 | 357 | **-72** — fixture misses a fifth of what prod exposes |
+| `kafka_*` | 177 | 188 | -11 |
+| `zookeeper_*` | 62 | 66 | -4 |
+| `ping_*` | 6 | 10 | -4 |
+| `aerospike_*`, `keepalived_*`, `promtail_*`, `certmanager_*` | — | — | -1 to -2, negligible |
+| `haproxy_*`, `nvme_*`, `ipsec_*` | — | — | **0, in parity** |
+| `mysql_*` | 995 | 818 | **+177** — the fixture has *more* than prod |
+
+Two worth acting on:
+
+- **`pg_*` is 72 metrics short.** Regenerating needs a scrape from a real postgres_exporter;
+  a container without the production `queries.yaml` would make it worse, not better.
+- **`mysql_*` has 177 metrics prod does not.** The fixture was captured with more
+  collectors enabled than the fleet runs. Harmless for rule authoring, but it inflates
+  the uncovered-metrics count for MySQL.
+
+`haproxy_*` and `keydb_exporter` were both regenerated from real scrapes on 2026-08-01
+and match their deployed versions.
+
 ### Rules with no data on our own Prometheus
 
 Audited 2026-08-01 by testing all 394 metrics the rules reference against the live
