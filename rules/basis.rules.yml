@@ -219,14 +219,14 @@
         summary: "Systemd unit failed for promtail {{ $labels.instance }}"
         description: "Systemd failed for promtail, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdCron
-      expr: node_systemd_unit_state{state="failed",name="crond?.service",ignoreCronDown=""} > 0
+      expr: node_systemd_unit_state{state="failed",name=~"crond?\\.service",ignoreCronDown=""} > 0
       labels:
         severity: critical
       annotations:
         summary: "Systemd unit failed for cron {{ $labels.instance }}"
         description: "Systemd failed for cron, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdSSH
-      expr: node_systemd_unit_state{state="failed",name="sshd?.service",ignoreSSHDown=""} > 0
+      expr: node_systemd_unit_state{state="failed",name=~"sshd?\\.service",ignoreSSHDown=""} > 0
       labels:
         severity: critical
       annotations:
@@ -331,7 +331,7 @@
         summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdOpenVPN
-      expr: node_systemd_unit_state{state="failed",name="openvpn-client@.*",ignoreOpenVPNDown=""} > 0
+      expr: node_systemd_unit_state{state="failed",name=~"openvpn-client@.*",ignoreOpenVPNDown=""} > 0
       labels:
         severity: critical
       annotations:
