@@ -1,6 +1,7 @@
 # Regression tests for rules/basis.rules.yml
 rule_files:
   - basis.rules.yml
+  - basis.records.yml
 
 evaluation_interval: 1m
 
@@ -67,3 +68,39 @@ tests:
       - alertname: RaidDegraded
         eval_time: 3m
         exp_alerts: []
+
+  # CPUwaitIO reads instance_mode:node_cpu_seconds:rate1m, which does
+  # sum without (cpu) -- the raw value is iowait-seconds per second summed over
+  # every core, not a ratio. Dividing by instance:node_cpus:count makes the 10%
+  # threshold mean the same thing on a 1-vCPU box and a 64-core one.
+  #
+  # Note the 15s sample interval: the record does rate(...[1m]), which needs at
+  # least two points in the range.
+  # 4 cores, iowait +3 per 15s sample = 0.2 core-seconds/s each.
+  # 0.8 total over 4 cores = 20%, above the 10% threshold.
+  - interval: 15s
+    input_series:
+      - series: 'node_cpu_seconds_total{mode="iowait",cpu="0",instance="h1",job="node-exporter"}'
+        values: '0+3x160'
+      - series: 'node_cpu_seconds_total{mode="iowait",cpu="1",instance="h1",job="node-exporter"}'
+        values: '0+3x160'
+      - series: 'node_cpu_seconds_total{mode="iowait",cpu="2",instance="h1",job="node-exporter"}'
+        values: '0+3x160'
+      - series: 'node_cpu_seconds_total{mode="iowait",cpu="3",instance="h1",job="node-exporter"}'
+        values: '0+3x160'
+      - series: 'node_cpu_seconds_total{mode="idle",cpu="0",instance="h1",job="node-exporter"}'
+        values: '0+12x160'
+      - series: 'node_cpu_seconds_total{mode="idle",cpu="1",instance="h1",job="node-exporter"}'
+        values: '0+12x160'
+      - series: 'node_cpu_seconds_total{mode="idle",cpu="2",instance="h1",job="node-exporter"}'
+        values: '0+12x160'
+      - series: 'node_cpu_seconds_total{mode="idle",cpu="3",instance="h1",job="node-exporter"}'
+        values: '0+12x160'
+    alert_rule_test:
+      - alertname: CPUwaitIO
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels: {alertname: CPUwaitIO, instance: h1, job: node-exporter, severity: critical}
+            exp_annotations:
+              summary: "High IOWait (20%) on h1"
+              description: "CPU time spent waiting on I/O is above 10% on h1 — check disk latency and saturation"

@@ -1,8 +1,8 @@
 - name: basis.records
   # Some records here have no alert consumer (instance:node_memory_utilization:ratio,
-  # instance:node_cpus:count, job:node_cpu_utilization:{min,max}_ratio, and the two
-  # NIC saturation ratios). They feed Grafana dashboards -- an empty grep for
-  # consumers in rules/ is expected and not grounds for deletion.
+  # job:node_cpu_utilization:{min,max}_ratio, and the two NIC saturation ratios).
+  # They feed Grafana dashboards -- an empty grep for consumers in rules/ is
+  # expected and not grounds for deletion.
   # for unspecified = default (0m)
   interval: 1m
   rules:
@@ -35,16 +35,18 @@
           1 - rate(node_cpu_seconds_total{mode="idle"}[1m])
         )
     # CPU in use by mode.
-    # Split recording for iowait to avoid reset bugs.
+    # This used to be split in two, with iowait handled by
+    # `deriv(...) > 0` and a comment claiming it avoided reset bugs. It is the
+    # other way round: deriv() is a linear regression meant for gauges and does
+    # no reset detection at all, while rate() handles resets natively.
+    # node_cpu_seconds_total is a counter, so rate() is correct for every mode.
+    # The `> 0` filter also made the iowait series disappear whenever iowait sat
+    # at zero -- the nominal case -- leaving gaps and staleness for any consumer.
+    # Merging the two also clears promtool's duplicate-rules lint on this file.
     - record: instance_mode:node_cpu_seconds:rate1m
       expr: >
         sum without (cpu) (
-          rate(node_cpu_seconds_total{mode!="iowait"}[1m])
-        )
-    - record: instance_mode:node_cpu_seconds:rate1m
-      expr: >
-        sum without (cpu) (
-          deriv(node_cpu_seconds_total{mode="iowait"}[1m]) > 0
+          rate(node_cpu_seconds_total[1m])
         )
     # CPU in use ratio.
     - record: instance:node_cpu_utilization:ratio
