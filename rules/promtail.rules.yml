@@ -1,27 +1,35 @@
 - name: promtail.rules
   rules:
     - alert: PromtailRequestErrors
+      # Two corrections, both verified against the live Prometheus.
+      # The Loki client reports status_code="-1" when the HTTP call fails before a
+      # response; the string "failed" is never emitted, so the old regex missed
+      # every network failure -- the most common kind. Observed values are
+      # "204" and "-1".
+      # `route` is not a label on this metric (it belongs to
+      # loki_request_duration_seconds, server side), so grouping by it did nothing
+      # and rendered empty in the annotation. Replaced with `host`, which exists.
       expr: |
-        100 * sum(rate(promtail_request_duration_seconds_count{status_code=~"5..|failed"}[1m])) by (namespace, job, route, instance)
-        / sum(rate(promtail_request_duration_seconds_count[1m])) by (namespace, job, route, instance)
+        100 * sum(rate(promtail_request_duration_seconds_count{status_code=~"5..|-1"}[5m])) by (namespace, job, host, instance)
+        / sum(rate(promtail_request_duration_seconds_count[5m])) by (namespace, job, host, instance)
         > 10
-        and sum(rate(promtail_request_duration_seconds_count[1m])) by (namespace, job, route, instance) > 0
+        and sum(rate(promtail_request_duration_seconds_count[5m])) by (namespace, job, host, instance) > 0
       for: 5m
       labels:
         severity: critical
       annotations:
         summary: "Promtail request errors (instance {{ $labels.instance }})"
-        description: "{{ $labels.job }} {{ $labels.route }} is experiencing {{ printf \"%.2f\" $value }}% errors"
+        description: "{{ $labels.job }} -> {{ $labels.host }} is experiencing {{ printf \"%.2f\" $value }}% errors"
 
     - alert: PromtailRequestLatency
       expr: |
-        histogram_quantile(0.99, sum(rate(promtail_request_duration_seconds_bucket[5m])) by (namespace, job, route, le)) > 1
+        histogram_quantile(0.99, sum(rate(promtail_request_duration_seconds_bucket[5m])) by (namespace, job, host, le)) > 1
       for: 5m
       labels:
         severity: critical
       annotations:
         summary: "Promtail request latency (instance {{ $labels.instance }})"
-        description: "{{ $labels.job }} {{ $labels.route }} p99 latency is {{ printf \"%.2f\" $value }}s"
+        description: "{{ $labels.job }} -> {{ $labels.host }} p99 latency is {{ printf \"%.2f\" $value }}s"
 
     - alert: PromtailDroppedEntries
       expr: rate(promtail_dropped_entries_total[5m]) > 0

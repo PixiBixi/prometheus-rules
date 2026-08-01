@@ -1,0 +1,69 @@
+# Regression tests for rules/promtail.rules.yml
+#
+# Both fixes here come from querying the live Prometheus, not the fixture.
+#
+# PromtailRequestErrors filtered status_code=~"5..|failed". The Loki client
+# reports status_code="-1" when the HTTP call fails before a response arrives,
+# and never emits the string "failed", so the alert missed every network
+# failure. Observed values in production are exactly "204" and "-1".
+#
+# Both alerts also grouped by `route`, which is not a label on this metric --
+# it belongs to loki_request_duration_seconds on the Loki server side.
+rule_files:
+  - promtail.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: network failures reported as status_code=-1 are detected
+    input_series:
+      # 3 failures for 7 successes = 30%, over the 10% threshold
+      - series: 'promtail_request_duration_seconds_count{status_code="-1",host="loki.dynfactory.com",job="promtail",instance="p1"}'
+        values: '0+18x20'
+      - series: 'promtail_request_duration_seconds_count{status_code="204",host="loki.dynfactory.com",job="promtail",instance="p1"}'
+        values: '0+42x20'
+    alert_rule_test:
+      - alertname: PromtailRequestErrors
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: PromtailRequestErrors
+              host: loki.dynfactory.com
+              job: promtail
+              instance: p1
+              severity: critical
+            exp_annotations:
+              summary: "Promtail request errors (instance p1)"
+              description: "promtail -> loki.dynfactory.com is experiencing 30.00% errors"
+
+  - interval: 1m
+    name: a healthy promtail raises nothing
+    input_series:
+      - series: 'promtail_request_duration_seconds_count{status_code="204",host="loki.dynfactory.com",job="promtail",instance="p1"}'
+        values: '0+60x20'
+    alert_rule_test:
+      - alertname: PromtailRequestErrors
+        eval_time: 10m
+        exp_alerts: []
+
+  - interval: 1m
+    name: HTTP 5xx are still detected alongside -1
+    input_series:
+      - series: 'promtail_request_duration_seconds_count{status_code="500",host="loki.dynfactory.com",job="promtail",instance="p1"}'
+        values: '0+18x20'
+      - series: 'promtail_request_duration_seconds_count{status_code="204",host="loki.dynfactory.com",job="promtail",instance="p1"}'
+        values: '0+42x20'
+    alert_rule_test:
+      - alertname: PromtailRequestErrors
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: PromtailRequestErrors
+              host: loki.dynfactory.com
+              job: promtail
+              instance: p1
+              severity: critical
+            exp_annotations:
+              summary: "Promtail request errors (instance p1)"
+              description: "promtail -> loki.dynfactory.com is experiencing 30.00% errors"

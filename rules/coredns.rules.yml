@@ -49,9 +49,13 @@
         runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorselevated
 
     - alert: CoreDNSForwardLatencyHigh
+      # This CoreDNS exposes the forward plugin's timing under coredns_proxy_*,
+      # not coredns_forward_*. Verified against the live Prometheus: only
+      # coredns_forward_healthcheck_broken_total and _max_concurrent_rejects_total
+      # carry the forward_ prefix; the duration histogram is coredns_proxy_*.
       expr: |
         histogram_quantile(0.99,
-          sum(rate(coredns_forward_request_duration_seconds_bucket{job="kube-dns"}[5m])) without (pod, instance, rcode)
+          sum(rate(coredns_proxy_request_duration_seconds_bucket{job="kube-dns"}[5m])) without (pod, instance, rcode)
         ) > 4
       for: 10m
       labels:
@@ -61,6 +65,10 @@
         description: "CoreDNS 99th percentile latency forwarding to {{ $labels.to }} is {{ $value | humanizeDuration }}."
         runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardlatencyhigh
 
+    # NOTE: coredns_forward_responses_total is exposed by neither this CoreDNS nor
+    # its coredns_proxy_* equivalent, so these two alerts have no data here. Kept
+    # because they are correct for a CoreDNS build that does expose it; check
+    # before relying on them.
     - alert: CoreDNSForwardErrorsHigh
       expr: |
         sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="kube-dns", rcode="SERVFAIL"}[5m]))
@@ -88,7 +96,7 @@
 
     - alert: CoreDNSForwardHealthcheckFailureCount
       expr: |
-        sum without (pod, instance) (rate(coredns_forward_healthcheck_failures_total{job="kube-dns"}[5m])) > 0
+        sum without (pod, instance) (rate(coredns_proxy_healthcheck_failures_total{job="kube-dns"}[5m])) > 0
       for: 10m
       labels:
         severity: warning
