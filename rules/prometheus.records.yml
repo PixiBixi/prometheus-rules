@@ -1,8 +1,28 @@
 - name: prometheus.records
   # Expensive full-series scan; evaluate infrequently — cardinality moves slowly.
+  # `count by (__name__)` is index-only work, so the cost is bounded, but this is
+  # still the most expensive query in the repo. Do not lower this interval.
   interval: 10m
   rules:
     # Per-metric series count. label_replace moves __name__ into `name` so the
     # recorded series stay distinct (record: would otherwise overwrite __name__).
+    #
+    # Both records below are excluded from the scan. name:tsdb_series:count
+    # emits one series per distinct metric name, so counting itself reports the
+    # number of metric names in the TSDB, filed under its own name — a
+    # monitoring artifact nobody can act on, and one that grows with every
+    # metric added. tsdb_series:total is the same class of artifact.
     - record: name:tsdb_series:count
-      expr: label_replace(count by (__name__) ({__name__=~".+"}), "name", "$1", "__name__", "(.+)")
+      expr: |
+        label_replace(
+          count by (__name__) ({__name__=~".+", __name__!~"name:tsdb_series:count|tsdb_series:total"}),
+          "name", "$1", "__name__", "(.+)"
+        )
+
+    # Total, derived from the record above rather than rescanning the index.
+    # Lets the alert say "this metric dominates the TSDB" instead of comparing
+    # against an absolute count, which is not portable: 10k series for a single
+    # metric is alarming on a small Prometheus and unremarkable on one scraping
+    # kube-state-metrics or cadvisor.
+    - record: tsdb_series:total
+      expr: sum(name:tsdb_series:count)
