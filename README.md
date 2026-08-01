@@ -197,6 +197,13 @@ Without `ExtendedStatus On` the exporter still reports worker and scoreboard sta
 `apache_accesses_total`, `apache_duration_ms_total` and `apache_sent_kilobytes_total` stay
 at zero — which silently disables `ApacheSlowRequests`.
 
+#### memcached_exporter
+
+**Exporter link :** [memcached_exporter](https://github.com/prometheus/memcached_exporter)
+**Version used :** v0.16.0 (tested against memcached 1.6.45)
+
+No configuration needed on memcached's side; the exporter speaks the text protocol and only needs `--memcached.address`.
+
 #### aerospike-prometheus-exporter
 
 **Exporter link :** [aerospike-prometheus-exporter](https://github.com/aerospike/aerospike-prometheus-exporter)

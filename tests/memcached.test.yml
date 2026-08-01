@@ -1,0 +1,81 @@
+# Tests for rules/memcached.rules.yml
+#
+# Fixture is a real scrape of memcached_exporter v0.16.0 against memcached
+# 1.6.45, so every metric name and label value below is one the exporter emits.
+rule_files:
+  - memcached.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: connections near the limit alert
+    input_series:
+      - series: 'memcached_current_connections{instance="mc1",job="memcached"}'
+        values: '900x15'
+      - series: 'memcached_max_connections{instance="mc1",job="memcached"}'
+        values: '1024x15'
+    alert_rule_test:
+      - alertname: MemcachedConnectionsSaturation
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: MemcachedConnectionsSaturation, instance: mc1, job: memcached, severity: critical}
+            exp_annotations:
+              summary: "Memcached connections near limit on mc1 (87.89%)"
+              description: "More than 85% of max_connections in use on mc1. memcached rejects new connections at the limit rather than queueing them."
+
+  - interval: 1m
+    name: a zero connection limit does not produce +Inf
+    input_series:
+      - series: 'memcached_current_connections{instance="mc1",job="memcached"}'
+        values: '900x15'
+      - series: 'memcached_max_connections{instance="mc1",job="memcached"}'
+        values: '0x15'
+    alert_rule_test:
+      - alertname: MemcachedConnectionsSaturation
+        eval_time: 8m
+        exp_alerts: []
+
+  # The hit-rate alert must ignore a cold cache with negligible traffic.
+  - interval: 1m
+    name: a low hit rate at negligible traffic stays quiet
+    input_series:
+      - series: 'memcached_commands_total{command="get",status="hit",instance="mc1",job="memcached"}'
+        values: '0+6x25'
+      - series: 'memcached_commands_total{command="get",status="miss",instance="mc1",job="memcached"}'
+        values: '0+54x25'
+    alert_rule_test:
+      - alertname: MemcachedLowHitRate
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a low hit rate at real traffic alerts
+    input_series:
+      # 1200/min hits + 3000/min misses = 70 req/s, hit rate 28.6%
+      - series: 'memcached_commands_total{command="get",status="hit",instance="mc1",job="memcached"}'
+        values: '0+1200x25'
+      - series: 'memcached_commands_total{command="get",status="miss",instance="mc1",job="memcached"}'
+        values: '0+3000x25'
+    alert_rule_test:
+      - alertname: MemcachedLowHitRate
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels: {alertname: MemcachedLowHitRate, instance: mc1, job: memcached, severity: warning}
+            exp_annotations:
+              summary: "Memcached hit rate low on mc1 (28.57%)"
+              description: "Fewer than half of gets are served from cache on mc1 at more than 10 req/s. The cache is not earning its keep."
+
+  - interval: 1m
+    name: memcached unreachable alerts
+    input_series:
+      - series: 'memcached_up{instance="mc1",job="memcached"}'
+        values: '0x15'
+    alert_rule_test:
+      - alertname: MemcachedDown
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: MemcachedDown, instance: mc1, job: memcached, severity: critical}
+            exp_annotations:
+              summary: "Memcached down on mc1"
+              description: "The exporter on mc1 cannot reach memcached."
