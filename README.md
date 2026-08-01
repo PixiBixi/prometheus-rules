@@ -204,6 +204,15 @@ at zero — which silently disables `ApacheSlowRequests`.
 
 No configuration needed on memcached's side; the exporter speaks the text protocol and only needs `--memcached.address`.
 
+#### varnish_exporter
+
+**Exporter link :** [prometheus_varnish_exporter](https://github.com/jonnenauha/prometheus_varnish_exporter)
+**Version used :** 1.6.1 (tested against Varnish 9.0.3)
+
+The exporter shells out to `varnishstat`, so it must run on the same host as Varnish with access to the shared memory in `/var/lib/varnish`. It cannot be run as a remote scraper.
+
+Only amd64 binaries are published upstream.
+
 #### aerospike-prometheus-exporter
 
 **Exporter link :** [aerospike-prometheus-exporter](https://github.com/aerospike/aerospike-prometheus-exporter)
