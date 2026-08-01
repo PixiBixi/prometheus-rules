@@ -108,42 +108,51 @@ Alertmanager, ou un chaînage `unless`. Aucun n'est en place.
   `*_status` : une seule valeur d'état est conservée. C'est ce qui empêche de trancher
   `HAproxyFrontendDown` en R2.
 
-### R5 — Reliquat P2/P3 non traité
+### R5 — Reliquat P2/P3 — traité, sauf trois points
 
-- **9 ratios HAProxy sans garde de volume** (`:249,258,267,360,373,387,428,437,446`) : un
-  backend recevant 1 requête en 5 min, en erreur, produit 100 % → critical. Leurs
-  voisines bien écrites (`:172,233,335,412`) ont toutes un `and … > 10`.
-- **`PrometheusTimeseriesCardinality`** (`prometheus.rules.yml`) : la requête la plus
-  chère du dépôt. Trois réserves — coût d'un scan intégral du head block toutes les 10
-  min ; **auto-référence** (`{__name__=~".+"}` inclut la sortie de la RR, qui crée N
-  séries) ; seuil `> 10000` absolu, banal pour `kube-state-metrics` ou `cadvisor`.
-  Alternative : `prometheus_tsdb_head_series` pour le total, et
-  `/api/v1/status/tsdb` pour le détail par métrique (déjà calculé, coût nul).
-- **`KubernetesApiServerLatency`** (`kubernetes.rules.yml`) : `sum … WITHOUT (subresource)`
-  ne retire qu'un label sur la métrique la plus cardinale de l'apiserver → quantile
-  calculé sur ~tout, et p99 **par code HTTP** (les 504 ont mécaniquement un p99 > 1s).
-  Manque aussi le sélecteur `job="apiserver"` présent sur ses voisines.
-- **`KubernetesCronjobFailing`** : un CronJob qui **n'a jamais réussi** n'a pas de série
-  `kube_cronjob_status_last_successful_time`, donc la comparaison ne retourne rien. Le
-  cas le plus grave n'est pas couvert.
-- **`KubernetesJobSlowCompletion`** : depuis KSM ≥ 2.1, `kube_job_status_failed` porte un
-  label `reason` **seulement quand `failed > 0`**. La soustraction ne matche alors plus,
-  et le Job disparaît du résultat — précisément le cas intéressant. Correctif si
-  confirmé : `sum without (reason) (…)`.
-- **`OldMetricsTextfile`** (`basis.rules.yml:40,48,56`) : trois alertes de même nom et
-  mêmes labels. Fonctionnellement correctes (sélecteurs `file` disjoints) mais c'est le
-  dernier lint `duplicate-rules` du dépôt. **Vrai trou au passage** : le catch-all `:57`
-  exclut `.*server_metrics.*` et aucune alerte ne couvre ce pattern — ces textfiles ne
-  sont surveillés par rien.
-- **`GaleraWrongSize`** (`mysql.rules.yml:40`) : seuil absolu `< 3` non portable (un
-  cluster peut légitimement avoir 5 ou 7 nœuds).
-- **`MysqlConnectionErrors`** (`mysql.rules.yml:30`) : `critical` dès la première erreur,
-  sans distinguer le label `error` (`accept`, `internal`, `max_connections`, `tcpwrap`…),
-  dont certains sont bénins.
+Traité en `95c637a`, `050bebf`, `436df1d`, `781e031` :
+
+- **9 ratios HAProxy sans garde de volume** → plancher à 1 req/s sur chacun, aligné sur
+  leurs voisines déjà correctes. Les alertes de saturation (`current`/`limit`) sont
+  volontairement exclues : un plancher de trafic n'y a pas de sens.
+- **`PrometheusTimeseriesCardinality`** → ne se compte plus elle-même (elle produisait une
+  série par nom de métrique, comptée sous son propre nom), et le seuil absolu `> 10000`
+  devient « > 10000 séries **et** plus de 10 % du TSDB », portable d'un Prometheus à
+  l'autre. Nouveau record `tsdb_series:total`, dérivé du premier plutôt que d'un second
+  scan d'index.
+- **`KubernetesApiServerLatency`** → agrégé sur `(verb, le)` au lieu de
+  `WITHOUT (subresource)`, qui ne retirait qu'un label et produisait un p99 **par code
+  HTTP** (les 504 ont un p99 > 1s par construction). Ajout du sélecteur `job="apiserver"`
+  et exclusion de `LIST`.
+- **`KubernetesCronjobFailing`** → couvre enfin le CronJob qui n'a **jamais** réussi :
+  sans série `last_successful_time`, la comparaison ne retournait rien.
+- **`KubernetesJobSlowCompletion`** → `sum without (reason)`, sans quoi les Jobs à échecs
+  partiels disparaissaient du résultat depuis KSM ≥ 2.1.
+- **`MysqlConnectionErrors`** → scindée par type d'erreur et par gravité, avec le label
+  `error` conservé dans l'annotation.
+
+Restent volontairement ouverts :
+
+- **`GaleraWrongSize`** : seuil `< 3` non portable — sur un cluster à 5 ou 7 nœuds il ne
+  tire qu'une fois le quorum déjà perdu. L'hypothèse est documentée dans le fichier ; le
+  bon seuil est une décision de dimensionnement.
 - **`RedisDisconnectedSlaves`** (`keydb.rules.yml:47`) : `count(…) - sum(…) - 1 > 0`
-  suppose une topologie à un seul master.
-- **`PostgresChecksumFailures`** : `NaN` quand `data_checksums` est désactivé — no-op
-  silencieux. Précondition opérationnelle, pas un bug de règle.
+  suppose une topologie à un seul master. Non vérifiable tant que la fixture keydb est
+  celle de R4.
+- **`OldMetricsTextfile`** (`basis.rules.yml:48,56,64`) : les trois alertes de même nom et
+  mêmes labels restent le dernier lint `duplicate-rules`. Fonctionnellement correctes
+  (sélecteurs `file` disjoints). Les départager demanderait soit un renommage (refusé,
+  cf. R6), soit un label distinctif — churn pour un lint advisory.
+
+  > **Correction d'un constat de la première passe.** J'avais annoncé un trou : le
+  > catch-all exclut `.*server_metrics.*` sans qu'aucune alerte ne couvre ce motif.
+  > Vérification faite, la fixture ne contient qu'un textfile,
+  > `/home/node_exporter/server_state.prom`, qui **ne matche pas** cette exclusion — il
+  > est donc bien couvert par le catch-all. L'exclusion vise un motif de nom de fichier
+  > qui n'existe pas dans la fixture, probablement une confusion avec la *métrique*
+  > `server_metrics` que ce fichier produit. **À confirmer** : existe-t-il des fichiers
+  > `*server_metrics*` sur d'autres hôtes ? Si non, l'exclusion est morte et peut être
+  > retirée.
 
 ### R6 — Renommages : décision prise de ne pas les faire
 
