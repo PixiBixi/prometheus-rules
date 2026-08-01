@@ -71,7 +71,13 @@
         description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minutes"
 
     - alert: HighDroppedPackages
-      expr: (irate(node_network_receive_drop_total{ignoredDroppedPackage=""}[5m])/irate(node_network_receive_packets_total[5m])) > 0.1
+      # rx_dropped can move while rx_packets stays flat (VLAN mistag, secondary
+      # NIC), giving X/0 = +Inf. Same guard as HighListenDrop below.
+      expr: |
+        (
+          irate(node_network_receive_drop_total{ignoredDroppedPackage=""}[5m])
+          / (irate(node_network_receive_packets_total[5m]) > 0)
+        ) > 0.1
       for: 5m
       labels:
         severity: critical
@@ -94,10 +100,12 @@
         summary: "High TCP listen drops on {{ $labels.instance }}"
         description: "More than 10% of incoming TCP connections are being dropped on {{ $labels.instance }} ({{ $value | humanizePercentage }}) — accept queue full, check backlog/somaxconn"
     - alert: ConntrackAlmostFull
-      expr: (node_nf_conntrack_entries / node_nf_conntrack_entries_limit) > 0.50
+      # 50% occupancy is not an emergency. Follow the warning/critical pairing
+      # used by NodeFileDescriptorLimit and the NIC saturation alerts.
+      expr: (node_nf_conntrack_entries / node_nf_conntrack_entries_limit) > 0.80
       for: 5m
       labels:
-        severity: critical
+        severity: warning
       annotations:
         description: "{{ $labels.instance }} of job {{ $labels.job }} has its conntrack stack almost full"
         summary: "{{ $labels.instance }} of job {{ $labels.job }} has its conntrack stack almost full, please check if HAproxy/whatever is running fine, also, check sysctl conntrack value"
@@ -136,6 +144,9 @@
     # Take a look : https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=34e431b0ae398fc54ea69ff85ec700722c9da773
     - alert: HostLowOfMemory
       expr: sum ((node_memory_MemAvailable_bytes{ignoreMonitoringMemory=""} / node_memory_MemTotal_bytes * 100) < 10) by (instance,job)
+      # MemAvailable crosses 10% on any page-cache spike; without a for: a
+      # single evaluation paged.
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -161,7 +172,7 @@
     # Disk
     ## All Servers
     - alert: HostOutOfDiskSpace
-      expr: (node_filesystem_free_bytes{fstype!="tmpfs",mountpoint!~"(/boot|/boot/efi)",job!="rds-enhanced",ignoreDiskUsage=""} / node_filesystem_size_bytes * 100) < 20
+      expr: (node_filesystem_avail_bytes{fstype!="tmpfs",mountpoint!~"(/boot|/boot/efi)",job!="rds-enhanced",ignoreDiskUsage=""} / node_filesystem_size_bytes * 100) < 20
       for: 5m
       labels:
         severity: critical
@@ -375,19 +386,26 @@
         summary: "Host high CPU load (instance RDS {{ $labels.instance }})"
         description: "The CPU load reported from RDS {{ $labels.instance }} has exceeded 90% for more than 1 minute."
     - alert: CPUwaitIO
-      expr: instance_mode:node_cpu_seconds:rate1m{ignoreCPULoad="",mode="iowait",ignoreSingleCPU=""} > 0.1
+      # The record does sum without (cpu), so the raw value is iowait-seconds per
+      # second summed over every core -- 0.1 means 10% of a 1-vCPU box but 0.16%
+      # of a 64-core one. Divide by the core count to get a portable ratio.
+      expr: |
+        instance_mode:node_cpu_seconds:rate1m{ignoreCPULoad="",mode="iowait",ignoreSingleCPU=""}
+        / ignoring(mode) instance:node_cpus:count
+        > 0.1
       for: 5m
       labels:
         severity: critical
       annotations:
-        summary: "High IOWait ({{$value| printf \"%.0f\"}}%) on {{$labels.instance}}"
+        summary: "High IOWait ({{ $value | humanizePercentage }}) on {{ $labels.instance }}"
+        description: "CPU time spent waiting on I/O is above 10% on {{ $labels.instance }} — check disk latency and saturation"
     - alert: CPULoadServerType
       expr: job:node_cpu_utilization:avg_ratio > 0.80
       for: 15m
       labels:
         severity: critical
       annotations:
-        summary: "Host high CPU load for {{ $labels.servertype }} @ {{ $labels.pop }} : {{ $value }}"
+        summary: "Host high CPU load for {{ $labels.servertype }} @ {{ $labels.pop }} : {{ $value | humanizePercentage }}"
         description: "The CPU load reported from {{ $labels.servertype }} on {{ $labels.pop }} has exceeded 80% for more than 15 minutes."
 
     # ── Filesystem (inodes, predictive) ───────────────────────────────────────
@@ -510,7 +528,9 @@
     # ── File descriptors ───────────────────────────────────────────────────────
 
     - alert: NodeFileDescriptorLimit
-      expr: node_filefd_allocated * 100 / node_filefd_maximum > 70
+      # An unbounded fs.file-max (2^63) makes this ratio ~5.6e-16, so both
+      # tiers were structurally dead. Skip hosts that do not cap it.
+      expr: node_filefd_allocated * 100 / (node_filefd_maximum < 1e9) > 70
       for: 15m
       labels:
         severity: warning
@@ -518,7 +538,9 @@
         summary: "File descriptor limit approaching on {{ $labels.instance }}"
         description: "{{ $labels.instance }} is using {{ printf \"%.2f\" $value }}% of available file descriptors (warning threshold: 70%)."
     - alert: NodeFileDescriptorLimit
-      expr: node_filefd_allocated * 100 / node_filefd_maximum > 90
+      # An unbounded fs.file-max (2^63) makes this ratio ~5.6e-16, so both
+      # tiers were structurally dead. Skip hosts that do not cap it.
+      expr: node_filefd_allocated * 100 / (node_filefd_maximum < 1e9) > 90
       for: 15m
       labels:
         severity: critical
@@ -600,7 +622,12 @@
     # ── Network carrier ────────────────────────────────────────────────────────
 
     - alert: NodeNetworkLinkDown
-      expr: node_network_carrier{device!~"lo|veth.*|docker.*|br-.*|virbr.*|tun.*"} == 0
+      # A second physical NIC left uncabled (free SFP port) reports carrier=0
+      # forever. node_network_up == 1 restricts this to interfaces the operator
+      # actually brought up; ignoreLinkDown allows per-host exceptions.
+      expr: |
+        node_network_carrier{device!~"lo|veth.*|docker.*|br-.*|virbr.*|tun.*",ignoreLinkDown=""} == 0
+        and on(instance, device) node_network_up == 1
       for: 2m
       labels:
         severity: critical
@@ -609,7 +636,10 @@
         description: Network interface {{ $labels.device }} on {{ $labels.instance }} has lost carrier.
 
     - alert: NodeNetworkInterfaceFlapping
-      expr: changes(node_network_carrier{device!~"lo|veth.*|docker.*|br-.*|virbr.*|tun.*"}[5m]) > 2
+      # changes() on a gauge only sees transitions visible between two scrapes;
+      # a down/up faster than the scrape interval is invisible. The kernel
+      # counter records every transition.
+      expr: increase(node_network_carrier_changes_total{device!~"lo|veth.*|docker.*|br-.*|virbr.*|tun.*"}[5m]) > 2
       for: 0m
       labels:
         severity: warning
@@ -644,10 +674,15 @@
     # ── Systemd system status ──────────────────────────────────────────────────
 
     - alert: NodeSystemdNotRunning
-      expr: node_systemd_system_running == 0
-      for: 1m
+      # `systemctl is-system-running` reports degraded as soon as ONE unit has
+      # failed, including every unit the 24 DownSystemd* alerts above
+      # deliberately exclude via their ignore*Down guards. Give it its own guard
+      # so it can be silenced the same way, and demote it: the per-unit alerts
+      # are the actionable ones, this is a catch-all for units nobody modelled.
+      expr: node_systemd_system_running{ignoreSystemdDegraded=""} == 0
+      for: 15m
       labels:
-        severity: critical
+        severity: warning
       annotations:
         summary: "systemd not fully operational on {{ $labels.instance }}"
         description: systemd reports system is not fully operational on {{ $labels.instance }}.
@@ -712,7 +747,9 @@
     # ── TCP kernel drops ───────────────────────────────────────────────────────
 
     - alert: NodeTCPListenOverflows
-      expr: rate(node_netstat_TcpExt_ListenOverflows[5m]) > 0
+      # A single increment keeps rate() > 0 for the whole [5m] window, which
+      # satisfies for: 5m exactly -- one event was enough to page.
+      expr: increase(node_netstat_TcpExt_ListenOverflows[5m]) > 10
       for: 5m
       labels:
         severity: critical
@@ -723,7 +760,9 @@
     # ── Softnet drops ──────────────────────────────────────────────────────────
 
     - alert: NodeSoftnetDrops
-      expr: rate(node_softnet_dropped_total[5m]) > 0
+      # A single increment keeps rate() > 0 for the whole [5m] window, which
+      # satisfies for: 5m exactly -- one event was enough to page.
+      expr: increase(node_softnet_dropped_total[5m]) > 10
       for: 5m
       labels:
         severity: warning
@@ -754,7 +793,9 @@
     # ── UDP buffer errors ──────────────────────────────────────────────────────
 
     - alert: NodeUDPReceiveBufferErrors
-      expr: rate(node_netstat_Udp_RcvbufErrors[5m]) > 0
+      # A single increment keeps rate() > 0 for the whole [5m] window, which
+      # satisfies for: 5m exactly -- one event was enough to page.
+      expr: increase(node_netstat_Udp_RcvbufErrors[5m]) > 10
       for: 5m
       labels:
         severity: warning
