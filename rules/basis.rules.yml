@@ -2,9 +2,17 @@
   rules:
     - alert: HostDown
       expr: |
-        group by (job, instance) (last_over_time(up{job=~".*node-exporter"}[1h]))
-        unless
-        group by (job, instance) (last_over_time(up{job=~".*node-exporter"}[5m]))
+        # Two distinct failure modes: a failing scrape (up == 0, exporter crashed
+        # or host unreachable) and the target vanishing from service discovery,
+        # where no up series exists to be 0. Both branches are grouped
+        # identically so the alert carries the same labels either way.
+        group by (job, instance) (up{job=~".*node-exporter"} == 0)
+        or
+        (
+          group by (job, instance) (last_over_time(up{job=~".*node-exporter"}[1h]))
+          unless
+          group by (job, instance) (last_over_time(up{job=~".*node-exporter"}[5m]))
+        )
       for: 2m
       labels:
         severity: critical

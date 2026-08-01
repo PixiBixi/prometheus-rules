@@ -1,0 +1,104 @@
+# Regression tests for the per-exporter "exporter down" watchdogs.
+#
+# Commit 5334c57 replaced `up == 0` with a last_over_time/unless pattern across
+# 13 alerts. That pattern only detects a target vanishing from service
+# discovery: when an exporter crashes, Prometheus keeps scraping and writes
+# up = 0, so the series is still present in the [5m] lookback, `unless` removes
+# it, and nothing fires. Detection only survived because PrometheusTargetMissing
+# was unscoped and caught up == 0 for everything -- at the cost of paging under
+# a generic name with no runbook.
+#
+# Each watchdog now covers both failure modes under its own name.
+rule_files:
+  - basis.rules.yml
+  - postgresql.rules.yml
+  - kafka.rules.yml
+  - prometheus.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # Failure mode 1: the exporter is down but the target still exists.
+  - interval: 1m
+    name: a crashed exporter fires its own watchdog
+    input_series:
+      - series: 'up{job="node-exporter",instance="h1"}'
+        values: '1 1 1 0 0 0 0 0 0 0 0 0'
+      - series: 'up{job="postgres-exporter",instance="pg1"}'
+        values: '1 1 1 0 0 0 0 0 0 0 0 0'
+    alert_rule_test:
+      - alertname: HostDown
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels: {alertname: HostDown, job: node-exporter, instance: h1, severity: critical}
+            exp_annotations:
+              description: "node_exporter seems down on h1, then the host is probably down"
+              summary: "Host down h1 (node_exporter)"
+      - alertname: PostgresExporter
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels: {alertname: PostgresExporter, job: postgres-exporter, instance: pg1, severity: critical}
+            exp_annotations:
+              description: "pg1 of job postgres-exporter has been down for more than 2 minutes."
+              summary: "Job postgres-exporter having an issue on pg1"
+
+  # Failure mode 2: the target disappears from service discovery entirely, so
+  # there is no up series left to be 0. This is what the unless branch covers.
+  - interval: 1m
+    name: a vanished target still fires its own watchdog
+    input_series:
+      - series: 'up{job="node-exporter",instance="h1"}'
+        values: '1x5 _x30'
+    alert_rule_test:
+      - alertname: HostDown
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels: {alertname: HostDown, job: node-exporter, instance: h1, severity: critical}
+            exp_annotations:
+              description: "node_exporter seems down on h1, then the host is probably down"
+              summary: "Host down h1 (node_exporter)"
+
+  - interval: 1m
+    name: a healthy target fires nothing
+    input_series:
+      - series: 'up{job="node-exporter",instance="h1"}'
+        values: '1x15'
+      - series: 'up{job="kafka",instance="b1"}'
+        values: '1x15'
+    alert_rule_test:
+      - alertname: HostDown
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: KafkaExporter
+        eval_time: 10m
+        exp_alerts: []
+
+  # PrometheusTargetMissing is now scoped to the monitoring stack, so a business
+  # exporter going down no longer double-notifies under a generic name.
+  - interval: 1m
+    name: a downed business exporter does not also trip the generic net
+    input_series:
+      - series: 'up{job="node-exporter",instance="h1"}'
+        values: '1 1 1 0 0 0 0 0 0 0 0 0'
+      - series: 'up{job="node-exporter",instance="h2"}'
+        values: '1x12'
+    alert_rule_test:
+      - alertname: PrometheusTargetMissing
+        eval_time: 10m
+        exp_alerts: []
+
+  - interval: 1m
+    name: the generic net still covers the monitoring stack itself
+    input_series:
+      - series: 'up{job="alertmanager",instance="am1"}'
+        values: '1 1 1 0 0 0 0 0 0 0 0 0'
+      - series: 'up{job="alertmanager",instance="am2"}'
+        values: '1x12'
+    alert_rule_test:
+      - alertname: PrometheusTargetMissing
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels: {alertname: PrometheusTargetMissing, job: alertmanager, instance: am1, severity: critical}
+            exp_annotations:
+              summary: "Prometheus target missing (instance am1)"
+              description: "A Prometheus target has disappeared. An exporter might be crashed."
