@@ -4,7 +4,7 @@ Review complète des **378 alertes / 23 fichiers** et **3 fichiers de recording 
 menée par 5 agents en parallèle, chaque constat re-vérifié contre les fixtures
 `exporters/` et, quand c'était reproductible, contre `promtool test rules`.
 
-**État : la majorité est corrigée** (30 commits, `f4276f2`..`a0e8382`). Ce document ne
+**État : la majorité est corrigée** (32 commits, `f4276f2`..`7377bd7`). Ce document ne
 conserve que ce qui reste ouvert, plus le contexte nécessaire pour l'arbitrer.
 
 Le compte d'alertes passe de **378 à 372** : 4 alertes mortes supprimées, 2 paires de
@@ -22,9 +22,10 @@ doublons fusionnées.
 | 20 RR HAProxy orphelines | Re-taguées et consommées par 11 alertes |
 | 13 watchdogs `up == 0` | Couvrent à nouveau les deux modes de panne |
 | ~45 P2 / ~25 P3 | Bruit, fenêtres, gardes, annotations |
+| 2 alertes keepalived inversées | Comptaient les BACKUP au lieu des MASTER (R1) |
 | 2 paires de doublons | Fusionnées |
 | Scripts Python | `build.py` 2× plus rapide, `validate_rules.py` 4× |
-| **`tests/`** | **12 fichiers `promtool test rules`, joués contre la révision avant *et* après chaque correctif** |
+| **`tests/`** | **13 fichiers `promtool test rules`, joués contre la révision avant *et* après chaque correctif** |
 
 ### Deux régressions issues de l'audit précédent, annulées
 
@@ -44,30 +45,21 @@ régressions passaient la validation. C'est ce qui a motivé `tests/`.
 
 ## Ce qui reste ouvert
 
-### R1 — `KeepalivedSplitBrain` / `KeepalivedNoMaster` sont probablement inversées
+### R1 — ~~Alertes keepalived inversées~~ → corrigé en `7377bd7`
 
-**Priorité : la plus haute du reliquat.** Non corrigé faute de confirmation de
-l'énumération exacte de l'exporter déployé.
+Confirmé puis corrigé. L'exporter déployé est **cafebazaar/keepalived-exporter v1.3.2**
+(identifié par `keepalived_exporter_build_info` dans la fixture). À ce tag il exporte
+l'entier brut de l'état, et son énumération est indexée sur
+`VRRPStates = []string{"INIT", "BACKUP", "MASTER", "FAULT"}` — donc **MASTER = 2**, et
+`== 1` sélectionnait les BACKUP.
 
-`rules/keepalived.rules.yml:13,22`
-```promql
-count by (vrid) (keepalived_vrrp_state == 1) > 1    # KeepalivedSplitBrain
-count by (vrid) (keepalived_vrrp_state == 1) == 0   # KeepalivedNoMaster
-```
+Un second bug, indépendant de l'énumération, a été trouvé au passage :
+`count by (vrid) (...) == 0` ne peut jamais être vrai, `count by()` sur une entrée vide
+ne produisant aucun groupe plutôt qu'un zéro.
 
-RFC 3768, reprise telle quelle par keepalived (`vrrp_state_t`) :
-`INIT=0, BACKUP=1, MASTER=2`. La fixture montre `keepalived_vrrp_state{vrid="1"} 2`,
-cohérent avec un nœud MASTER.
-
-Si l'énumération est bien celle-là, `== 1` sélectionne les **BACKUP** :
-
-- `KeepalivedSplitBrain` compte les nœuds en veille → **vrai en permanence** dès qu'il y
-  a 2 backups, et ne détecte jamais un vrai split-brain (2 MASTER) ;
-- `KeepalivedNoMaster` tire dès qu'aucun nœud n'est en BACKUP — cas normal d'un cluster à
-  un seul membre — et ne détecte jamais l'absence réelle de MASTER.
-
-**À faire** : confirmer l'énumération sur l'exporter déployé (`curl` sur un nœud MASTER
-et un nœud BACKUP), puis remplacer `== 1` par `== 2` dans les deux.
+Reproduit avant correction : un cluster sain levait un split-brain, un vrai split-brain à
+2 MASTER ne levait rien, et un VRID sans aucun master ne levait rien. Couvert par
+`tests/keepalived.test.yml`.
 
 ### R2 — Constats « à confirmer » nécessitant un accès à l'infra réelle
 
