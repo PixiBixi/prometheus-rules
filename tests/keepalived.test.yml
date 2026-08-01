@@ -1,0 +1,105 @@
+# Regression tests for rules/keepalived.rules.yml
+#
+# KeepalivedSplitBrain and KeepalivedNoMaster both matched
+# keepalived_vrrp_state == 1. The deployed exporter
+# (cafebazaar/keepalived-exporter, per keepalived_exporter_build_info in the
+# fixture) exports the raw VRRP state integer, and its enum is
+#   VRRPStates = []string{"INIT", "BACKUP", "MASTER", "FAULT"}
+# so 1 is BACKUP and MASTER is 2. The alerts therefore fired exactly when the
+# cluster was healthy and stayed silent when it was not.
+#
+# KeepalivedNoMaster had a second, enum-independent bug: `count by (vrid) (...)
+# == 0` can never be true, because count by() over an empty input produces no
+# group rather than a zero.
+rule_files:
+  - keepalived.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a healthy cluster with two standbys raises nothing
+    input_series:
+      - series: 'keepalived_vrrp_state{vrid="1",iname="eth0",intf="eth0",ip_address="10.0.0.1/16",instance="n1"}'
+        values: '2x10'
+      - series: 'keepalived_vrrp_state{vrid="1",iname="eth0",intf="eth0",ip_address="10.0.0.2/16",instance="n2"}'
+        values: '1x10'
+      - series: 'keepalived_vrrp_state{vrid="1",iname="eth0",intf="eth0",ip_address="10.0.0.3/16",instance="n3"}'
+        values: '1x10'
+    alert_rule_test:
+      - alertname: KeepalivedSplitBrain
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: KeepalivedNoMaster
+        eval_time: 5m
+        exp_alerts: []
+
+  - interval: 1m
+    name: two MASTER nodes on one VRID raise a split brain
+    input_series:
+      - series: 'keepalived_vrrp_state{vrid="1",iname="eth0",intf="eth0",ip_address="10.0.0.1/16",instance="n1"}'
+        values: '2x10'
+      - series: 'keepalived_vrrp_state{vrid="1",iname="eth0",intf="eth0",ip_address="10.0.0.2/16",instance="n2"}'
+        values: '2x10'
+    alert_rule_test:
+      - alertname: KeepalivedSplitBrain
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels: {alertname: KeepalivedSplitBrain, vrid: "1", severity: critical}
+            exp_annotations:
+              summary: "Keepalived split-brain detected on VRID 1"
+              description: "Multiple instances are in MASTER state for VRID 1. This causes IP conflicts on the network."
+      - alertname: KeepalivedNoMaster
+        eval_time: 5m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a VRID with every node in BACKUP raises no-master
+    input_series:
+      - series: 'keepalived_vrrp_state{vrid="1",iname="eth0",intf="eth0",ip_address="10.0.0.1/16",instance="n1"}'
+        values: '1x10'
+      - series: 'keepalived_vrrp_state{vrid="1",iname="eth0",intf="eth0",ip_address="10.0.0.2/16",instance="n2"}'
+        values: '1x10'
+    alert_rule_test:
+      - alertname: KeepalivedNoMaster
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels: {alertname: KeepalivedNoMaster, vrid: "1", severity: critical}
+            exp_annotations:
+              summary: "No Keepalived master for VRID 1"
+              description: "No instance is in MASTER state for VRID 1. The VIP is unreachable."
+      - alertname: KeepalivedSplitBrain
+        eval_time: 5m
+        exp_alerts: []
+
+  # FAULT (3) and INIT (0) are not MASTER either.
+  - interval: 1m
+    name: a VRID stuck in FAULT raises no-master
+    input_series:
+      - series: 'keepalived_vrrp_state{vrid="7",iname="eth0",intf="eth0",ip_address="10.0.0.1/16",instance="n1"}'
+        values: '3x10'
+    alert_rule_test:
+      - alertname: KeepalivedNoMaster
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels: {alertname: KeepalivedNoMaster, vrid: "7", severity: critical}
+            exp_annotations:
+              summary: "No Keepalived master for VRID 7"
+              description: "No instance is in MASTER state for VRID 7. The VIP is unreachable."
+
+  # Per-VRID scoping: a healthy VRID must not mask a broken one.
+  - interval: 1m
+    name: a healthy VRID does not mask a masterless one
+    input_series:
+      - series: 'keepalived_vrrp_state{vrid="1",iname="eth0",intf="eth0",ip_address="10.0.0.1/16",instance="n1"}'
+        values: '2x10'
+      - series: 'keepalived_vrrp_state{vrid="2",iname="eth1",intf="eth1",ip_address="10.0.1.1/16",instance="n1"}'
+        values: '1x10'
+    alert_rule_test:
+      - alertname: KeepalivedNoMaster
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels: {alertname: KeepalivedNoMaster, vrid: "2", severity: critical}
+            exp_annotations:
+              summary: "No Keepalived master for VRID 2"
+              description: "No instance is in MASTER state for VRID 2. The VIP is unreachable."

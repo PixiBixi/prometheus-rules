@@ -10,7 +10,11 @@
         description: "Keepalived is unreachable on {{ $labels.instance }}. VIP failover may be broken."
 
     - alert: KeepalivedSplitBrain
-      expr: count by (vrid) (keepalived_vrrp_state == 1) > 1
+      # MASTER is 2, not 1. cafebazaar/keepalived-exporter exports the raw VRRP
+      # state int, and its enum is VRRPStates = {INIT, BACKUP, MASTER, FAULT},
+      # so == 1 counted BACKUP nodes: true on any healthy cluster with two or
+      # more standbys, and never true for an actual two-MASTER split brain.
+      expr: count by (vrid) (keepalived_vrrp_state == 2) > 1
       for: 1m
       labels:
         severity: critical
@@ -19,7 +23,15 @@
         description: "Multiple instances are in MASTER state for VRID {{ $labels.vrid }}. This causes IP conflicts on the network."
 
     - alert: KeepalivedNoMaster
-      expr: count by (vrid) (keepalived_vrrp_state == 1) == 0
+      # Two bugs here. Besides == 1 selecting BACKUP rather than MASTER,
+      # `count by (vrid) (...) == 0` can never be true: when nothing matches,
+      # count by() yields no group at all rather than a zero, so the comparison
+      # has nothing to test. Select the VRIDs that exist and subtract those that
+      # do have a master.
+      expr: |
+        count by (vrid) (keepalived_vrrp_state)
+        unless
+        count by (vrid) (keepalived_vrrp_state == 2)
       for: 2m
       labels:
         severity: critical
