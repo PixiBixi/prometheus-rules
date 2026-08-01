@@ -46,7 +46,7 @@
       annotations:
         summary: "CoreDNS elevated SERVFAIL rate ({{ $value | humanizePercentage }})"
         description: "CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of requests."
-        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorshigh
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorselevated
 
     - alert: CoreDNSForwardLatencyHigh
       expr: |
@@ -84,7 +84,7 @@
       annotations:
         summary: "CoreDNS elevated forward SERVFAIL rate to {{ $labels.to }} ({{ $value | humanizePercentage }})"
         description: "CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of forward requests to {{ $labels.to }}."
-        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwarderrorshigh
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwarderrorselevated
 
     - alert: CoreDNSForwardHealthcheckFailureCount
       expr: |

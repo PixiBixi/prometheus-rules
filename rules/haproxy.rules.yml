@@ -217,7 +217,7 @@
     # ── Backend ──────────────────────────────────────────────
 
     - alert: HAproxyBackendDown
-      expr: (sum by (namespace, proxy) (haproxy_backend_agg_server_check_status{state='UP'}) == 0)
+      expr: (sum by (namespace, proxy) (haproxy_backend_agg_server_check_status{state="UP"}) == 0)
       for: 5m
       labels:
         severity: critical
@@ -309,7 +309,11 @@
         description: "Backend {{ $labels.proxy }} @ {{ $labels.instance }} connection reuse rate is {{ $value | printf \"%.0f\" }}% (< 50%) for the last 10 minutes. This may indicate misconfigured keep-alive, backend restarts, or HTTP/1.0 fallback."
 
     - alert: HAproxyBackendMaxActiveSessionHigh
-      expr: (haproxy_server_max_sessions * 100) / (haproxy_server_limit_sessions > 0) > 80
+      # haproxy_server_max_sessions is a monotonic high-water mark ("highest
+      # value encountered since process started"), so a single burst reaching
+      # 81% latched this alert until the next reload, however idle the server
+      # became afterwards. Use the instantaneous value.
+      expr: (haproxy_server_current_sessions * 100) / (haproxy_server_limit_sessions > 0) > 80
       for: 5m
       labels:
         severity: warning
