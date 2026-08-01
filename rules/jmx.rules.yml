@@ -1,7 +1,7 @@
 - name: jmx.rules
   rules:
     - alert: JvmMemoryFillingUp
-      expr: (sum by (instance)(jvm_memory_used_bytes{area="heap"}) / sum by (instance)(jvm_memory_max_bytes{area="heap"})) * 100 > 80 and sum by (instance)(jvm_memory_max_bytes{area="heap"}) > 0
+      expr: (sum by (instance)(jvm_memory_bytes_used{area="heap"}) / sum by (instance)(jvm_memory_bytes_max{area="heap"})) * 100 > 80 and sum by (instance)(jvm_memory_bytes_max{area="heap"}) > 0
       for: 2m
       labels:
         severity: warning
@@ -10,7 +10,7 @@
         description: "JVM heap memory is filling up (> 80%) on {{ $labels.instance }}\n  VALUE = {{ $value }}"
 
     - alert: JvmHeapMemoryCritical
-      expr: (sum by (instance)(jvm_memory_used_bytes{area="heap"}) / sum by (instance)(jvm_memory_max_bytes{area="heap"})) * 100 > 90 and sum by (instance)(jvm_memory_max_bytes{area="heap"}) > 0
+      expr: (sum by (instance)(jvm_memory_bytes_used{area="heap"}) / sum by (instance)(jvm_memory_bytes_max{area="heap"})) * 100 > 90 and sum by (instance)(jvm_memory_bytes_max{area="heap"}) > 0
       for: 5m
       labels:
         severity: critical
@@ -28,7 +28,9 @@
         description: "JVM is spending more than 5% of wall clock time in GC on {{ $labels.instance }}\n  VALUE = {{ $value }}"
 
     - alert: JvmOldGenGcFrequency
-      expr: rate(jvm_gc_collection_seconds_count{gc=~".*old.*|.*major.*"}[5m]) > 0.3
+      # Case-insensitive: the real label values are "G1 Old Generation" /
+      # "G1 Young Generation" -- a lowercase .*old.* matcher never matched.
+      expr: rate(jvm_gc_collection_seconds_count{gc=~"(?i).*old.*|.*major.*"}[5m]) > 0.3
       for: 5m
       labels:
         severity: warning
