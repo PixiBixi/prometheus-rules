@@ -219,7 +219,15 @@
         description: "Job {{ $labels.namespace }}/{{ $labels.job_name }} did not start for 10 minutes"
 
     - alert: KubernetesJobSlowCompletion
-      expr: kube_job_spec_completions - kube_job_status_succeeded - kube_job_status_failed > 0
+      # Since kube-state-metrics 2.1, kube_job_status_failed carries a `reason`
+      # label only when failed > 0. The label sets then diverge, the subtraction
+      # stops matching and the Job drops out of the result -- losing exactly the
+      # jobs that had partial failures. sum without (reason) keeps them.
+      expr: |
+        kube_job_spec_completions
+        - kube_job_status_succeeded
+        - sum without (reason) (kube_job_status_failed)
+        > 0
       for: 12h
       labels:
         severity: critical
@@ -229,7 +237,19 @@
 
     - alert: KubernetesCronjobFailing
       expr: |
-        (kube_cronjob_status_last_schedule_time > kube_cronjob_status_last_successful_time)
+        (
+          # Scheduled more recently than it last succeeded.
+          (kube_cronjob_status_last_schedule_time > kube_cronjob_status_last_successful_time)
+          or
+          # Or never succeeded at all: with no last_successful_time series the
+          # comparison above returns nothing, so the worst case -- a CronJob
+          # that has never once worked -- went undetected.
+          (
+            kube_cronjob_status_last_schedule_time > 0
+            unless
+            kube_cronjob_status_last_successful_time
+          )
+        )
         AND (kube_cronjob_status_active == 0)
         AND (kube_cronjob_spec_suspend == 0)
       # Race window between active dropping to 0 and lastSuccessfulTime being
@@ -352,8 +372,19 @@
         description: "API client on {{ $labels.instance }} is experiencing {{ $value | printf \"%.2f\" }}% error rate"
 
     - alert: KubernetesApiServerLatency
+      # `sum ... WITHOUT (subresource)` dropped a single label from the most
+      # cardinal metric the apiserver exposes, leaving code, resource, verb,
+      # scope, group, version, component, instance and job in place. That made
+      # the quantile both expensive and meaningless: a p99 *per HTTP code*, and
+      # 504s have a p99 above 1s by definition. Aggregate to (verb, le), scope
+      # to job="apiserver" like its neighbours, and exclude LIST, which is
+      # legitimately slow.
       expr: |
-        histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{verb!~"(?:CONNECT|WATCHLIST|WATCH|PROXY)"}[10m])) WITHOUT (subresource)) > 1
+        histogram_quantile(0.99,
+          sum by (verb, le) (
+            rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb!~"(?:CONNECT|WATCHLIST|WATCH|PROXY|LIST)"}[10m])
+          )
+        ) > 1
       for: 2m
       labels:
         severity: warning
