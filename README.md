@@ -109,7 +109,12 @@ I do use [Maven JMX Exporter](https://github.com/prometheus/jmx_exporter/)
 #### node-exporter
 
 **Exporter link :** [node_exporter](https://github.com/prometheus/node_exporter)
-**Version used :** 1.7.0
+**Version used :** 1.12.1
+
+> The collector list below includes `openvpn-client@.*`, but the node_exporter Ansible
+> role does not — verified against the live Prometheus, zero hosts collect an openvpn
+> unit. `DownSystemdOpenVPN` therefore has no series to match. Either add the pattern to
+> the role's `--collector.systemd.unit-include`, or drop the alert.
 
 You must enable custom collectors for node-exporter :
 ```
