@@ -1,0 +1,83 @@
+# Tests for rules/rabbitmq.rules.yml
+#
+# Fixture is a real scrape of RabbitMQ 4.3.4's built-in rabbitmq_prometheus
+# plugin on :15692 — there is no third-party exporter for modern RabbitMQ.
+# Memory metrics are rabbitmq_process_resident_memory_bytes and
+# rabbitmq_resident_memory_limit_bytes, not the node_mem_used/limit pair some
+# community alert sets use.
+rule_files:
+  - rabbitmq.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a memory alarm alerts immediately
+    input_series:
+      - series: 'rabbitmq_alarms_memory_used_watermark{instance="rmq1",job="rabbitmq"}'
+        values: '0 0 1 1 1 1 1 1'
+    alert_rule_test:
+      - alertname: RabbitmqMemoryAlarm
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels: {alertname: RabbitmqMemoryAlarm, instance: rmq1, job: rabbitmq, severity: critical}
+            exp_annotations:
+              summary: "RabbitMQ memory alarm on rmq1 — publishers blocked"
+              description: "RabbitMQ on rmq1 has crossed its memory watermark and is blocking all publishing connections."
+
+  - interval: 1m
+    name: a healthy broker raises no alarm
+    input_series:
+      - series: 'rabbitmq_alarms_memory_used_watermark{instance="rmq1",job="rabbitmq"}'
+        values: '0x10'
+      - series: 'rabbitmq_alarms_free_disk_space_watermark{instance="rmq1",job="rabbitmq"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: RabbitmqMemoryAlarm
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: RabbitmqDiskAlarm
+        eval_time: 5m
+        exp_alerts: []
+
+  - interval: 1m
+    name: file descriptors near the limit alert
+    input_series:
+      - series: 'rabbitmq_process_open_fds{instance="rmq1",job="rabbitmq"}'
+        values: '900x20'
+      - series: 'rabbitmq_process_max_fds{instance="rmq1",job="rabbitmq"}'
+        values: '1024x20'
+    alert_rule_test:
+      - alertname: RabbitmqFileDescriptorsSaturation
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels: {alertname: RabbitmqFileDescriptorsSaturation, instance: rmq1, job: rabbitmq, severity: critical}
+            exp_annotations:
+              summary: "RabbitMQ file descriptors near limit on rmq1 (87.89%)"
+              description: "More than 80% of the file descriptor limit is in use on rmq1. Connections will be dropped at the limit."
+
+  - interval: 1m
+    name: a zero fd limit does not produce +Inf
+    input_series:
+      - series: 'rabbitmq_process_open_fds{instance="rmq1",job="rabbitmq"}'
+        values: '900x20'
+      - series: 'rabbitmq_process_max_fds{instance="rmq1",job="rabbitmq"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: RabbitmqFileDescriptorsSaturation
+        eval_time: 15m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a queue backlog alerts
+    input_series:
+      - series: 'rabbitmq_queue_messages_ready{instance="rmq1",job="rabbitmq"}'
+        values: '25000x25'
+    alert_rule_test:
+      - alertname: RabbitmqQueueBacklog
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels: {alertname: RabbitmqQueueBacklog, instance: rmq1, job: rabbitmq, severity: warning}
+            exp_annotations:
+              summary: "RabbitMQ backlog of 25k ready messages on rmq1"
+              description: "Messages are accumulating faster than consumers drain them on rmq1."
