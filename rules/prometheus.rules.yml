@@ -32,13 +32,13 @@
       labels:
         severity: warning
       annotations:
-        summary: "Errors while sending alerts from Prometheus {{ $labels.instance }} to Alertmanager {{ $labels.Alertmanager }}"
+        summary: "Errors while sending alerts from Prometheus {{ $labels.instance }} to Alertmanager {{ $labels.alertmanager }}"
     - alert: PrometheusJobMissing
       expr: absent(up{job="prometheus"})
       labels:
         severity: warning
       annotations:
-        summary: "Prometheus job missing (instance {{ $labels.instance }})"
+        summary: "Prometheus job missing (job {{ $labels.job }})"
         description: "A Prometheus job has disappeared"
     - alert: PrometheusTargetMissing
       # Scoped to the monitoring stack itself. This used to be unscoped and
@@ -66,10 +66,10 @@
       labels:
         severity: warning
       annotations:
-        summary: "Prometheus AlertManager job missing (instance {{ $labels.instance }})"
+        summary: "Prometheus AlertManager job missing (job {{ $labels.job }})"
         description: "A Prometheus AlertManager job has disappeared"
     - alert: PrometheusTooManyRestarts
-      expr: changes(process_start_time_seconds{job=~"prometheus|pushgateway|alertmanager"}[15m]) > 2
+      expr: changes(process_start_time_seconds{job=~"prometheus|.*pushgateway|alertmanager"}[15m]) > 2
       labels:
         severity: warning
       annotations:
@@ -83,14 +83,20 @@
         summary: "Prometheus AlertManager configuration reload failure (instance {{ $labels.instance }})"
         description: "AlertManager configuration reload error"
     - alert: PrometheusAlertmanagerConfigNotSynced
-      expr: count(count_values("config_hash", alertmanager_config_hash)) > 1
+      # Aggregated per job: two independent Alertmanager clusters legitimately
+      # run different configs. The for: rides out the few seconds of divergence
+      # during a rolling config update.
+      expr: count by (job) (count_values by (job) ("config_hash", alertmanager_config_hash)) > 1
+      for: 15m
       labels:
         severity: warning
       annotations:
         summary: "Prometheus AlertManager config not synced (instance {{ $labels.instance }})"
         description: "Configurations of AlertManager cluster instances are out of sync"
     - alert: PrometheusNotConnectedToAlertmanager
+      # Transient during an Alertmanager service-discovery refresh.
       expr: prometheus_notifications_alertmanagers_discovered < 1
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -131,14 +137,17 @@
         severity: critical
       annotations:
         summary: "Prometheus AlertManager notification failing (instance {{ $labels.instance }})"
-        description: "Alertmanager is failing sending notifications ({{ $value | humanizePercentage }} failure rate)"
+        description: "Alertmanager is failing sending notifications ({{ $value | humanize }} failures/s)"
     - alert: PrometheusTargetEmpty
+      # Per-SD-config gauge, not global: a podMonitor over a namespace with
+      # nothing deployed yet legitimately discovers zero targets.
       expr: prometheus_sd_discovered_targets == 0
+      for: 30m
       labels:
-        severity: critical
+        severity: warning
       annotations:
-        summary: "Prometheus target empty (instance {{ $labels.instance }})"
-        description: "Prometheus has no target in service discovery"
+        summary: "Prometheus target empty (instance {{ $labels.instance }}, config {{ $labels.config }})"
+        description: "SD config {{ $labels.config }} on {{ $labels.instance }} has discovered no target for 30 minutes"
     - alert: PrometheusTargetScrapingSlow
       # This summary only exposes objectives 0.01 / 0.05 / 0.5 -- quantile="0.9"
       # matched nothing and the alert was dead. Compare the median against the
@@ -166,49 +175,49 @@
         summary: "Prometheus target scrape duplicate (instance {{ $labels.instance }})"
         description: "Prometheus has many samples rejected due to duplicate timestamps but different values ({{ $value }} samples)"
     - alert: PrometheusTsdbCheckpointCreationFailures
-      expr: increase(prometheus_tsdb_checkpoint_creations_failed_total[1m]) > 0
+      expr: increase(prometheus_tsdb_checkpoint_creations_failed_total[5m]) > 0
       labels:
         severity: critical
       annotations:
         summary: "Prometheus TSDB checkpoint creation failures (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} checkpoint creation failures"
     - alert: PrometheusTsdbCheckpointDeletionFailures
-      expr: increase(prometheus_tsdb_checkpoint_deletions_failed_total[1m]) > 0
+      expr: increase(prometheus_tsdb_checkpoint_deletions_failed_total[5m]) > 0
       labels:
         severity: critical
       annotations:
         summary: "Prometheus TSDB checkpoint deletion failures (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} checkpoint deletion failures"
     - alert: PrometheusTsdbCompactionsFailed
-      expr: increase(prometheus_tsdb_compactions_failed_total[1m]) > 0
+      expr: increase(prometheus_tsdb_compactions_failed_total[5m]) > 0
       labels:
         severity: critical
       annotations:
         summary: "Prometheus TSDB compactions failed (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} TSDB compactions failures"
     - alert: PrometheusTsdbHeadTruncationsFailed
-      expr: increase(prometheus_tsdb_head_truncations_failed_total[1m]) > 0
+      expr: increase(prometheus_tsdb_head_truncations_failed_total[5m]) > 0
       labels:
         severity: critical
       annotations:
         summary: "Prometheus TSDB head truncations failed (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} TSDB head truncation failures"
     - alert: PrometheusTsdbReloadFailures
-      expr: increase(prometheus_tsdb_reloads_failures_total[1m]) > 0
+      expr: increase(prometheus_tsdb_reloads_failures_total[5m]) > 0
       labels:
         severity: critical
       annotations:
         summary: "Prometheus TSDB reload failures (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} TSDB reload failures"
     - alert: PrometheusTsdbWalCorruptions
-      expr: increase(prometheus_tsdb_wal_corruptions_total[1m]) > 0
+      expr: increase(prometheus_tsdb_wal_corruptions_total[5m]) > 0
       labels:
         severity: critical
       annotations:
         summary: "Prometheus TSDB WAL corruptions (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} TSDB WAL corruptions"
     - alert: PrometheusTsdbWalTruncationsFailed
-      expr: increase(prometheus_tsdb_wal_truncations_failed_total[1m]) > 0
+      expr: increase(prometheus_tsdb_wal_truncations_failed_total[5m]) > 0
       labels:
         severity: critical
       annotations:
@@ -268,12 +277,14 @@
         summary: "Prometheus TSDB out-of-bound samples (instance {{ $labels.instance }})"
         description: "Prometheus is rejecting samples with timestamps too old or too far in the future ({{ $value | humanize }}/s). Check target clocks."
     - alert: PrometheusTargetLimitExceeded
+      # prometheus_target_scrape_pool_exceeded_target_limit_total carries no
+      # labels, so the annotation cannot name the offending pool.
       expr: increase(prometheus_target_scrape_pool_exceeded_target_limit_total[5m]) > 0
       labels:
         severity: warning
       annotations:
         summary: "Prometheus scrape pool target limit exceeded (instance {{ $labels.instance }})"
-        description: "Prometheus is silently dropping targets in job {{ $labels.scrape_job }} because the target limit was exceeded."
+        description: "Prometheus is silently dropping targets in job {{ $labels.instance }} because the target limit was exceeded."
     - alert: PrometheusScrapedBodySizeExceeded
       expr: rate(prometheus_target_scrapes_exceeded_body_size_limit_total[5m]) > 0
       labels:
