@@ -4,9 +4,17 @@
 
     - alert: HAproxyDown
       expr: |
-        group by (job, instance) (last_over_time(up{job=~".*haproxy.*"}[1h]))
-        unless
-        group by (job, instance) (last_over_time(up{job=~".*haproxy.*"}[5m]))
+        # Two distinct failure modes: a failing scrape (up == 0, exporter crashed
+        # or host unreachable) and the target vanishing from service discovery,
+        # where no up series exists to be 0. Both branches are grouped
+        # identically so the alert carries the same labels either way.
+        group by (job, instance) (up{job=~".*haproxy.*"} == 0)
+        or
+        (
+          group by (job, instance) (last_over_time(up{job=~".*haproxy.*"}[1h]))
+          unless
+          group by (job, instance) (last_over_time(up{job=~".*haproxy.*"}[5m]))
+        )
       for: 5m
       labels:
         severity: critical

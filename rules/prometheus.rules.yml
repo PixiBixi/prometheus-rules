@@ -2,9 +2,17 @@
   rules:
     - alert: PushGatewayDown
       expr: |
-        group by (job, instance) (last_over_time(up{job="prometheus-pushgateway"}[1h]))
-        unless
-        group by (job, instance) (last_over_time(up{job="prometheus-pushgateway"}[2m]))
+        # Two distinct failure modes: a failing scrape (up == 0, exporter crashed
+        # or host unreachable) and the target vanishing from service discovery,
+        # where no up series exists to be 0. Both branches are grouped
+        # identically so the alert carries the same labels either way.
+        group by (job, instance) (up{job="prometheus-pushgateway"} == 0)
+        or
+        (
+          group by (job, instance) (last_over_time(up{job="prometheus-pushgateway"}[1h]))
+          unless
+          group by (job, instance) (last_over_time(up{job="prometheus-pushgateway"}[2m]))
+        )
       for: 2m
       labels:
         severity: critical
@@ -33,7 +41,12 @@
         summary: "Prometheus job missing (instance {{ $labels.instance }})"
         description: "A Prometheus job has disappeared"
     - alert: PrometheusTargetMissing
-      expr: up == 0 unless on(job) (sum by (job) (up) == 0)
+      # Scoped to the monitoring stack itself. This used to be unscoped and
+      # acted as the only real `up == 0` net for every exporter in the repo,
+      # since the per-exporter watchdogs only detected targets vanishing from
+      # service discovery. Those now cover both cases under their own names,
+      # so an unscoped net here would just double-notify without a runbook.
+      expr: up{job=~"prometheus|alertmanager|.*pushgateway"} == 0 unless on(job) (sum by (job) (up) == 0)
       for: 1m
       labels:
         severity: critical
