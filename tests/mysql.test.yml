@@ -1,0 +1,69 @@
+# Regression tests for rules/mysql.rules.yml
+#
+# MysqlConnectionErrors summed every error type away and paged critical on the
+# first error of any kind, so a transient tcpwrap or DNS blip was
+# indistinguishable from a saturated connection limit.
+rule_files:
+  - mysql.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a saturated connection limit pages critical and names the type
+    input_series:
+      - series: 'mysql_global_status_connection_errors_total{error="max_connections",job="mysql",instance="db1"}'
+        values: '0+6x20'
+    alert_rule_test:
+      - alertname: MysqlConnectionErrorsCritical
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: MysqlConnectionErrorsCritical
+              job: mysql
+              instance: db1
+              error: max_connections
+              severity: critical
+            exp_annotations:
+              summary: "MySQL connection errors (max_connections) on db1"
+              description: "db1 of job mysql is rejecting connections (max_connections) — clients are being refused"
+      - alertname: MysqlConnectionErrors
+        eval_time: 10m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a transient tcpwrap error is a warning, not a page
+    input_series:
+      - series: 'mysql_global_status_connection_errors_total{error="tcpwrap",job="mysql",instance="db1"}'
+        values: '0+6x20'
+    alert_rule_test:
+      - alertname: MysqlConnectionErrorsCritical
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: MysqlConnectionErrors
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: MysqlConnectionErrors
+              job: mysql
+              instance: db1
+              error: tcpwrap
+              severity: warning
+            exp_annotations:
+              summary: "MySQL connection errors (tcpwrap) on db1"
+              description: "db1 of job mysql has connection errors of type tcpwrap (0.1/s)"
+
+  - interval: 1m
+    name: a healthy server raises nothing
+    input_series:
+      - series: 'mysql_global_status_connection_errors_total{error="max_connections",job="mysql",instance="db1"}'
+        values: '0x20'
+      - series: 'mysql_global_status_connection_errors_total{error="tcpwrap",job="mysql",instance="db1"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: MysqlConnectionErrorsCritical
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: MysqlConnectionErrors
+        eval_time: 10m
+        exp_alerts: []

@@ -35,17 +35,40 @@
       annotations:
         description: "Mysql on {{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
         summary: "Mysql having an issue on {{ $labels.instance }}"
-    - alert: MysqlConnectionErrors
-      expr: sum(rate(mysql_global_status_connection_errors_total[5m])) by (job,instance) > 0
+    # Split by error type. The previous single alert summed every type away and
+    # paged critical on the first error of any kind, so the operator could not
+    # tell a saturated connection limit from a transient tcpwrap or DNS blip.
+    # The fixture exposes: accept, internal, max_connections, peer_address,
+    # select, tcpwrap.
+    - alert: MysqlConnectionErrorsCritical
+      expr: |
+        sum by (job,instance,error) (
+          rate(mysql_global_status_connection_errors_total{error=~"max_connections|internal"}[5m])
+        ) > 0
       for: 2m
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} has connection errors"
-        summary: "{{ $labels.instance }} has connection errors for more than 2 minutes. {{ $value }}"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} is rejecting connections ({{ $labels.error }}) — clients are being refused"
+        summary: "MySQL connection errors ({{ $labels.error }}) on {{ $labels.instance }}"
+    - alert: MysqlConnectionErrors
+      expr: |
+        sum by (job,instance,error) (
+          rate(mysql_global_status_connection_errors_total{error!~"max_connections|internal"}[5m])
+        ) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has connection errors of type {{ $labels.error }} ({{ $value }}/s)"
+        summary: "MySQL connection errors ({{ $labels.error }}) on {{ $labels.instance }}"
 
     # Galera
     - alert: GaleraWrongSize
+      # Assumes a 3-node cluster. Not portable as written: on a 5- or 7-node
+      # cluster this only fires once the cluster is already below quorum.
+      # Left as-is because the right threshold is a deployment decision, but
+      # adjust it if your clusters are not three nodes.
       expr: sum(mysql_global_status_wsrep_cluster_size) by (job,instance) < 3
       for: 2m
       labels:
