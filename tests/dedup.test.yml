@@ -1,0 +1,82 @@
+# Regression tests for the two de-duplicated alert pairs.
+#
+# Both were exact functional duplicates that double-notified on a single
+# incident. These tests assert the survivor still covers the case, and pin the
+# merged thresholds so a future edit cannot silently reintroduce the weaker
+# variant.
+rule_files:
+  - blackbox.rules.yml
+  - certs.rules.yml
+  - postgresql.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # TargetDown (certs) was identical to BlackboxProbeFailed (blackbox).
+  - interval: 1m
+    name: a failing probe raises exactly one alert
+    input_series:
+      - series: 'probe_success{job="blackbox-http",instance="https://example.com"}'
+        values: '0x10'
+    promql_expr_test:
+      - expr: 'count(ALERTS{alertstate="firing",alertname=~"BlackboxProbeFailed|TargetDown"})'
+        eval_time: 5m
+        exp_samples:
+          - labels: '{}'
+            value: 1
+    alert_rule_test:
+      - alertname: BlackboxProbeFailed
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: BlackboxProbeFailed
+              job: blackbox-http
+              instance: "https://example.com"
+              severity: critical
+            exp_annotations:
+              summary: "Blackbox probe failed — blackbox-http @ https://example.com"
+              description: "Probe blackbox-http failed on https://example.com"
+
+  # PostgresDeadlockHigh was merged into PostgresqlDeadLocks.
+  - interval: 1m
+    name: a deadlocking database raises exactly one alert
+    input_series:
+      # 0.6 deadlocks/min against 120 commits/min -> 0.5% of commits, over the
+      # 0.1% threshold, and well past the > 50 commits floor over 5m.
+      - series: 'pg_stat_database_deadlocks{datname="mydb",datid="1",server="pg1:5432",instance="pg1",job="pg"}'
+        values: '0+0.6x20'
+      - series: 'pg_stat_database_xact_commit{datname="mydb",datid="1",server="pg1:5432",instance="pg1",job="pg"}'
+        values: '0+120x20'
+    promql_expr_test:
+      - expr: 'count(ALERTS{alertstate="firing",alertname=~"PostgresqlDeadLocks|PostgresDeadlockHigh"})'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{}'
+            value: 1
+
+  # The system-database filter kept from PostgresqlDeadLocks must survive.
+  - interval: 1m
+    name: deadlocks in template databases are ignored
+    input_series:
+      - series: 'pg_stat_database_deadlocks{datname="template1",datid="1",server="pg1:5432",instance="pg1",job="pg"}'
+        values: '0+0.6x20'
+      - series: 'pg_stat_database_xact_commit{datname="template1",datid="1",server="pg1:5432",instance="pg1",job="pg"}'
+        values: '0+120x20'
+    alert_rule_test:
+      - alertname: PostgresqlDeadLocks
+        eval_time: 10m
+        exp_alerts: []
+
+  # The > 50 commits floor kept from PostgresDeadlockHigh must survive: a
+  # near-idle database should not alert on a single deadlock.
+  - interval: 1m
+    name: a near-idle database does not alert on one deadlock
+    input_series:
+      - series: 'pg_stat_database_deadlocks{datname="mydb",datid="1",server="pg1:5432",instance="pg1",job="pg"}'
+        values: '0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+      - series: 'pg_stat_database_xact_commit{datname="mydb",datid="1",server="pg1:5432",instance="pg1",job="pg"}'
+        values: '0+2x20'
+    alert_rule_test:
+      - alertname: PostgresqlDeadLocks
+        eval_time: 10m
+        exp_alerts: []

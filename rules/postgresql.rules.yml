@@ -112,20 +112,23 @@
     # was dead. Removed rather than repaired, to avoid a third duplicate.
 
     - alert: PostgresqlDeadLocks
+      # Merged with the former PostgresDeadlockHigh, which computed the same
+      # ratio: keeps this rule's system-database filter, and that one's 5m
+      # window and > 50 commit floor (both steadier than 1m / > 10).
       expr: |
         (
-          increase(pg_stat_database_deadlocks{datname!~"template.*|postgres",datid!="0"}[1m])
+          increase(pg_stat_database_deadlocks{datname!~"template.*|postgres",datid!="0"}[5m])
           /
-          increase(pg_stat_database_xact_commit{datname!~"template.*|postgres",datid!="0"}[1m])
+          increase(pg_stat_database_xact_commit{datname!~"template.*|postgres",datid!="0"}[5m])
         ) > 0.001
         and
-        increase(pg_stat_database_xact_commit{datname!~"template.*|postgres",datid!="0"}[1m]) > 10
+        increase(pg_stat_database_xact_commit{datname!~"template.*|postgres",datid!="0"}[5m]) > 50
       for: 0m
       labels:
         severity: warning
       annotations:
         summary: "PostgreSQL dead locks (instance {{ $labels.instance }})"
-        description: "Deadlock rate above 0.1% of commits on {{ $labels.instance }}/{{ $labels.datname }} ({{ $value | humanizePercentage }})"
+        description: "Deadlock rate above 0.1% of commits on {{ $labels.instance }}/{{ $labels.datname }} over 5m ({{ $value | humanizePercentage }})"
 
     - alert: PostgresqlHighRollbackRate
       expr: |
@@ -274,21 +277,9 @@
         summary: "PostgreSQL connections saturation (server {{ $labels.server }})"
         description: "PostgreSQL connection usage above 80% of max_connections on {{ $labels.server }}."
 
-    - alert: PostgresDeadlockHigh
-      expr: |
-        (
-          increase(pg_stat_database_deadlocks[5m])
-          /
-          increase(pg_stat_database_xact_commit[5m])
-        ) > 0.001
-        and
-        increase(pg_stat_database_xact_commit[5m]) > 50
-      for: 0m
-      labels:
-        severity: warning
-      annotations:
-        summary: "PostgreSQL deadlock high (database {{ $labels.datname }})"
-        description: "Deadlock rate above 0.1% of commits on database {{ $labels.datname }} ({{ $value | humanizePercentage }})"
+    # PostgresDeadlockHigh was merged into PostgresqlDeadLocks above: same ratio,
+    # same threshold, same severity. Its 5m window and > 50 commit floor were
+    # kept; it lacked the template/postgres exclusion.
 
     - alert: PostgresChecksumFailures
       expr: increase(pg_stat_database_checksum_failures[5m]) > 0
