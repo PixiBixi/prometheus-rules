@@ -206,12 +206,14 @@
         summary: "Prometheus timeseries cardinality (instance {{ $labels.instance }})"
         description: "The \"{{ $labels.name }}\" timeseries cardinality is getting very high: {{ $value }}"
     - alert: PrometheusRemoteWriteDroppedSamples
-      expr: rate(prometheus_remote_storage_samples_dropped_total[5m]) > 0
+      # reason="dropped_series" is intentional filtering via write_relabel_configs,
+      # not an incident -- excluding it keeps this alert about genuine sample loss.
+      expr: rate(prometheus_remote_storage_samples_dropped_total{reason!="dropped_series"}[5m]) > 0
       labels:
         severity: critical
       annotations:
         summary: "Prometheus remote write dropping samples (instance {{ $labels.instance }})"
-        description: "Prometheus is dropping samples for remote_name={{ $labels.remote_name }} ({{ $value | humanize }} samples/s lost)"
+        description: "Prometheus is dropping samples for remote_name={{ $labels.remote_name }}, reason={{ $labels.reason }} ({{ $value | humanize }} samples/s lost)"
     - alert: PrometheusRemoteWriteFailed
       expr: rate(prometheus_remote_storage_samples_failed_total[5m]) > 0
       labels:
