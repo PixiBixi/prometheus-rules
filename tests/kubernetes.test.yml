@@ -69,3 +69,70 @@ tests:
             exp_annotations:
               summary: "Kubernetes Job running too long (batch/etl-1)"
               description: "Job batch/etl-1 is taking more than 1 hour to complete"
+
+  # A pod left behind in Failed by a completed Job stays in that phase forever.
+  - interval: 1m
+    name: a Failed pod left by a Job does not page as unhealthy
+    input_series:
+      - series: 'kube_pod_status_phase{phase="Failed",namespace="batch",pod="etl-abc",job="ksm",instance="ksm"}'
+        values: '1x40'
+    alert_rule_test:
+      - alertname: KubernetesPodNotHealthy
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a genuinely Pending pod still pages
+    input_series:
+      - series: 'kube_pod_status_phase{phase="Pending",namespace="app",pod="web-1",job="ksm",instance="ksm"}'
+        values: '1x40'
+    alert_rule_test:
+      - alertname: KubernetesPodNotHealthy
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels: {alertname: KubernetesPodNotHealthy, namespace: app, pod: web-1, severity: critical}
+            exp_annotations:
+              summary: "Kubernetes pod not healthy (app/web-1)"
+              description: "Pod app/web-1 has been in a non-running state for more than 15 minutes"
+
+  # A Job that failed once then succeeded on retry should not keep paging.
+  - interval: 1m
+    name: a Job that succeeded after a retry does not page
+    input_series:
+      - series: 'kube_job_status_failed{namespace="batch",job_name="etl-1",job="ksm",instance="ksm"}'
+        values: '1x20'
+      - series: 'kube_job_status_succeeded{namespace="batch",job_name="etl-1",job="ksm",instance="ksm"}'
+        values: '1x20'
+    alert_rule_test:
+      - alertname: KubernetesJobFailed
+        eval_time: 10m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a Job that only ever failed still pages
+    input_series:
+      - series: 'kube_job_status_failed{namespace="batch",job_name="etl-2",job="ksm",instance="ksm"}'
+        values: '1x20'
+      - series: 'kube_job_status_succeeded{namespace="batch",job_name="etl-2",job="ksm",instance="ksm"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: KubernetesJobFailed
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels: {alertname: KubernetesJobFailed, namespace: batch, job_name: etl-2, job: ksm, instance: ksm, severity: warning}
+            exp_annotations:
+              summary: "Kubernetes job failed (batch/etl-2)"
+              description: "Job batch/etl-2 failed to complete"
+
+  # A volume with plenty of headroom should not page on one transient dip.
+  - interval: 1m
+    name: a mostly-empty volume does not page on a transient write burst
+    input_series:
+      - series: 'kubelet_volume_stats_available_bytes{namespace="app",persistentvolumeclaim="data",job="kubelet",instance="n1"}'
+        values: '900-1x60'
+      - series: 'kubelet_volume_stats_capacity_bytes{namespace="app",persistentvolumeclaim="data",job="kubelet",instance="n1"}'
+        values: '1000x60'
+    alert_rule_test:
+      - alertname: KubernetesVolumeFullInFourDays
+        eval_time: 50m
+        exp_alerts: []

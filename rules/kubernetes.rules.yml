@@ -64,7 +64,9 @@
     # ── Pods & Containers ─────────────────────────────────────────────────────
 
     - alert: KubernetesPodNotHealthy
-      expr: sum by (namespace, pod) (kube_pod_status_phase{phase=~"Pending|Unknown|Failed"}) > 0
+      # Failed is excluded: pods left behind by Jobs stay in that phase forever,
+      # making this permanent. Job failures are covered by KubernetesJobFailed.
+      expr: sum by (namespace, pod) (kube_pod_status_phase{phase=~"Pending|Unknown"}) > 0
       for: 15m
       labels:
         severity: critical
@@ -73,13 +75,15 @@
         description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-running state for more than 15 minutes"
 
     - alert: KubernetesPodCrashLooping
-      expr: increase(kube_pod_container_status_restarts_total[1m]) > 3
+      # [1m] holds 1-2 kube-state-metrics scrapes; increase() needs at least two
+      # points and extrapolates heavily over so few.
+      expr: increase(kube_pod_container_status_restarts_total[15m]) > 3
       for: 2m
       labels:
         severity: warning
       annotations:
         summary: "Kubernetes pod crash looping ({{ $labels.namespace }}/{{ $labels.pod }})"
-        description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container }} is crash looping ({{ $value }} restarts/min)"
+        description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container }} is crash looping ({{ $value | printf \"%.0f\" }} restarts in 15m)"
 
     - alert: KubernetesContainerOomKiller
       expr: |
@@ -114,7 +118,9 @@
 
     - alert: KubernetesStatefulsetDown
       expr: kube_statefulset_replicas != kube_statefulset_status_replicas_ready > 0
-      for: 1m
+      # A StatefulSet rolls pod by pod and routinely exceeds a minute; for: 1m
+      # paged on every normal deployment.
+      for: 10m
       labels:
         severity: critical
       annotations:
@@ -143,6 +149,10 @@
       expr: |
         max without (revision) (kube_statefulset_status_current_revision unless kube_statefulset_status_update_revision)
         * (kube_statefulset_replicas != kube_statefulset_status_replicas_updated)
+        and
+        # Both conditions above are true by definition during any rolling update.
+        # Only alert once the rollout has stopped making progress.
+        (changes(kube_statefulset_status_replicas_updated[5m]) == 0)
       for: 10m
       labels:
         severity: warning
@@ -185,7 +195,9 @@
     # ── Jobs & CronJobs ───────────────────────────────────────────────────────
 
     - alert: KubernetesJobFailed
-      expr: kube_job_status_failed > 0
+      # Stays true for as long as the Job object exists -- indefinitely without
+      # ttlSecondsAfterFinished -- and fired even when a retry later succeeded.
+      expr: kube_job_status_failed > 0 and kube_job_status_succeeded == 0
       for: 0m
       labels:
         severity: warning
@@ -220,7 +232,9 @@
         (kube_cronjob_status_last_schedule_time > kube_cronjob_status_last_successful_time)
         AND (kube_cronjob_status_active == 0)
         AND (kube_cronjob_spec_suspend == 0)
-      for: 0m
+      # Race window between active dropping to 0 and lastSuccessfulTime being
+      # updated; for: 0m flapped on every successful run.
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -244,12 +258,14 @@
 
     - alert: KubernetesPersistentvolumeclaimPending
       expr: kube_persistentvolumeclaim_status_phase{phase="Pending"} == 1
-      for: 2m
+      # volumeBindingMode: WaitForFirstConsumer (the default on GKE/EKS/AKS)
+      # legitimately leaves a PVC Pending until a pod consumes it.
+      for: 15m
       labels:
         severity: warning
       annotations:
         summary: "Kubernetes PVC pending ({{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }})"
-        description: "PersistentVolumeClaim {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has been pending for more than 2 minutes"
+        description: "PersistentVolumeClaim {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has been pending for more than 15 minutes"
 
     - alert: KubernetesVolumeOutOfDiskSpace
       expr: kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes * 100 < 10 and kubelet_volume_stats_capacity_bytes > 0
@@ -261,7 +277,11 @@
         description: "Volume {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has less than 10% free space ({{ $value | printf \"%.1f\" }}%)"
 
     - alert: KubernetesVolumeFullInFourDays
-      expr: predict_linear(kubelet_volume_stats_available_bytes[6h:5m], 4 * 24 * 3600) < 0
+      # The subquery re-samples a plain gauge for nothing. The fill guard stops a
+      # volume that is 90% empty from paging on one transient write burst.
+      expr: |
+        kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes < 0.15
+        and predict_linear(kubelet_volume_stats_available_bytes[6h], 4 * 24 * 3600) < 0
       for: 0m
       labels:
         severity: critical
@@ -294,7 +314,9 @@
 
     - alert: KubernetesHpaMetricsUnavailability
       expr: kube_horizontalpodautoscaler_status_condition{status="false", condition="ScalingActive"} == 1
-      for: 0m
+      # ScalingActive=false is the normal state of an HPA whose target is scaled
+      # to zero, and is transient while metrics-server starts.
+      for: 15m
       labels:
         severity: warning
       annotations:
@@ -305,9 +327,9 @@
 
     - alert: KubernetesApiServerErrors
       expr: |
-        sum(rate(apiserver_request_total{job="apiserver",code=~"5.."}[1m])) by (instance, job)
-        / sum(rate(apiserver_request_total{job="apiserver"}[1m])) by (instance, job) * 100 > 3
-        and sum(rate(apiserver_request_total{job="apiserver"}[1m])) by (instance, job) > 0
+        sum(rate(apiserver_request_total{job="apiserver",code=~"5.."}[5m])) by (instance, job)
+        / sum(rate(apiserver_request_total{job="apiserver"}[5m])) by (instance, job) * 100 > 3
+        and sum(rate(apiserver_request_total{job="apiserver"}[5m])) by (instance, job) > 0
       for: 2m
       labels:
         severity: critical
@@ -316,10 +338,12 @@
         description: "Kubernetes API server is experiencing {{ $value | printf \"%.2f\" }}% error rate on {{ $labels.instance }}"
 
     - alert: KubernetesApiClientErrors
+      # 4xx are client-go's nominal regime: 404 from reconcile loops, 409 from
+      # optimistic-concurrency retries. Only 5xx indicate a real problem.
       expr: |
-        (sum(rate(rest_client_requests_total{code=~"(4|5).."}[1m])) by (instance, job)
-        / sum(rate(rest_client_requests_total[1m])) by (instance, job)) * 100 > 1
-        and sum(rate(rest_client_requests_total[1m])) by (instance, job) > 0
+        (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (instance, job)
+        / sum(rate(rest_client_requests_total[5m])) by (instance, job)) * 100 > 1
+        and sum(rate(rest_client_requests_total[5m])) by (instance, job) > 0
       for: 2m
       labels:
         severity: critical
