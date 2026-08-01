@@ -136,3 +136,72 @@ tests:
       - alertname: KubernetesVolumeFullInFourDays
         eval_time: 50m
         exp_alerts: []
+
+  # A CronJob that has never once succeeded has no last_successful_time series,
+  # so the `last_schedule > last_successful` comparison returned nothing and the
+  # worst case went undetected.
+  - interval: 1m
+    name: a CronJob that never succeeded is detected
+    input_series:
+      - series: 'kube_cronjob_status_last_schedule_time{namespace="batch",cronjob="nightly",job="ksm",instance="ksm"}'
+        values: '1000x20'
+      - series: 'kube_cronjob_status_active{namespace="batch",cronjob="nightly",job="ksm",instance="ksm"}'
+        values: '0x20'
+      - series: 'kube_cronjob_spec_suspend{namespace="batch",cronjob="nightly",job="ksm",instance="ksm"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: KubernetesCronjobFailing
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesCronjobFailing
+              namespace: batch
+              cronjob: nightly
+              job: ksm
+              instance: ksm
+              severity: critical
+            exp_annotations:
+              summary: "Kubernetes CronJob failing (batch/nightly)"
+              description: "CronJob batch/nightly last schedule did not complete successfully"
+
+  - interval: 1m
+    name: a CronJob that succeeded after its last schedule is quiet
+    input_series:
+      - series: 'kube_cronjob_status_last_schedule_time{namespace="batch",cronjob="ok",job="ksm",instance="ksm"}'
+        values: '1000x20'
+      - series: 'kube_cronjob_status_last_successful_time{namespace="batch",cronjob="ok",job="ksm",instance="ksm"}'
+        values: '1100x20'
+      - series: 'kube_cronjob_status_active{namespace="batch",cronjob="ok",job="ksm",instance="ksm"}'
+        values: '0x20'
+      - series: 'kube_cronjob_spec_suspend{namespace="batch",cronjob="ok",job="ksm",instance="ksm"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: KubernetesCronjobFailing
+        eval_time: 10m
+        exp_alerts: []
+
+  # kube_job_status_failed gains a `reason` label once failed > 0, which broke
+  # the subtraction and dropped partially-failed jobs from the result.
+  - interval: 1m
+    name: a job with partial failures stays visible to the completion check
+    input_series:
+      - series: 'kube_job_spec_completions{namespace="batch",job_name="etl",job="ksm",instance="ksm"}'
+        values: '5x800'
+      - series: 'kube_job_status_succeeded{namespace="batch",job_name="etl",job="ksm",instance="ksm"}'
+        values: '2x800'
+      - series: 'kube_job_status_failed{namespace="batch",job_name="etl",job="ksm",instance="ksm",reason="BackoffLimitExceeded"}'
+        values: '1x800'
+    alert_rule_test:
+      - alertname: KubernetesJobSlowCompletion
+        eval_time: 13h
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesJobSlowCompletion
+              namespace: batch
+              job_name: etl
+              job: ksm
+              instance: ksm
+              severity: critical
+            exp_annotations:
+              summary: "Kubernetes job slow completion (batch/etl)"
+              description: "Job batch/etl did not complete within 12 hours"
