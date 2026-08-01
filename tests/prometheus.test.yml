@@ -1,0 +1,62 @@
+# Regression tests for rules/prometheus.rules.yml
+rule_files:
+  - prometheus.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # PrometheusTargetScrapingSlow divided quantile="0.9" by quantile="0.5", but
+  # this summary only publishes objectives 0.01 / 0.05 / 0.5.
+  - interval: 1m
+    name: slow scraping is detected using the exposed quantiles
+    input_series:
+      - series: 'prometheus_target_interval_length_seconds{quantile="0.5",interval="10s",instance="p1",job="prometheus"}'
+        values: '12x10'
+      - series: 'prometheus_target_interval_length_seconds{quantile="0.01",interval="10s",instance="p1",job="prometheus"}'
+        values: '10x10'
+    alert_rule_test:
+      - alertname: PrometheusTargetScrapingSlow
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusTargetScrapingSlow
+              interval: 10s
+              instance: p1
+              job: prometheus
+              severity: warning
+            exp_annotations:
+              summary: "Prometheus target scraping slow (instance p1)"
+              description: "Prometheus is scraping exporters slowly since it exceeded the requested interval time. Your Prometheus server is under-provisioned."
+
+  # reason="dropped_series" is deliberate write_relabel_configs filtering, not
+  # data loss. Alerting on the unfiltered rate made this a permanent critical.
+  - interval: 1m
+    name: relabel-dropped samples do not raise remote-write alerts
+    input_series:
+      - series: 'prometheus_remote_storage_samples_dropped_total{instance="p1",job="prom",remote_name="thanos",url="https://x",reason="dropped_series"}'
+        values: '0+1000x10'
+    alert_rule_test:
+      - alertname: PrometheusRemoteWriteDroppedSamples
+        eval_time: 8m
+        exp_alerts: []
+
+  - interval: 1m
+    name: genuinely lost samples still raise remote-write alerts
+    input_series:
+      - series: 'prometheus_remote_storage_samples_dropped_total{instance="p1",job="prom",remote_name="thanos",url="https://x",reason="too_old"}'
+        values: '0+1000x10'
+    alert_rule_test:
+      - alertname: PrometheusRemoteWriteDroppedSamples
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusRemoteWriteDroppedSamples
+              instance: p1
+              job: prom
+              remote_name: thanos
+              url: "https://x"
+              reason: too_old
+              severity: critical
+            exp_annotations:
+              summary: "Prometheus remote write dropping samples (instance p1)"
+              description: "Prometheus is dropping samples for remote_name=thanos, reason=too_old (16.67 samples/s lost)"

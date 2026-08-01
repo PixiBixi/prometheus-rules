@@ -1,0 +1,62 @@
+# Regression tests for rules/kafka.rules.yml
+#
+# ActiveControllerCount is exposed per broker: the elected controller reports 1
+# and every other broker reports 0. Compared unaggregated against != 1, the
+# alert was true on N-1 of N brokers at all times.
+rule_files:
+  - kafka.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a healthy three-broker cluster with one controller is silent
+    input_series:
+      - series: 'kafka_controller_kafkacontroller_activecontrollercount{job="kafka",instance="b1"}'
+        values: '1x10'
+      - series: 'kafka_controller_kafkacontroller_activecontrollercount{job="kafka",instance="b2"}'
+        values: '0x10'
+      - series: 'kafka_controller_kafkacontroller_activecontrollercount{job="kafka",instance="b3"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: KafkaNoActiveController
+        eval_time: 5m
+        exp_alerts: []
+
+  - interval: 1m
+    name: losing the controller alerts once, cluster-wide
+    input_series:
+      - series: 'kafka_controller_kafkacontroller_activecontrollercount{job="kafka",instance="b1"}'
+        values: '0x10'
+      - series: 'kafka_controller_kafkacontroller_activecontrollercount{job="kafka",instance="b2"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: KafkaNoActiveController
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: KafkaNoActiveController
+              job: kafka
+              severity: critical
+            exp_annotations:
+              summary: "Wrong active Kafka controller count on kafka"
+              description: "Kafka cluster kafka has 0 active controllers instead of exactly 1. Cluster operations are impaired."
+
+  - interval: 1m
+    name: a split brain with two controllers also alerts
+    input_series:
+      - series: 'kafka_controller_kafkacontroller_activecontrollercount{job="kafka",instance="b1"}'
+        values: '1x10'
+      - series: 'kafka_controller_kafkacontroller_activecontrollercount{job="kafka",instance="b2"}'
+        values: '1x10'
+    alert_rule_test:
+      - alertname: KafkaNoActiveController
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: KafkaNoActiveController
+              job: kafka
+              severity: critical
+            exp_annotations:
+              summary: "Wrong active Kafka controller count on kafka"
+              description: "Kafka cluster kafka has 2 active controllers instead of exactly 1. Cluster operations are impaired."
