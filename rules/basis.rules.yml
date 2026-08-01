@@ -345,6 +345,13 @@
       annotations:
         summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
+    - alert: DownSystemdSupervisor
+      expr: node_systemd_unit_state{state="failed",name="supervisor.service",ignoreSupervisorDown=""} > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Systemd unit failed for supervisor on {{ $labels.instance }}"
+        description: "Systemd failed for supervisor, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdSquid
       expr: node_systemd_unit_state{state="failed",name="squid.service",ignoreSquidDown=""} > 0
       labels:
@@ -353,6 +360,10 @@
         summary: "Systemd unit failed for {{ $labels.name }} @ {{ $labels.instance }}"
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdOpenVPN
+      # NOTE: node_exporter does not collect these units on any host today --
+      # openvpn is absent from --collector.systemd.unit-include in the
+      # node_exporter Ansible role, so this alert has no series to match and
+      # cannot fire. Add openvpn-client@.* to that allowlist to enable it.
       expr: node_systemd_unit_state{state="failed",name=~"openvpn-client@.*",ignoreOpenVPNDown=""} > 0
       labels:
         severity: critical
@@ -685,10 +696,18 @@
       #
       # So as an opt-out alert this fired on nearly half the estate saying
       # "something you cannot see has failed", which no rule can make
-      # actionable. The real fix is on the node_exporter side: widen
-      # --collector.systemd.unit-include so the failing units become visible,
-      # at which point the 24 DownSystemd* alerts above can name them and this
-      # catch-all can go back to being opt-out.
+      # actionable.
+      #
+      # Widening --collector.systemd.unit-include is NOT the answer: the
+      # allowlist is deliberately narrow (~20 patterns, matching the
+      # DownSystemd* alerts below) and the fleet already carries ~53 systemd
+      # series per host. Collecting every unit would mean roughly 150-250 units
+      # x 5 states x 526 hosts, several hundred thousand series, for units
+      # nobody chose to monitor.
+      #
+      # Which is the point: degraded on these hosts means a unit outside the
+      # allowlist failed -- a unit that was deliberately excluded. Alerting on
+      # it contradicts that decision. Hence opt-in.
       expr: node_systemd_system_running{alertSystemdDegraded="yes"} == 0
       for: 15m
       labels:
