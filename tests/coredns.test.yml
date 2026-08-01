@@ -1,0 +1,94 @@
+# Regression tests for rules/coredns.rules.yml
+#
+# CoreDNS 1.11.0 renamed the forward plugin's metrics from coredns_forward_* to
+# coredns_proxy_*. Both conventions are live in this estate: one cluster runs
+# 1.11.4 and emits coredns_proxy_*, another runs 1.10.x and emits
+# coredns_forward_*. The rules must fire on either, which is what these tests
+# pin -- a fix targeting only one naming is a regression for the other cluster.
+rule_files:
+  - coredns.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: forward latency alerts on CoreDNS 1.11 (coredns_proxy_*)
+    input_series:
+      - series: 'coredns_proxy_request_duration_seconds_bucket{job="kube-dns",to="10.0.0.1:53",le="1",instance="c1",pod="p1"}'
+        values: '0x20'
+      - series: 'coredns_proxy_request_duration_seconds_bucket{job="kube-dns",to="10.0.0.1:53",le="8",instance="c1",pod="p1"}'
+        values: '0+60x20'
+      - series: 'coredns_proxy_request_duration_seconds_bucket{job="kube-dns",to="10.0.0.1:53",le="+Inf",instance="c1",pod="p1"}'
+        values: '0+60x20'
+    alert_rule_test:
+      - alertname: CoreDNSForwardLatencyHigh
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: CoreDNSForwardLatencyHigh
+              job: kube-dns
+              to: "10.0.0.1:53"
+              severity: critical
+            exp_annotations:
+              summary: "CoreDNS forward p99 latency high (7.93s) to 10.0.0.1:53"
+              description: "CoreDNS 99th percentile latency forwarding to 10.0.0.1:53 is 7.93s."
+              runbook_url: "https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardlatencyhigh"
+
+  - interval: 1m
+    name: forward latency alerts on CoreDNS 1.10 (coredns_forward_*)
+    input_series:
+      - series: 'coredns_forward_request_duration_seconds_bucket{job="kube-dns",to="10.0.0.2:53",le="1",instance="c2",pod="p2"}'
+        values: '0x20'
+      - series: 'coredns_forward_request_duration_seconds_bucket{job="kube-dns",to="10.0.0.2:53",le="8",instance="c2",pod="p2"}'
+        values: '0+60x20'
+      - series: 'coredns_forward_request_duration_seconds_bucket{job="kube-dns",to="10.0.0.2:53",le="+Inf",instance="c2",pod="p2"}'
+        values: '0+60x20'
+    alert_rule_test:
+      - alertname: CoreDNSForwardLatencyHigh
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: CoreDNSForwardLatencyHigh
+              job: kube-dns
+              to: "10.0.0.2:53"
+              severity: critical
+            exp_annotations:
+              summary: "CoreDNS forward p99 latency high (7.93s) to 10.0.0.2:53"
+              description: "CoreDNS 99th percentile latency forwarding to 10.0.0.2:53 is 7.93s."
+              runbook_url: "https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardlatencyhigh"
+
+  - interval: 1m
+    name: healthcheck failures are caught under either naming
+    input_series:
+      - series: 'coredns_proxy_healthcheck_failures_total{job="kube-dns",to="10.0.0.1:53",instance="c1",pod="p1"}'
+        values: '0+6x20'
+      - series: 'coredns_forward_healthcheck_failures_total{job="kube-dns",to="10.0.0.2:53",instance="c2",pod="p2"}'
+        values: '0+6x20'
+    promql_expr_test:
+      - expr: 'count(ALERTS{alertname="CoreDNSForwardHealthcheckFailureCount",alertstate="firing"})'
+        eval_time: 15m
+        exp_samples:
+          - labels: '{}'
+            value: 2
+
+  - interval: 1m
+    name: SERVFAIL ratio is caught under either naming
+    input_series:
+      # 1.10 cluster: 10% SERVFAIL
+      - series: 'coredns_forward_responses_total{job="kube-dns",to="10.0.0.2:53",rcode="SERVFAIL",instance="c2",pod="p2"}'
+        values: '0+6x20'
+      - series: 'coredns_forward_responses_total{job="kube-dns",to="10.0.0.2:53",rcode="NOERROR",instance="c2",pod="p2"}'
+        values: '0+54x20'
+    alert_rule_test:
+      - alertname: CoreDNSForwardErrorsHigh
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: CoreDNSForwardErrorsHigh
+              job: kube-dns
+              to: "10.0.0.2:53"
+              severity: critical
+            exp_annotations:
+              summary: "CoreDNS high forward SERVFAIL rate to 10.0.0.2:53 (10%)"
+              description: "CoreDNS is returning SERVFAIL for 10% of forward requests to 10.0.0.2:53."
+              runbook_url: "https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwarderrorshigh"
