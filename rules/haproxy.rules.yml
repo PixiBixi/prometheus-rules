@@ -234,13 +234,11 @@
 
     - alert: HAproxyBackendConnectionErrors
       expr: |
-        (
-          sum by (proxy, instance, job) (rate(haproxy_backend_connection_errors_total[5m]))
-          /
-          sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
-        ) > 0.05
+        sum by (namespace, proxy, instance, job) (rate(haproxy_backend_connection_errors_total[5m]))
+        / haproxy:backend_connection_attempts:rate5m
+        > 0.05
         and
-        sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m])) > 10
+        haproxy:backend_connection_attempts:rate5m > 10
       for: 5m
       labels:
         severity: critical
@@ -249,7 +247,7 @@
         description: "More than 5% of connection attempts failing on {{ $labels.proxy }} @ {{ $labels.instance }} ({{ $value | humanizePercentage }}) — check backend health or network connectivity"
 
     - alert: HAproxyHighHttp5xxErrorRateBackend
-      expr: ((sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{code="5xx"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total[5m]))) * 100) > 5
+      expr: haproxy:backend_5xx_error_rate:ratio5m > 5
       for: 5m
       labels:
         severity: critical
@@ -258,7 +256,7 @@
         description: "Too many HTTP requests with status 5xx (> 5%) on {{ $labels.proxy }} @ {{ $labels.instance }}"
 
     - alert: HAproxyHighHttp4xxErrorRateBackend
-      expr: ((sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{code="4xx",proxy!~".*default-local-service.*"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{proxy!~".*default-local-service.*"}[5m]))) * 100) > 50
+      expr: haproxy:backend_4xx_error_rate:ratio5m{proxy!~".*default-local-service.*"} > 50
       for: 5m
       labels:
         severity: critical
@@ -267,7 +265,7 @@
         description: "Too many HTTP requests with status 4xx (> 50%) on {{ $labels.proxy }} @ {{ $labels.instance }}"
 
     - alert: HAproxyHighHttp4xxErrorRateBackendWarning
-      expr: ((sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{code="4xx",proxy!~".*default-local-service.*"}[5m])) / sum by (proxy,instance,job) (rate(haproxy_backend_http_responses_total{proxy!~".*default-local-service.*"}[5m]))) * 100) > 15
+      expr: haproxy:backend_4xx_error_rate:ratio5m{proxy!~".*default-local-service.*"} > 15
       for: 5m
       labels:
         severity: warning
@@ -277,13 +275,9 @@
 
     - alert: HAproxyBackendConnectionReuseCollapse
       expr: |
-        (
-          sum by (proxy, instance, job) (rate(haproxy_backend_connection_reuses_total[5m]))
-          /
-          sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
-        ) * 100 < 20
+        haproxy:backend_connection_reuse:ratio5m < 20
         and
-        sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m])) > 10
+        haproxy:backend_connection_attempts:rate5m > 10
       for: 10m
       labels:
         severity: critical
@@ -293,13 +287,9 @@
 
     - alert: HAproxyBackendConnectionReuseDrop
       expr: |
-        (
-          sum by (proxy, instance, job) (rate(haproxy_backend_connection_reuses_total[5m]))
-          /
-          sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
-        ) * 100 < 50
+        haproxy:backend_connection_reuse:ratio5m < 50
         and
-        sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m])) > 10
+        haproxy:backend_connection_attempts:rate5m > 10
       for: 10m
       labels:
         severity: warning
@@ -336,13 +326,11 @@
 
     - alert: HAproxyBackendRedispatch
       expr: |
-        (
-          sum by (proxy, instance, job) (rate(haproxy_backend_redispatch_warnings_total[5m]))
-          /
-          sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m]))
-        ) > 0.05
+        sum by (namespace, proxy, instance, job) (rate(haproxy_backend_redispatch_warnings_total[5m]))
+        / haproxy:backend_connection_attempts:rate5m
+        > 0.05
         and
-        sum by (proxy, instance, job) (rate(haproxy_backend_connection_attempts_total[5m])) > 10
+        haproxy:backend_connection_attempts:rate5m > 10
       for: 5m
       labels:
         severity: warning
@@ -365,9 +353,8 @@
 
     - alert: HAproxyRetryHigh
       expr: |
-        sum by (proxy, job, instance) (rate(haproxy_backend_retry_warnings_total[5m]))
-        /
-        sum by (proxy, job, instance) (rate(haproxy_backend_connection_attempts_total[5m]))
+        haproxy:backend_retries:rate5m
+        / (haproxy:backend_connection_attempts:rate5m > 0)
         > 0.05
       for: 5m
       labels:
@@ -379,9 +366,9 @@
     - alert: HAproxyBlackholedTrafficNamespaceWarning
       expr: |
         (
-          sum by (namespace) (rate(haproxy_backend_http_responses_total{proxy=~".*default-local-service.*"}[5m]))
+          sum by (namespace) (haproxy:backend_http_responses:rate5m{proxy=~".*default-local-service.*"})
           /
-          sum by (namespace) (rate(haproxy_backend_http_responses_total[5m]))
+          sum by (namespace) (haproxy:backend_http_responses:rate5m)
         ) * 100 > 0.5
       for: 5m
       labels:
@@ -393,9 +380,9 @@
     - alert: HAproxyBlackholedTrafficNamespaceCritical
       expr: |
         (
-          sum by (namespace) (rate(haproxy_backend_http_responses_total{proxy=~".*default-local-service.*"}[5m]))
+          sum by (namespace) (haproxy:backend_http_responses:rate5m{proxy=~".*default-local-service.*"})
           /
-          sum by (namespace) (rate(haproxy_backend_http_responses_total[5m]))
+          sum by (namespace) (haproxy:backend_http_responses:rate5m)
         ) * 100 > 2
       for: 5m
       labels:
@@ -432,31 +419,46 @@
         description: "More than 5% of connection attempts failing on {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }} ({{ $value | humanizePercentage }})"
 
     - alert: HAproxyHighHttp5xxErrorRateServer
-      expr: ((sum by (server,instance) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
+      expr: |
+        sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m{code="5xx"})
+        / clamp_min(
+            sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m),
+            0.01
+          ) * 100 > 5
       for: 5m
       labels:
         severity: critical
       annotations:
-        summary: "HAProxy high HTTP 5xx error rate — {{ $labels.server }} @ {{ $labels.instance }}"
-        description: "Too many HTTP requests with status 5xx (> 5%) on {{ $labels.server }} @ {{ $labels.instance }}"
+        summary: "HAProxy high HTTP 5xx error rate — {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
+        description: "Too many HTTP requests with status 5xx (> 5%) on {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
 
     - alert: HAproxyHighHttp4xxErrorRateServer
-      expr: ((sum by (server,instance) (rate(haproxy_server_http_responses_total{code="4xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 50
+      expr: |
+        sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m{code="4xx"})
+        / clamp_min(
+            sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m),
+            0.01
+          ) * 100 > 50
       for: 5m
       labels:
         severity: critical
       annotations:
-        summary: "HAProxy high HTTP 4xx error rate — {{ $labels.server }} @ {{ $labels.instance }}"
-        description: "Too many HTTP requests with status 4xx (> 50%) on {{ $labels.server }} @ {{ $labels.instance }}"
+        summary: "HAProxy high HTTP 4xx error rate — {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
+        description: "Too many HTTP requests with status 4xx (> 50%) on {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
 
     - alert: HAproxyHighHttp4xxErrorRateServerWarning
-      expr: ((sum by (server,instance) (rate(haproxy_server_http_responses_total{code="4xx"}[5m])) / sum by (server,instance) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 15
+      expr: |
+        sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m{code="4xx"})
+        / clamp_min(
+            sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m),
+            0.01
+          ) * 100 > 15
       for: 5m
       labels:
         severity: warning
       annotations:
-        summary: "HAProxy high HTTP 4xx error rate (warning) — {{ $labels.server }} @ {{ $labels.instance }}"
-        description: "Too many HTTP requests with status 4xx (> 15%) on {{ $labels.server }} @ {{ $labels.instance }}"
+        summary: "HAProxy high HTTP 4xx error rate (warning) — {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
+        description: "Too many HTTP requests with status 4xx (> 15%) on {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
 
     - alert: HAproxyServerHealthcheckFailure
       expr: increase(haproxy_server_check_failures_total[1m]) > 2
