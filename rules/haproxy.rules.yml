@@ -156,13 +156,17 @@
     # ── Frontend ─────────────────────────────────────────────
 
     - alert: HAproxyFrontendDown
-      expr: haproxy_frontend_status{state="OPEN"} == 0
+      # promex never emits state="OPEN" for a frontend: haproxy_frontend_status
+      # only carries DOWN and UP, verified against 2.7.11 and 3.2.21. The alert
+      # matched nothing and could not fire. Test the faulty state directly, as
+      # HAproxyServerDown and HAproxyBackendStatusDown already do.
+      expr: haproxy_frontend_status{state="DOWN"} == 1
       for: 1m
       labels:
         severity: critical
       annotations:
         summary: "HAProxy frontend down — {{ $labels.proxy }} @ {{ $labels.instance }}"
-        description: "Frontend {{ $labels.proxy }} @ {{ $labels.instance }} is not in OPEN state"
+        description: "Frontend {{ $labels.proxy }} @ {{ $labels.instance }} is DOWN and not accepting connections"
 
     - alert: HAproxyFrontendSessionCritical
       expr: haproxy_frontend_current_sessions / haproxy_frontend_limit_sessions > 0.85
