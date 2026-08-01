@@ -1,0 +1,116 @@
+- name: apache.rules
+  rules:
+    - alert: ApacheExporterDown
+      # Two distinct failure modes: a failing scrape (up == 0, exporter crashed
+      # or host unreachable) and the target vanishing from service discovery,
+      # where no up series exists to be 0. Both branches are grouped
+      # identically so the alert carries the same labels either way.
+      expr: |
+        group by (job, instance) (up{job=~".*apache.*"} == 0)
+        or
+        (
+          group by (job, instance) (last_over_time(up{job=~".*apache.*"}[1h]))
+          unless
+          group by (job, instance) (last_over_time(up{job=~".*apache.*"}[5m]))
+        )
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Apache exporter down — {{ $labels.job }} @ {{ $labels.instance }}"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+    - alert: ApacheDown
+      # apache_up is the exporter's view of Apache itself: it goes to 0 when the
+      # scrape of mod_status succeeds but Apache does not answer. Distinct from
+      # the exporter being down, which is the alert above.
+      expr: apache_up == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Apache down on {{ $labels.instance }}"
+        description: "The exporter on {{ $labels.instance }} cannot reach Apache's mod_status endpoint. Apache is likely stopped or refusing connections."
+
+    # ── Worker saturation ─────────────────────────────────────────────────────
+    # The classic Apache outage: every worker busy, MaxRequestWorkers reached,
+    # new connections queue in the kernel backlog and clients see timeouts.
+    # Guarded with > 0 so a scrape returning neither busy nor idle workers
+    # cannot produce +Inf.
+
+    - alert: ApacheWorkersSaturation
+      expr: |
+        sum by (instance, job) (apache_workers{state="busy"})
+        / (sum by (instance, job) (apache_workers) > 0)
+        > 0.80
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Apache worker saturation on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "More than 80% of Apache workers are busy on {{ $labels.instance }}. Consider raising MaxRequestWorkers before the pool is exhausted."
+
+    - alert: ApacheWorkersSaturationCritical
+      expr: |
+        sum by (instance, job) (apache_workers{state="busy"})
+        / (sum by (instance, job) (apache_workers) > 0)
+        > 0.90
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Apache worker pool nearly exhausted on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "More than 90% of Apache workers are busy on {{ $labels.instance }}. New connections will start queueing."
+
+    - alert: ApacheNoFreeSlot
+      # open_slot counts scoreboard positions Apache can still spawn a worker
+      # into. At zero the process limit is reached, which is a harder wall than
+      # the busy-worker ratio above.
+      expr: apache_scoreboard{state="open_slot"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Apache has no free scoreboard slot on {{ $labels.instance }}"
+        description: "Apache on {{ $labels.instance }} has exhausted its scoreboard: ServerLimit is reached and no further worker can be spawned."
+
+    # ── Process health ────────────────────────────────────────────────────────
+
+    - alert: ApacheRestarted
+      # uptime_seconds_total resets on restart. A graceful reload does not reset
+      # it, so this only catches a real process restart -- usually a crash.
+      expr: apache_uptime_seconds_total < 300
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Apache restarted on {{ $labels.instance }}"
+        description: "Apache on {{ $labels.instance }} has been up for {{ $value | humanizeDuration }}. A graceful reload does not reset this counter, so the process actually restarted."
+
+    - alert: ApacheWorkersStopping
+      # Workers stuck in the stopping state usually mean a graceful restart that
+      # never finished, often because a request is hanging.
+      expr: apache_processes{state="stopping"} > 0
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Apache has workers stuck stopping on {{ $labels.instance }}"
+        description: "{{ $value }} Apache worker(s) on {{ $labels.instance }} have been in the stopping state for 15 minutes. A graceful restart is not completing."
+
+    # ── Latency ───────────────────────────────────────────────────────────────
+
+    - alert: ApacheSlowRequests
+      # Average request duration derived from two counters. Guarded on request
+      # volume: at very low traffic a single slow request skews the mean, and a
+      # zero denominator would give +Inf.
+      expr: |
+        rate(apache_duration_ms_total[5m])
+        / (rate(apache_accesses_total[5m]) > 1)
+        > 1000
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Apache average request duration high on {{ $labels.instance }} ({{ $value | humanize }}ms)"
+        description: "Mean request duration on {{ $labels.instance }} is above 1s over the last 5 minutes."

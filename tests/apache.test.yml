@@ -1,0 +1,131 @@
+# Tests for rules/apache.rules.yml
+#
+# The fixture is a real scrape of apache_exporter v1.1.1 against Apache 2.4.68
+# with mod_status ExtendedStatus on, so the metric names and label values below
+# are the ones the exporter actually emits -- not guessed from documentation.
+rule_files:
+  - apache.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a saturated worker pool alerts at both tiers
+    input_series:
+      # 92 busy of 100 -> over both the 80% and 90% thresholds
+      - series: 'apache_workers{state="busy",instance="web1",job="apache"}'
+        values: '92x15'
+      - series: 'apache_workers{state="idle",instance="web1",job="apache"}'
+        values: '8x15'
+    alert_rule_test:
+      - alertname: ApacheWorkersSaturation
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: ApacheWorkersSaturation, instance: web1, job: apache, severity: warning}
+            exp_annotations:
+              summary: "Apache worker saturation on web1 (92%)"
+              description: "More than 80% of Apache workers are busy on web1. Consider raising MaxRequestWorkers before the pool is exhausted."
+      - alertname: ApacheWorkersSaturationCritical
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: ApacheWorkersSaturationCritical, instance: web1, job: apache, severity: critical}
+            exp_annotations:
+              summary: "Apache worker pool nearly exhausted on web1 (92%)"
+              description: "More than 90% of Apache workers are busy on web1. New connections will start queueing."
+
+  - interval: 1m
+    name: an idle server alerts on neither tier
+    input_series:
+      - series: 'apache_workers{state="busy",instance="web1",job="apache"}'
+        values: '1x15'
+      - series: 'apache_workers{state="idle",instance="web1",job="apache"}'
+        values: '74x15'
+    alert_rule_test:
+      - alertname: ApacheWorkersSaturation
+        eval_time: 8m
+        exp_alerts: []
+      - alertname: ApacheWorkersSaturationCritical
+        eval_time: 8m
+        exp_alerts: []
+
+  # A scrape returning no workers at all must not divide by zero.
+  - interval: 1m
+    name: zero workers does not produce +Inf
+    input_series:
+      - series: 'apache_workers{state="busy",instance="web1",job="apache"}'
+        values: '0x15'
+      - series: 'apache_workers{state="idle",instance="web1",job="apache"}'
+        values: '0x15'
+    alert_rule_test:
+      - alertname: ApacheWorkersSaturation
+        eval_time: 8m
+        exp_alerts: []
+
+  - interval: 1m
+    name: an exhausted scoreboard alerts
+    input_series:
+      - series: 'apache_scoreboard{state="open_slot",instance="web1",job="apache"}'
+        values: '0x15'
+    alert_rule_test:
+      - alertname: ApacheNoFreeSlot
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: ApacheNoFreeSlot, instance: web1, job: apache, state: open_slot, severity: critical}
+            exp_annotations:
+              summary: "Apache has no free scoreboard slot on web1"
+              description: "Apache on web1 has exhausted its scoreboard: ServerLimit is reached and no further worker can be spawned."
+
+  - interval: 1m
+    name: a scoreboard with room alerts on nothing
+    input_series:
+      - series: 'apache_scoreboard{state="open_slot",instance="web1",job="apache"}'
+        values: '325x15'
+    alert_rule_test:
+      - alertname: ApacheNoFreeSlot
+        eval_time: 8m
+        exp_alerts: []
+
+  - interval: 1m
+    name: mod_status unreachable raises ApacheDown
+    input_series:
+      - series: 'apache_up{instance="web1",job="apache"}'
+        values: '0x15'
+    alert_rule_test:
+      - alertname: ApacheDown
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: ApacheDown, instance: web1, job: apache, severity: critical}
+            exp_annotations:
+              summary: "Apache down on web1"
+              description: "The exporter on web1 cannot reach Apache's mod_status endpoint. Apache is likely stopped or refusing connections."
+
+  # Volume guard: one slow request on an almost idle server must stay quiet.
+  - interval: 1m
+    name: a slow request at negligible traffic does not alert
+    input_series:
+      # 0.1 req/s, below the > 1 req/s floor
+      - series: 'apache_accesses_total{instance="web1",job="apache"}'
+        values: '0+6x20'
+      - series: 'apache_duration_ms_total{instance="web1",job="apache"}'
+        values: '0+30000x20'
+    alert_rule_test:
+      - alertname: ApacheSlowRequests
+        eval_time: 15m
+        exp_alerts: []
+
+  - interval: 1m
+    name: sustained slow requests at real traffic do alert
+    input_series:
+      # 120 req/min = 2 req/s, mean 2s per request
+      - series: 'apache_accesses_total{instance="web1",job="apache"}'
+        values: '0+120x20'
+      - series: 'apache_duration_ms_total{instance="web1",job="apache"}'
+        values: '0+240000x20'
+    alert_rule_test:
+      - alertname: ApacheSlowRequests
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels: {alertname: ApacheSlowRequests, instance: web1, job: apache, severity: warning}
+            exp_annotations:
+              summary: "Apache average request duration high on web1 (2kms)"
+              description: "Mean request duration on web1 is above 1s over the last 5 minutes."
