@@ -127,7 +127,10 @@
         summary: "Prometheus target empty (instance {{ $labels.instance }})"
         description: "Prometheus has no target in service discovery"
     - alert: PrometheusTargetScrapingSlow
-      expr: prometheus_target_interval_length_seconds{quantile="0.9"} / on (interval, instance, job) prometheus_target_interval_length_seconds{quantile="0.5"} > 1.05
+      # This summary only exposes objectives 0.01 / 0.05 / 0.5 -- quantile="0.9"
+      # matched nothing and the alert was dead. Compare the median against the
+      # 1st percentile instead.
+      expr: prometheus_target_interval_length_seconds{quantile="0.5"} / on (interval, instance, job) prometheus_target_interval_length_seconds{quantile="0.01"} > 1.05
       for: 5m
       labels:
         severity: warning
