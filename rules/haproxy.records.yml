@@ -64,20 +64,29 @@
           1
         )
 
-    # Session saturation % — used by HAproxyBackendMaxActiveSession alert
+    # Session saturation %
+    # Both operands are raw metrics carrying instance+job, so they are NOT unique
+    # per (namespace, proxy): group_left() raised "found duplicate series for the
+    # match group" as soon as two HAProxy instances were scraped. Aggregate both
+    # sides first, then divide 1:1. Guarding with > 0 rather than clamp_min(x, 1)
+    # drops backends with no maxconn instead of pretending their limit is 1.
     - record: haproxy:backend_session_saturation:ratio
       expr: |
-        haproxy_backend_current_sessions
-        / on(namespace, proxy) group_left()
-        clamp_min(haproxy_backend_limit_sessions, 1)
+        sum by (namespace, proxy) (haproxy_backend_current_sessions)
+        / (sum by (namespace, proxy) (haproxy_backend_limit_sessions) > 0)
         * 100
 
     # Connection reuse ratio — keep-alive efficiency
+    # Same duplicate-match-group failure as above.
+    # NOTE: the denominator is also semantically wrong (reuse rate should be
+    # reuse / (reuse + connect), not reuse / connect) — tracked separately.
     - record: haproxy:backend_connection_reuse:ratio5m
       expr: |
-        rate(haproxy_backend_connection_reuses_total[5m])
-        / on(namespace, proxy) group_left()
-        clamp_min(rate(haproxy_backend_connection_attempts_total[5m]), 1)
+        sum by (namespace, proxy) (rate(haproxy_backend_connection_reuses_total[5m]))
+        / clamp_min(
+            sum by (namespace, proxy) (rate(haproxy_backend_connection_attempts_total[5m])),
+            0.01
+          )
 
     # Abort rate (client + server) per backend
     - record: haproxy:backend_aborts:rate5m
