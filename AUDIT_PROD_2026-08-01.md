@@ -114,12 +114,27 @@ est destructive et le dépôt a vocation à être réutilisable.
 
 ---
 
-## E. Reste à faire
+## E. Livrables
 
-- [ ] Compléter l'audit de complétude des fixtures (§A/B portent sur les métriques
-      *utilisées par les règles*, pas sur l'exhaustivité des fixtures)
-- [ ] Corriger A1, A2, A3 + tests promtool joués contre la révision d'avant
-- [ ] Documenter B dans le README
-- [ ] Logiciels non couverts (apache2 et autres) — une MR par produit
-- [ ] Upgrades d'exporters côté dépôt ansible
-- [ ] Ticket Jira PE consolidé, avec la MR !184
+- [x] Complétude des fixtures — README, section « Fixture completeness versus production »
+- [x] A1, A2, A3 corrigés + tests joués contre la révision d'avant — PR #1
+- [x] B documenté dans le README
+- [x] Apache — PR #2, fixture capturée d'un vrai apache_exporter 1.1.1
+- [x] Écarts de versions d'exporters relevés — ticket PE-1570
+- [x] Ticket Jira consolidé — PE-1570, avec la MR !184
+
+**Correction importante apportée en cours de route (§A1).** J'avais d'abord renommé les
+métriques CoreDNS en `coredns_proxy_*` après n'avoir consulté qu'un seul Prometheus.
+C'était une régression pour le cluster en 1.10, où seul `coredns_forward_*` existe. Les
+deux conventions coexistent — 1.11.4 d'un côté, 1.10.0/1.10.1 de l'autre — et les règles
+matchent désormais les deux. Ma note « `coredns_forward_responses_total` n'existe nulle
+part » était fausse pour la même raison, et a été retirée du README.
+
+## F. Ne pas déployer sans vérifier
+
+- **redis_exporter 1.58 → 1.88** casserait `RedisTooManyConnections` :
+  `redis_config_maxclients` a été renommée `redis_max_clients` entre les deux.
+- **aerospike-prometheus-exporter 1.9.0 → 1.33.0** : 24 versions mineures d'écart,
+  non vérifié.
+
+Détail dans PE-1570.
