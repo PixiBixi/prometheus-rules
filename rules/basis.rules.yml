@@ -674,12 +674,22 @@
     # ── Systemd system status ──────────────────────────────────────────────────
 
     - alert: NodeSystemdNotRunning
+      # OPT-IN: this alert is silent unless a target carries
+      # alertSystemdDegraded="yes". That is deliberate.
+      #
       # `systemctl is-system-running` reports degraded as soon as ONE unit has
-      # failed, including every unit the 24 DownSystemd* alerts above
-      # deliberately exclude via their ignore*Down guards. Give it its own guard
-      # so it can be silenced the same way, and demote it: the per-unit alerts
-      # are the actionable ones, this is a catch-all for units nobody modelled.
-      expr: node_systemd_system_running{ignoreSystemdDegraded=""} == 0
+      # failed. Measured against the live fleet: 239 of 526 hosts (45%) report
+      # degraded, while ZERO report a failed unit through node_systemd_unit_state
+      # -- because the collector only exposes 55 unit names, and whatever is
+      # failing on those hosts is outside that filter.
+      #
+      # So as an opt-out alert this fired on nearly half the estate saying
+      # "something you cannot see has failed", which no rule can make
+      # actionable. The real fix is on the node_exporter side: widen
+      # --collector.systemd.unit-include so the failing units become visible,
+      # at which point the 24 DownSystemd* alerts above can name them and this
+      # catch-all can go back to being opt-out.
+      expr: node_systemd_system_running{alertSystemdDegraded="yes"} == 0
       for: 15m
       labels:
         severity: warning

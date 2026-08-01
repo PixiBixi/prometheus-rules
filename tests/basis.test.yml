@@ -104,3 +104,35 @@ tests:
             exp_annotations:
               summary: "High IOWait (20%) on h1"
               description: "CPU time spent waiting on I/O is above 10% on h1 — check disk latency and saturation"
+
+  # NodeSystemdNotRunning is opt-in: 45% of the live fleet reports systemd
+  # degraded while no failed unit is visible through node_systemd_unit_state,
+  # so an opt-out form paged on 239 hosts with nothing actionable in the page.
+  - interval: 1m
+    name: a degraded host without the opt-in label stays silent
+    input_series:
+      - series: 'node_systemd_system_running{instance="h1",job="node-exporter"}'
+        values: '0x30'
+    alert_rule_test:
+      - alertname: NodeSystemdNotRunning
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a degraded host that opted in does alert
+    input_series:
+      - series: 'node_systemd_system_running{instance="h2",job="node-exporter",alertSystemdDegraded="yes"}'
+        values: '0x30'
+    alert_rule_test:
+      - alertname: NodeSystemdNotRunning
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alertname: NodeSystemdNotRunning
+              instance: h2
+              job: node-exporter
+              alertSystemdDegraded: "yes"
+              severity: warning
+            exp_annotations:
+              summary: "systemd not fully operational on h2"
+              description: "systemd reports system is not fully operational on h2."
