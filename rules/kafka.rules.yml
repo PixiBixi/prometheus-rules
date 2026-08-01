@@ -47,13 +47,16 @@
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
         summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
     - alert: KafkaNoActiveController
-      expr: kafka_controller_kafkacontroller_activecontrollercount != 1
+      # ActiveControllerCount is per broker: the controller reports 1, every other
+      # broker reports 0. This is a cluster-wide invariant, so it must be summed --
+      # unaggregated, it is true on N-1 of N brokers at all times.
+      expr: sum by (job) (kafka_controller_kafkacontroller_activecontrollercount) != 1
       for: 1m
       labels:
         severity: critical
       annotations:
-        description: "There is no active Kafka controller (or more than one) on {{ $labels.instance }}. Cluster operations are impaired."
-        summary: "No active Kafka controller on {{ $labels.instance }}"
+        description: "Kafka cluster {{ $labels.job }} has {{ $value }} active controllers instead of exactly 1. Cluster operations are impaired."
+        summary: "Wrong active Kafka controller count on {{ $labels.job }}"
     - alert: KafkaBrokerFenced
       expr: kafka_controller_kafkacontroller_fencedbrokercount > 0
       for: 2m
