@@ -23,8 +23,11 @@
         description: "{{ $labels.job }} @ {{ $labels.instance }} has been down for more than 5 minutes"
 
     - alert: HAproxyProcessStopping
+      # A worker draining during a seamless reload reports stopping=1 until
+      # hard-stop-after elapses. With for: 0m this paged on every config reload.
+      # Only a worker that never finishes draining is worth waking for.
       expr: haproxy_process_stopping == 1
-      for: 0m
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -402,8 +405,12 @@
     # ── Server ───────────────────────────────────────────────
 
     - alert: HAproxyServerDown
-      expr: haproxy_server_status{state="UP"} == 0
-      for: 0m
+      # Target the faulty state rather than the absence of the healthy one:
+      # unprovisioned server-template slots sit in MAINT, so {state="UP"} == 0
+      # was permanently true for them. Servers put in MAINT or DRAIN on purpose
+      # were also paging.
+      expr: haproxy_server_status{state="DOWN"} == 1
+      for: 2m
       labels:
         severity: critical
       annotations:
@@ -469,7 +476,8 @@
         description: "Too many HTTP requests with status 4xx (> 15%) on {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
 
     - alert: HAproxyServerHealthcheckFailure
-      expr: increase(haproxy_server_check_failures_total[1m]) > 2
+      # [1m] holds 1-2 scrape points; increase() extrapolates wildly over so few.
+      expr: increase(haproxy_server_check_failures_total[5m]) > 3
       for: 0m
       labels:
         severity: warning
