@@ -1,0 +1,44 @@
+# Regression tests for rules/aerospike.rules.yml
+#
+# DeviceCloseToStopWrite had the +15 margin on the free_pct side, which expands
+# to used_pct > stop_writes_pct + 15 -- the opposite of the intent. With the
+# usual stop_writes_pct of 90 it would have needed used_pct > 105.
+rule_files:
+  - aerospike.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: fires when used_pct comes within 15 points of the stop-writes threshold
+    input_series:
+      # used_pct = 80, threshold 90, margin 10 -> within 15, must alert
+      - series: 'aerospike_namespace_memory_free_pct{instance="as1",ns="mynamespace",cluster_name="c",service="s"}'
+        values: '20x5'
+      - series: 'aerospike_namespace_stop_writes_pct{instance="as1",ns="mynamespace",cluster_name="c",service="s"}'
+        values: '90x5'
+    alert_rule_test:
+      - alertname: DeviceCloseToStopWrite
+        eval_time: 3m
+        exp_alerts:
+          - exp_labels:
+              alertname: DeviceCloseToStopWrite
+              instance: as1
+              ns: mynamespace
+              severity: critical
+            exp_annotations:
+              summary: "AS - Stop Write Limit close for mynamespace @ as1 (< 15%)"
+              description: "AS stop write threshold (aerospike_namespace_stop_writes_pct) for ns=mynamespace @ as1 is nearly reached — only 15% remaining before writes are blocked."
+
+  - interval: 1m
+    name: stays silent well below the threshold
+    input_series:
+      # used_pct = 50, threshold 90, margin 40 -> no alert
+      - series: 'aerospike_namespace_memory_free_pct{instance="as2",ns="n2",cluster_name="c",service="s"}'
+        values: '50x5'
+      - series: 'aerospike_namespace_stop_writes_pct{instance="as2",ns="n2",cluster_name="c",service="s"}'
+        values: '90x5'
+    alert_rule_test:
+      - alertname: DeviceCloseToStopWrite
+        eval_time: 3m
+        exp_alerts: []

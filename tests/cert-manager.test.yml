@@ -1,0 +1,44 @@
+# Regression tests for rules/cert-manager.rules.yml
+#
+# CertManagerACMEHighErrorRate divided without aggregating, so the division
+# matched on the full label set -- `status` included -- and each error series
+# was divided by itself. The ratio was exactly 1.0 whenever any 4xx/5xx
+# existed, and a badNonce 400 is routine with Let's Encrypt.
+rule_files:
+  - cert-manager.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a 1% ACME error rate does not trip the 5% threshold
+    input_series:
+      - series: 'certmanager_http_acme_client_request_duration_seconds_count{instance="cm",job="cm",host="acme",status="200",method="GET",path="/d",scheme="https"}'
+        values: '0+99x10'
+      - series: 'certmanager_http_acme_client_request_duration_seconds_count{instance="cm",job="cm",host="acme",status="400",method="GET",path="/d",scheme="https"}'
+        values: '0+1x10'
+    alert_rule_test:
+      - alertname: CertManagerACMEHighErrorRate
+        eval_time: 10m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a genuinely high ACME error rate still alerts
+    input_series:
+      - series: 'certmanager_http_acme_client_request_duration_seconds_count{instance="cm",job="cm",host="acme",status="200",method="GET",path="/d",scheme="https"}'
+        values: '0+50x10'
+      - series: 'certmanager_http_acme_client_request_duration_seconds_count{instance="cm",job="cm",host="acme",status="500",method="GET",path="/d",scheme="https"}'
+        values: '0+50x10'
+    alert_rule_test:
+      - alertname: CertManagerACMEHighErrorRate
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: CertManagerACMEHighErrorRate
+              instance: cm
+              job: cm
+              host: acme
+              severity: warning
+            exp_annotations:
+              summary: "Cert Manager ACME client high error rate on acme"
+              description: "cert-manager ACME client has more than 5% error rate (50%) talking to acme."

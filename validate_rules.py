@@ -22,22 +22,11 @@ import subprocess
 import sys
 import tempfile
 
-RULES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rules")
-SKIP = {".yamllint.yml"}
+from ruleslib import rule_files, wrap_into
 
 
 def promtool_available():
     return shutil.which("promtool") is not None
-
-
-def wrap_into(path, dest_dir):
-    """Write a 'groups:'-wrapped copy of `path` into `dest_dir`, same basename."""
-    dest = os.path.join(dest_dir, os.path.basename(path))
-    with open(path) as src, open(dest, "w") as dst:
-        dst.write("groups:\n")
-        for line in src:
-            dst.write("  " + line.rstrip("\n") + "\n")
-    return dest
 
 
 def main():
@@ -48,11 +37,7 @@ def main():
         print("Install: brew install prometheus  or  https://github.com/prometheus/prometheus/releases")
         sys.exit(0)
 
-    files = sorted(
-        os.path.join(RULES_DIR, f)
-        for f in os.listdir(RULES_DIR)
-        if f.endswith(".yml") and f not in SKIP
-    )
+    files = rule_files()
     if not files:
         print("No rule files found.")
         sys.exit(0)

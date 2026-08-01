@@ -1,0 +1,71 @@
+# Regression tests for rules/kubernetes.rules.yml
+rule_files:
+  - kubernetes.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # The certificate alerts used a bare `and`, which matches on the full label
+  # set: {job,instance,...} on the left against {job} on the right, since
+  # histogram_quantile consumes `le`. Nothing ever matched.
+  - interval: 1m
+    name: client certificate expiry is detected 12h out
+    input_series:
+      - series: 'apiserver_client_certificate_expiration_seconds_count{job="apiserver",instance="api1"}'
+        values: '0+10x10'
+      - series: 'apiserver_client_certificate_expiration_seconds_bucket{job="apiserver",instance="api1",le="21600"}'
+        values: '0x10'
+      - series: 'apiserver_client_certificate_expiration_seconds_bucket{job="apiserver",instance="api1",le="43200"}'
+        values: '0+10x10'
+      - series: 'apiserver_client_certificate_expiration_seconds_bucket{job="apiserver",instance="api1",le="+Inf"}'
+        values: '0+10x10'
+    alert_rule_test:
+      - alertname: KubernetesClientCertificateExpiresSoon
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesClientCertificateExpiresSoon
+              instance: api1
+              job: apiserver
+              severity: critical
+            exp_annotations:
+              summary: "Kubernetes client certificate expires soon"
+              description: "A client certificate used to authenticate to the apiserver expires within 24 hours"
+      - alertname: KubernetesClientCertificateExpiresNextWeek
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesClientCertificateExpiresNextWeek
+              instance: api1
+              job: apiserver
+              severity: warning
+            exp_annotations:
+              summary: "Kubernetes client certificate expires next week"
+              description: "A client certificate used to authenticate to the apiserver expires within 7 days"
+
+  # KubernetesCronjobTooLong combined per-job series with absent(), which is
+  # global: it went empty as soon as any one job in the cluster completed.
+  # The second job here is what made the old form undetectable.
+  - interval: 1m
+    name: a long-running job is detected even when another job has completed
+    input_series:
+      - series: 'kube_job_status_start_time{namespace="batch",job_name="etl-1",job="ksm",instance="ksm"}'
+        values: '1x200'
+      - series: 'kube_job_status_start_time{namespace="batch",job_name="done-1",job="ksm",instance="ksm"}'
+        values: '1x200'
+      - series: 'kube_job_status_completion_time{namespace="batch",job_name="done-1",job="ksm",instance="ksm"}'
+        values: '100x200'
+    alert_rule_test:
+      - alertname: KubernetesJobRunningTooLong
+        eval_time: 120m
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesJobRunningTooLong
+              namespace: batch
+              job_name: etl-1
+              job: ksm
+              instance: ksm
+              severity: warning
+            exp_annotations:
+              summary: "Kubernetes Job running too long (batch/etl-1)"
+              description: "Job batch/etl-1 is taking more than 1 hour to complete"

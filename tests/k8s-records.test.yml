@@ -1,0 +1,44 @@
+# Regression tests for rules/k8s.records.yml
+#
+# The four kube_namespace_* rules joined on (pod, cluster_id, container,
+# instance) with group_right, which requires the left side to be unique per
+# match group. Pod names are unique per namespace, not cluster-wide, so two
+# same-named pods in different namespaces raised
+#   found duplicate series for the match group ... many-to-many matching not allowed
+# and took down all four rules plus the six derived from them.
+rule_files:
+  - k8s.records.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: same pod name in two namespaces does not collide
+    input_series:
+      - series: 'kube_pod_container_resource_limits{resource="cpu",namespace="ns-a",pod="redis-0",container="redis",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '2x5'
+      - series: 'kube_pod_container_resource_limits{resource="cpu",namespace="ns-b",pod="redis-0",container="redis",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '4x5'
+      - series: 'kube_pod_container_resource_requests{resource="memory",namespace="ns-a",pod="redis-0",container="redis",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '1024x5'
+      - series: 'kube_pod_container_resource_requests{resource="memory",namespace="ns-b",pod="redis-0",container="redis",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '2048x5'
+      - series: 'kube_pod_container_status_running{namespace="ns-a",pod="redis-0",container="redis",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1"}'
+        values: '1x5'
+      - series: 'kube_pod_container_status_running{namespace="ns-b",pod="redis-0",container="redis",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1"}'
+        values: '1x5'
+    promql_expr_test:
+      - expr: kube_namespace_cpu_limit
+        eval_time: 3m
+        exp_samples:
+          - labels: 'kube_namespace_cpu_limit{dc="dc1",k8s_cluster_name="c1",namespace="ns-a",pod="redis-0"}'
+            value: 2
+          - labels: 'kube_namespace_cpu_limit{dc="dc1",k8s_cluster_name="c1",namespace="ns-b",pod="redis-0"}'
+            value: 4
+      - expr: kube_namespace_memory_request
+        eval_time: 3m
+        exp_samples:
+          - labels: 'kube_namespace_memory_request{dc="dc1",k8s_cluster_name="c1",namespace="ns-a",pod="redis-0"}'
+            value: 1024
+          - labels: 'kube_namespace_memory_request{dc="dc1",k8s_cluster_name="c1",namespace="ns-b",pod="redis-0"}'
+            value: 2048

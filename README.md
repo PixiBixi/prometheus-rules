@@ -44,6 +44,40 @@ All rules have been reviewed, deduplicated, and adjusted (thresholds, labels, ex
 
 These rules have been tested with specific exporters version/ some custom parameters
 
+### Validating and testing rules
+
+```bash
+# Syntax + lint (promtool check rules), all files in one invocation
+python3 validate_rules.py
+
+# Same, but treat lint issues such as duplicate rules as failures
+python3 validate_rules.py --strict
+
+# Behavioural unit tests (promtool test rules) from tests/
+python3 run_tests.py
+```
+
+Both run automatically via pre-commit. They cover different failure modes, and
+the second is the one that matters most here:
+
+`promtool check rules` only validates syntax. It passes a rule whose vector
+matching never matches, or whose selector names a metric no exporter emits —
+such a rule is silent forever, which is indistinguishable from "nothing is
+wrong". Several alerts in this repo were dead that way for a long time: a
+`name=` matcher containing regex metacharacters, a `sum by (instance)` divided
+by a vector still carrying `server`, a heap alert querying
+`jvm_memory_used_bytes` when the exporter emits `jvm_memory_bytes_used`.
+
+`tests/*.test.yml` feeds synthetic series through the rules and asserts what
+does and does not fire, so silence becomes a test failure. When you fix or add
+a rule, add a case — ideally one that fires and one that must stay quiet.
+
+Rule files are bare lists, so both scripts wrap them under a `groups:` key in a
+temp directory first (shared logic in `ruleslib.py`). Tests reference their
+rules by plain basename: `rule_files: [basis.rules.yml]`. promtool does not
+report which file a failing test came from, so give every test a descriptive
+`name:`.
+
 ### Exporters
 
 Here the list of all used exporters

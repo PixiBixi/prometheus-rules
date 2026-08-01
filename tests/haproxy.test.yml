@@ -1,0 +1,112 @@
+# Regression tests for rules/haproxy.rules.yml and rules/haproxy.records.yml
+rule_files:
+  - haproxy.rules.yml
+  - haproxy.records.yml
+
+evaluation_interval: 1m
+
+tests:
+  # global.maxconnrate is unset by default, so the limit is 0 and the
+  # unguarded division yielded +Inf > 0.8 on any traffic at all.
+  - interval: 1m
+    name: connection-rate alert stays silent when maxconnrate is unset
+    input_series:
+      - series: 'haproxy_process_current_connection_rate{instance="h1",job="hap"}'
+        values: '500x10'
+      - series: 'haproxy_process_limit_connection_rate{instance="h1",job="hap"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: HAproxyConnectionRateNearLimit
+        eval_time: 8m
+        exp_alerts: []
+
+  - interval: 1m
+    name: connection-rate alert still fires against a configured limit
+    input_series:
+      - series: 'haproxy_process_current_connection_rate{instance="h1",job="hap"}'
+        values: '900x10'
+      - series: 'haproxy_process_limit_connection_rate{instance="h1",job="hap"}'
+        values: '1000x10'
+    alert_rule_test:
+      - alertname: HAproxyConnectionRateNearLimit
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyConnectionRateNearLimit
+              instance: h1
+              job: hap
+              severity: warning
+            exp_annotations:
+              summary: "HAProxy connection rate near limit — h1"
+              description: "HAProxy connection rate at 80% of limit on h1"
+
+  # current_queue is a gauge: rate() returned 0 for a queue sitting steadily at
+  # N, which is the worst case, not the harmless one.
+  - interval: 1m
+    name: a steady non-empty queue is detected
+    input_series:
+      - series: 'haproxy_backend_current_queue{proxy="p",instance="h1",job="hap"}'
+        values: '5x10'
+    alert_rule_test:
+      - alertname: HAproxyPendingRequests
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyPendingRequests
+              proxy: p
+              instance: h1
+              job: hap
+              severity: warning
+            exp_annotations:
+              summary: "HAProxy pending requests — p @ h1"
+              description: "Some HAProxy requests are pending on p @ h1 - 5.00"
+
+  # Both recording rules below divided raw metrics carrying instance+job with
+  # group_left(), which is a hard evaluation error once two HAProxy instances
+  # are scraped: "found duplicate series for the match group".
+  - interval: 1m
+    name: session saturation survives two scraped instances
+    input_series:
+      - series: 'haproxy_backend_current_sessions{namespace="ns",proxy="p",instance="i1",job="hap"}'
+        values: '10x5'
+      - series: 'haproxy_backend_current_sessions{namespace="ns",proxy="p",instance="i2",job="hap"}'
+        values: '30x5'
+      - series: 'haproxy_backend_limit_sessions{namespace="ns",proxy="p",instance="i1",job="hap"}'
+        values: '100x5'
+      - series: 'haproxy_backend_limit_sessions{namespace="ns",proxy="p",instance="i2",job="hap"}'
+        values: '100x5'
+    promql_expr_test:
+      - expr: haproxy:backend_session_saturation:ratio
+        eval_time: 3m
+        exp_samples:
+          - labels: 'haproxy:backend_session_saturation:ratio{namespace="ns",proxy="p"}'
+            value: 20
+
+  - interval: 1m
+    name: a backend with no maxconn drops out instead of yielding +Inf
+    input_series:
+      - series: 'haproxy_backend_current_sessions{namespace="ns",proxy="nolimit",instance="i1",job="hap"}'
+        values: '50x5'
+      - series: 'haproxy_backend_limit_sessions{namespace="ns",proxy="nolimit",instance="i1",job="hap"}'
+        values: '0x5'
+    promql_expr_test:
+      - expr: haproxy:backend_session_saturation:ratio
+        eval_time: 3m
+        exp_samples: []
+
+  # `(4xx_rate > 10) + 5xx_rate` is empty below 10 4xx/s, because `>` filters
+  # rather than returning a boolean and `empty + B` is empty. A backend serving
+  # only 5xx -- the case the record exists for -- never appeared.
+  - interval: 1m
+    name: combined error rate reports a backend serving only 5xx
+    input_series:
+      - series: 'haproxy_backend_http_responses_total{code="5xx",namespace="ns",proxy="p",instance="h1",job="hap"}'
+        values: '0+30x10'
+      - series: 'haproxy_backend_http_responses_total{code="2xx",namespace="ns",proxy="p",instance="h1",job="hap"}'
+        values: '0+30x10'
+    promql_expr_test:
+      - expr: haproxy:backend_error_rate:ratio5m
+        eval_time: 8m
+        exp_samples:
+          - labels: 'haproxy:backend_error_rate:ratio5m{namespace="ns",proxy="p"}'
+            value: 50

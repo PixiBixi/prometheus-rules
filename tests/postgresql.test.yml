@@ -1,0 +1,70 @@
+# Regression tests for rules/postgresql.rules.yml
+#
+# Both alerts aggregated one side of a division to a narrower label set than
+# the other -- sum by (instance) / sum by (server) against {server,instance,job}
+# -- with no on() modifier, so the division matched nothing.
+rule_files:
+  - postgresql.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: connection and lock saturation are detected
+    input_series:
+      # 600 + 400 = 1000 backends against max_connections 1200 -> 83%
+      - series: 'pg_stat_database_numbackends{server="pg1:5432",datname="mydb",datid="1",instance="pg1",job="pg"}'
+        values: '600x10'
+      - series: 'pg_stat_database_numbackends{server="pg1:5432",datname="other",datid="2",instance="pg1",job="pg"}'
+        values: '400x10'
+      - series: 'pg_settings_max_connections{server="pg1:5432",instance="pg1",job="pg"}'
+        values: '1200x10'
+      # 20000 locks against 64 * 1200 = 76800 -> 26%
+      - series: 'pg_locks_count{server="pg1:5432",datname="mydb",mode="accesssharelock",instance="pg1",job="pg"}'
+        values: '20000x10'
+      - series: 'pg_settings_max_locks_per_transaction{server="pg1:5432",instance="pg1",job="pg"}'
+        values: '64x10'
+    alert_rule_test:
+      - alertname: PostgresConnectionsSaturation
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: PostgresConnectionsSaturation
+              server: "pg1:5432"
+              instance: pg1
+              job: pg
+              severity: warning
+            exp_annotations:
+              summary: "PostgreSQL connections saturation (server pg1:5432)"
+              description: "PostgreSQL connection usage above 80% of max_connections on pg1:5432."
+      - alertname: PostgresqlTooManyLocksAcquired
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: PostgresqlTooManyLocksAcquired
+              server: "pg1:5432"
+              instance: pg1
+              job: pg
+              severity: critical
+            exp_annotations:
+              summary: "PostgreSQL too many locks acquired (instance pg1)"
+              description: "More than 20% of max_locks_per_transaction used on pg1 — consider increasing max_locks_per_transaction"
+
+  - interval: 1m
+    name: a lightly loaded server triggers neither alert
+    input_series:
+      - series: 'pg_stat_database_numbackends{server="pg1:5432",datname="mydb",datid="1",instance="pg1",job="pg"}'
+        values: '50x10'
+      - series: 'pg_settings_max_connections{server="pg1:5432",instance="pg1",job="pg"}'
+        values: '1200x10'
+      - series: 'pg_locks_count{server="pg1:5432",datname="mydb",mode="accesssharelock",instance="pg1",job="pg"}'
+        values: '100x10'
+      - series: 'pg_settings_max_locks_per_transaction{server="pg1:5432",instance="pg1",job="pg"}'
+        values: '64x10'
+    alert_rule_test:
+      - alertname: PostgresConnectionsSaturation
+        eval_time: 8m
+        exp_alerts: []
+      - alertname: PostgresqlTooManyLocksAcquired
+        eval_time: 8m
+        exp_alerts: []

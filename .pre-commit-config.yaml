@@ -6,7 +6,15 @@ repos:
         language: system
         entry: python3 validate_rules.py
         pass_filenames: false
-        files: ^rules/.*\.yml$
+        files: ^(rules/.*\.yml|validate_rules\.py|ruleslib\.py)$
+        stages: [pre-commit]
+
+      - id: test-rules
+        name: Run promtool rule unit tests
+        language: system
+        entry: python3 run_tests.py
+        pass_filenames: false
+        files: ^(rules/.*\.yml|tests/.*\.test\.yml|run_tests\.py|ruleslib\.py)$
         stages: [pre-commit]
 
       - id: build-docs

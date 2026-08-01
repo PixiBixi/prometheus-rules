@@ -1,0 +1,62 @@
+# Regression tests for rules/jmx.rules.yml
+#
+# All three alerts below were dead: the heap ones queried jvm_memory_used_bytes
+# / jvm_memory_max_bytes (the exporter emits jvm_memory_bytes_used / _max), and
+# the GC one used a lowercase .*old.* matcher against "G1 Old Generation".
+rule_files:
+  - jmx.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: heap and old-gen GC alerts fire on a JVM under pressure
+    input_series:
+      - series: 'jvm_memory_bytes_used{area="heap",instance="kafka1",job="kafka"}'
+        values: '950x10'
+      - series: 'jvm_memory_bytes_max{area="heap",instance="kafka1",job="kafka"}'
+        values: '1000x10'
+      - series: 'jvm_gc_collection_seconds_count{gc="G1 Old Generation",instance="kafka1",job="kafka"}'
+        values: '0+60x10'
+    alert_rule_test:
+      - alertname: JvmMemoryFillingUp
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: JvmMemoryFillingUp, instance: kafka1, severity: warning}
+            exp_annotations:
+              summary: "JVM heap memory filling up (instance kafka1)"
+              description: "JVM heap memory is filling up (> 80%) on kafka1\n  VALUE = 95"
+      - alertname: JvmHeapMemoryCritical
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels: {alertname: JvmHeapMemoryCritical, instance: kafka1, severity: critical}
+            exp_annotations:
+              summary: "JVM heap memory critical (instance kafka1)"
+              description: "JVM heap memory above 90% on kafka1 — raise -Xmx or investigate a leak\n  VALUE = 95"
+      - alertname: JvmOldGenGcFrequency
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: JvmOldGenGcFrequency
+              gc: "G1 Old Generation"
+              instance: kafka1
+              job: kafka
+              severity: warning
+            exp_annotations:
+              summary: "JVM old gen GC frequency high (instance kafka1)"
+              description: "Frequent old/major GC cycles indicate memory pressure on kafka1\n  VALUE = 1"
+
+  - interval: 1m
+    name: heap alerts stay silent on a healthy JVM
+    input_series:
+      - series: 'jvm_memory_bytes_used{area="heap",instance="kafka1",job="kafka"}'
+        values: '400x10'
+      - series: 'jvm_memory_bytes_max{area="heap",instance="kafka1",job="kafka"}'
+        values: '1000x10'
+    alert_rule_test:
+      - alertname: JvmMemoryFillingUp
+        eval_time: 8m
+        exp_alerts: []
+      - alertname: JvmHeapMemoryCritical
+        eval_time: 8m
+        exp_alerts: []

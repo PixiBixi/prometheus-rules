@@ -1,0 +1,69 @@
+# Regression tests for rules/basis.rules.yml
+rule_files:
+  - basis.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # DownSystemdCron / SSH / OpenVPN used `name=` with regex metacharacters.
+  # `=` is an exact match, so they looked for units literally called
+  # "crond?.service" and matched nothing.
+  - interval: 1m
+    name: systemd unit selectors match real unit names
+    input_series:
+      - series: 'node_systemd_unit_state{state="failed",name="cron.service",instance="h1",job="node-exporter",type="simple"}'
+        values: '1x5'
+      - series: 'node_systemd_unit_state{state="failed",name="ssh.service",instance="h1",job="node-exporter",type="simple"}'
+        values: '1x5'
+      - series: 'node_systemd_unit_state{state="failed",name="openvpn-client@corp.service",instance="h1",job="node-exporter",type="simple"}'
+        values: '1x5'
+      # Decoy: `\.` must match a literal dot, so this must NOT be picked up.
+      - series: 'node_systemd_unit_state{state="failed",name="crondXservice",instance="h1",job="node-exporter",type="simple"}'
+        values: '1x5'
+    promql_expr_test:
+      - expr: 'count(ALERTS{alertname=~"DownSystemdCron|DownSystemdSSH|DownSystemdOpenVPN",alertstate="firing"})'
+        eval_time: 3m
+        exp_samples:
+          - labels: '{}'
+            value: 3
+
+  # RaidDegraded summed node_md_disks across all states, giving the number of
+  # disks present -- invariant exactly when a disk goes active -> failed.
+  - interval: 1m
+    name: RaidDegraded fires when a disk drops out of the array
+    input_series:
+      - series: 'node_md_disks{device="md2",state="active",instance="h1",job="node-exporter"}'
+        values: '1x5'
+      - series: 'node_md_disks{device="md2",state="failed",instance="h1",job="node-exporter"}'
+        values: '1x5'
+      - series: 'node_md_disks{device="md2",state="spare",instance="h1",job="node-exporter"}'
+        values: '0x5'
+      - series: 'node_md_disks_required{device="md2",instance="h1",job="node-exporter"}'
+        values: '2x5'
+    alert_rule_test:
+      - alertname: RaidDegraded
+        eval_time: 3m
+        exp_alerts:
+          - exp_labels:
+              alertname: RaidDegraded
+              device: md2
+              instance: h1
+              job: node-exporter
+              severity: critical
+            exp_annotations:
+              summary: "MDRaid is degraded md2 for h1"
+              description: "A disk seems disabled by kernel md2 for h1"
+
+  - interval: 1m
+    name: RaidDegraded stays silent on a healthy array
+    input_series:
+      - series: 'node_md_disks{device="md2",state="active",instance="h1",job="node-exporter"}'
+        values: '2x5'
+      - series: 'node_md_disks{device="md2",state="failed",instance="h1",job="node-exporter"}'
+        values: '0x5'
+      - series: 'node_md_disks_required{device="md2",instance="h1",job="node-exporter"}'
+        values: '2x5'
+    alert_rule_test:
+      - alertname: RaidDegraded
+        eval_time: 3m
+        exp_alerts: []
