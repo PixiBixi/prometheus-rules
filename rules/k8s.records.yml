@@ -1,5 +1,15 @@
 - name: k8s.records
   # for unspecified = default (0m)
+  #
+  # CONSUMED BY GRAFANA DASHBOARDS, NOT BY ALERTS.
+  # No alert in this repo references these records, so a grep for consumers
+  # will come up empty -- that is expected, do not delete them on that basis.
+  # They run every minute over container_cpu_usage_seconds_total and
+  # container_memory_working_set_bytes, both high-cardinality cAdvisor metrics,
+  # so the evaluation cost is real and deliberate.
+  #
+  # kube_container_* and kube_namespace_* are already pre-aggregated per pod /
+  # per namespace: do not re-aggregate them downstream.
   interval: 1m
   rules:
     - record: kube_container_cpu_usage_5m

@@ -1,4 +1,8 @@
 - name: basis.records
+  # Some records here have no alert consumer (instance:node_memory_utilization:ratio,
+  # instance:node_cpus:count, job:node_cpu_utilization:{min,max}_ratio, and the two
+  # NIC saturation ratios). They feed Grafana dashboards -- an empty grep for
+  # consumers in rules/ is expected and not grounds for deletion.
   # for unspecified = default (0m)
   interval: 1m
   rules:
