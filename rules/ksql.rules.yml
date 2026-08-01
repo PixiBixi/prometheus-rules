@@ -44,7 +44,8 @@
       expr: sum(ksql_ksql_engine_query_stats_rebalancing_queries > 0) by (instance,job)
       for: 5m
       labels:
-        severity: critical
+        # The description says this can be normal; critical contradicts that.
+        severity: warning
       annotations:
         description: "{{ $labels.instance }} has rebalancing queries for 5 minutes, it could be normal"
         summary: "KSQL queries are rebalancing on {{ $labels.instance }} for 5 minutes"

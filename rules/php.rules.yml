@@ -20,7 +20,9 @@
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
         summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
     - alert: PHPFPMDown
-      expr: sum(phpfpm_up) by (instance,job) == 0
+      # phpfpm_up is per pool; summing across pools hid a single pool going
+      # down behind its healthy neighbours.
+      expr: sum(phpfpm_up) by (instance,job,pool) == 0
       for: 2m
       annotations:
         summary: "PHPFPM Exporter is UP but PHPFPM seems down for {{ $labels.instance }}"
@@ -36,7 +38,9 @@
         severity: critical
 
     - alert: PHPFPMQueueSaturation
-      expr: phpfpm_listen_queue / phpfpm_listen_queue_length > 0.8
+      # listen.backlog unset leaves listen_queue_length at 0: 0/0 = NaN (never
+      # fires) or +Inf if the queue grows (always fires). Neither is wanted.
+      expr: phpfpm_listen_queue / (phpfpm_listen_queue_length > 0) > 0.8
       for: 2m
       labels:
         severity: critical
