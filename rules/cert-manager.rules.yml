@@ -65,7 +65,13 @@
         description: "cert-manager controller {{ $labels.controller }} is failing more than 10% of sync operations. Certificate issuance may be delayed."
 
     - alert: CertManagerACMEHighErrorRate
-      expr: rate(certmanager_http_acme_client_request_duration_seconds_count{status=~"4..|5.."}[5m]) / rate(certmanager_http_acme_client_request_duration_seconds_count[5m]) > 0.05
+      # Must aggregate away `status` before dividing: without it the division matches
+      # on the full label set and each error series is divided by itself, giving 1.0.
+      expr: |
+        sum by (instance, job, host) (rate(certmanager_http_acme_client_request_duration_seconds_count{status=~"4..|5.."}[5m]))
+        /
+        sum by (instance, job, host) (rate(certmanager_http_acme_client_request_duration_seconds_count[5m]))
+        > 0.05
       for: 5m
       labels:
         severity: warning
