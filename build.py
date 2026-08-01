@@ -6,6 +6,13 @@ import os
 import re
 import yaml
 
+# libyaml-backed loader is ~10x faster than the pure-Python one and accounts for
+# most of this script's runtime. Fall back gracefully if PyYAML was built without it.
+try:
+    from yaml import CSafeLoader as YamlLoader
+except ImportError:  # pragma: no cover - depends on local PyYAML build
+    from yaml import SafeLoader as YamlLoader
+
 ROOT      = os.path.dirname(os.path.abspath(__file__))
 EXPORTERS_DIR = os.path.join(ROOT, "exporters")
 RULES_DIR     = os.path.join(ROOT, "rules")
@@ -48,6 +55,13 @@ PROMQL_KEYWORDS = {
     "sort", "sort_desc", "inf", "nan",
 }
 
+# Precompiled once — these run on every line of every exporter fixture.
+RE_SAMPLE       = re.compile(r"^(\S+?)(\{[^}]*\})?\s+(.+)$")
+RE_LABEL        = re.compile(r'(\w+)="[^"]*"')
+RE_FIRST_LINE   = re.compile(r"^(# HELP|# TYPE|\w+[{ ])")
+RE_LABEL_MATCHER = re.compile(r"\{[^}]*\}")
+RE_TOKEN        = re.compile(r"[a-zA-Z_:][a-zA-Z0-9_:]*")
+
 
 # ── Exporters ────────────────────────────────────────────────────────────────
 
@@ -67,14 +81,23 @@ def parse_exporter(path, native=False):
                 parts = line.split(" ", 3)
                 current_type = parts[3] if len(parts) > 3 else ""
             elif line and not line.startswith("#"):
-                m = re.match(r"^(\S+?)(\{[^}]*\})?\s+(.+)$", line)
+                # Cheap name extraction first: histogram buckets repeat the same
+                # metric name on every `le=` line, so most samples are skipped
+                # here without paying for the full regex.
+                cut = min(
+                    (i for i in (line.find("{"), line.find(" ")) if i != -1),
+                    default=-1,
+                )
+                if cut != -1 and line[:cut] in seen:
+                    continue
+                m = RE_SAMPLE.match(line)
                 if not m:
                     continue
                 name = m.group(1)
                 if name in seen:
                     continue
                 seen.add(name)
-                labels = re.findall(r'(\w+)="[^"]*"', m.group(2) or "")
+                labels = RE_LABEL.findall(m.group(2) or "")
                 metrics.append({
                     "name": name,
                     "type": current_type or "",
@@ -99,7 +122,7 @@ def load_exporters():
             continue
         with open(fpath) as f:
             first = f.read(50)
-        if not re.match(r"^(# HELP|# TYPE|\w+[{ ])", first):
+        if not RE_FIRST_LINE.match(first):
             continue
         metrics = parse_exporter(fpath, native=fname in NATIVE_EXPORTERS)
         if not metrics:
@@ -117,8 +140,8 @@ def load_exporters():
 
 def extract_metric_names(expr):
     """Extract likely metric names from a PromQL expression."""
-    expr = re.sub(r'\{[^}]*\}', '', str(expr))  # strip label matchers
-    tokens = re.findall(r'[a-zA-Z_:][a-zA-Z0-9_:]*', expr)
+    expr = RE_LABEL_MATCHER.sub('', str(expr))  # strip label matchers
+    tokens = RE_TOKEN.findall(expr)
     return {
         t for t in tokens
         if t not in PROMQL_KEYWORDS
@@ -134,7 +157,7 @@ def load_rules():
             continue
         fpath = os.path.join(RULES_DIR, fname)
         with open(fpath) as f:
-            raw = yaml.safe_load(f)
+            raw = yaml.load(f, Loader=YamlLoader)
         if not raw or not isinstance(raw, list):
             continue
 
