@@ -209,7 +209,15 @@ Environment="KAFKA_OPTS=-javaagent:/usr/share/java/kafka/jmx_prometheus_javaagen
 Redis exporter is also used for KeyDB exporter as KeyDB is a fork of Redis
 
 **Exporter link :** [redis_exporter](https://github.com/oliver006/redis_exporter)
-**Version used :** 1.58.0
+**Version used :** v1.52.0 (the fleet also runs a small number of v1.58.0)
+
+> **Metric names move between versions of this exporter.** v1.52 exposes
+> `redis_config_maxclients`; current releases renamed it to `redis_max_clients`.
+> The rules in this repo target the former. `exporters/keydb_exporter` is a real
+> v1.52.0 scrape against KeyDB, merged from three roles — primary (with AOF and
+> maxmemory configured), replica, and a cluster-enabled node — so that
+> replication, AOF and `redis_cluster_*` metrics are all represented.
+> Regenerate it against the version you actually run, not `:latest`.
 
 #### php-fpm_exporter
 
