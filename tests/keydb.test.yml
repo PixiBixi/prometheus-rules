@@ -1,0 +1,84 @@
+# Regression tests for rules/keydb.rules.yml
+#
+# These were unverifiable until August 2026: exporters/keydb_exporter held JMX
+# Kafka/KSQL metrics, not Redis ones. The fixture is now a real scrape of
+# oliver006/redis_exporter v1.52.0 -- the version running on most of the fleet
+# -- against KeyDB, covering primary, replica and cluster-enabled roles.
+#
+# Metric names move between exporter versions: v1.52 exposes
+# redis_config_maxclients, while current releases renamed it to
+# redis_max_clients. These tests pin the names this repo's deployment actually
+# emits, so a fixture regenerated from a newer exporter cannot silently
+# invalidate the rules.
+rule_files:
+  - keydb.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: connection saturation is detected
+    input_series:
+      - series: 'redis_connected_clients{instance="10.0.0.1:9121",job="keydb"}'
+        values: '9500x10'
+      - series: 'redis_config_maxclients{instance="10.0.0.1:9121",job="keydb"}'
+        values: '10000x10'
+    alert_rule_test:
+      - alertname: RedisTooManyConnections
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: RedisTooManyConnections
+              instance: "10.0.0.1:9121"
+              job: keydb
+              severity: warning
+            exp_annotations:
+              summary: "Redis too many connections (instance 10.0.0.1:9121)"
+              description: "Redis connections > 90% of maxclients on 10.0.0.1:9121\n  VALUE = 95"
+
+  - interval: 1m
+    name: a lightly loaded instance raises nothing
+    input_series:
+      - series: 'redis_connected_clients{instance="10.0.0.1:9121",job="keydb"}'
+        values: '1x10'
+      - series: 'redis_config_maxclients{instance="10.0.0.1:9121",job="keydb"}'
+        values: '10000x10'
+    alert_rule_test:
+      - alertname: RedisTooManyConnections
+        eval_time: 5m
+        exp_alerts: []
+
+  # maxmemory=0 means unlimited, which is the Redis default. This guard is what
+  # commit 75c221b added; keep it pinned.
+  - interval: 1m
+    name: an instance with no maxmemory does not report as out of memory
+    input_series:
+      - series: 'redis_memory_used_bytes{instance="10.0.0.1:9121",job="keydb"}'
+        values: '1000000000x10'
+      - series: 'redis_memory_max_bytes{instance="10.0.0.1:9121",job="keydb"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: RedisOutOfConfiguredMaxmemory
+        eval_time: 5m
+        exp_alerts: []
+
+  - interval: 1m
+    name: an instance near its configured maxmemory alerts
+    input_series:
+      # 250MiB used of a 256MiB limit
+      - series: 'redis_memory_used_bytes{instance="10.0.0.1:9121",job="keydb"}'
+        values: '262144000x10'
+      - series: 'redis_memory_max_bytes{instance="10.0.0.1:9121",job="keydb"}'
+        values: '268435456x10'
+    alert_rule_test:
+      - alertname: RedisOutOfConfiguredMaxmemory
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: RedisOutOfConfiguredMaxmemory
+              instance: "10.0.0.1:9121"
+              job: keydb
+              severity: critical
+            exp_annotations:
+              summary: "Redis out of configured maxmemory (instance 10.0.0.1:9121)"
+              description: "Redis is running out of configured maxmemory (> 90%) on 10.0.0.1:9121\n  VALUE = 97.65625"
