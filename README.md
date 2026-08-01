@@ -120,9 +120,14 @@ reusable. Details in `AUDIT_PROD_2026-08-01.md`.
 | `pg_bloat_*`, `pg_stat_user_tables_*`, `pg_general_index_info_*` | `PostgresqlBloatIndexHigh`, `PostgresqlBloatTableHigh`, `PostgresqlTooManyDeadTuples`, `PostgresqlTableNotAutoVacuumed` | these come from a custom postgres_exporter `queries.yaml` that is not deployed |
 | `kafka_consumer_consumer_fetch_manager_metrics_*` | `KafkaConsumerLagHigh` | the `consumer` job is not scraped |
 | `blackbox_exporter_config_*`, `blackbox_module_unknown_total` | blackbox config-reload alerts | only the probe endpoint is scraped, not the exporter's own `/metrics` |
-| `coredns_forward_responses_total` | `CoreDNSForwardErrorsHigh`, `...Elevated` | exposed under neither `coredns_forward_*` nor `coredns_proxy_*` on this CoreDNS build |
 
 Enabling any of them is a scrape or exporter-flag change, not a rule change.
+
+> **Check more than one Prometheus before declaring a metric dead.** CoreDNS 1.11.0
+> renamed the forward plugin's metrics from `coredns_forward_*` to `coredns_proxy_*`,
+> and this estate runs both — 1.11.4 on one cluster, 1.10.x on another. Looking at a
+> single datasource made `coredns_forward_responses_total` appear not to exist anywhere,
+> which was wrong. The CoreDNS rules now match either naming.
 
 ### Exporters
 
