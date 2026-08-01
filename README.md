@@ -78,6 +78,24 @@ rules by plain basename: `rule_files: [basis.rules.yml]`. promtool does not
 report which file a failing test came from, so give every test a descriptive
 `name:`.
 
+### Rules with no data on our own Prometheus
+
+Audited 2026-08-01 by testing all 394 metrics the rules reference against the live
+Prometheus. The following are **not bugs** — the rules are correct, the software simply
+is not deployed (or not scraped) here. They are kept because this ruleset is meant to be
+reusable. Details in `AUDIT_PROD_2026-08-01.md`.
+
+| Family | Alerts | Why there is no data |
+|---|---|---|
+| `stackdriver_*` | all 5 in `stackdriver.rules.yml` | exporter not scraped — zero metric families present |
+| `mysql_slave_status_*` | `MySQLReplicationDown` | the fleet is Galera-only; `--collect.slave_status` is off |
+| `pg_bloat_*`, `pg_stat_user_tables_*`, `pg_general_index_info_*` | `PostgresqlBloatIndexHigh`, `PostgresqlBloatTableHigh`, `PostgresqlTooManyDeadTuples`, `PostgresqlTableNotAutoVacuumed` | these come from a custom postgres_exporter `queries.yaml` that is not deployed |
+| `kafka_consumer_consumer_fetch_manager_metrics_*` | `KafkaConsumerLagHigh` | the `consumer` job is not scraped |
+| `blackbox_exporter_config_*`, `blackbox_module_unknown_total` | blackbox config-reload alerts | only the probe endpoint is scraped, not the exporter's own `/metrics` |
+| `coredns_forward_responses_total` | `CoreDNSForwardErrorsHigh`, `...Elevated` | exposed under neither `coredns_forward_*` nor `coredns_proxy_*` on this CoreDNS build |
+
+Enabling any of them is a scrape or exporter-flag change, not a rule change.
+
 ### Exporters
 
 Here the list of all used exporters
