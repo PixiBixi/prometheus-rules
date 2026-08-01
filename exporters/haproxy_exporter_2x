@@ -1,39 +1,39 @@
 # HELP haproxy_process_nbthread Number of started threads (global.nbthread)
 # TYPE haproxy_process_nbthread gauge
-haproxy_process_nbthread 0
+haproxy_process_nbthread 10
 # HELP haproxy_process_nbproc Number of started worker processes (historical, always 1)
 # TYPE haproxy_process_nbproc gauge
-haproxy_process_nbproc 0
+haproxy_process_nbproc 1
 # HELP haproxy_process_relative_process_id Relative worker process number (1)
 # TYPE haproxy_process_relative_process_id gauge
-haproxy_process_relative_process_id 0
+haproxy_process_relative_process_id 1
 # HELP haproxy_process_uptime_seconds How long ago this worker process was started (seconds)
 # TYPE haproxy_process_uptime_seconds gauge
-haproxy_process_uptime_seconds 0
+haproxy_process_uptime_seconds 25
 # HELP haproxy_process_pool_failures_total Number of failed pool allocations since this worker was started
 # TYPE haproxy_process_pool_failures_total counter
 haproxy_process_pool_failures_total 0
 # HELP haproxy_process_max_fds Hard limit on the number of per-process file descriptors
 # TYPE haproxy_process_max_fds gauge
-haproxy_process_max_fds 0
+haproxy_process_max_fds 1048576
 # HELP haproxy_process_max_sockets Hard limit on the number of per-process sockets
 # TYPE haproxy_process_max_sockets gauge
-haproxy_process_max_sockets 0
+haproxy_process_max_sockets 1048576
 # HELP haproxy_process_max_connections Hard limit on the number of per-process connections (configured or imposed by Ulimit-n)
 # TYPE haproxy_process_max_connections gauge
-haproxy_process_max_connections 0
+haproxy_process_max_connections 524260
 # HELP haproxy_process_hard_max_connections Hard limit on the number of per-process connections (imposed by Memmax_MB or Ulimit-n)
 # TYPE haproxy_process_hard_max_connections gauge
-haproxy_process_hard_max_connections 0
+haproxy_process_hard_max_connections 524260
 # HELP haproxy_process_current_connections Current number of connections on this worker process
 # TYPE haproxy_process_current_connections gauge
-haproxy_process_current_connections 0
+haproxy_process_current_connections 1
 # HELP haproxy_process_connections_total Total number of connections on this worker process since started
 # TYPE haproxy_process_connections_total counter
-haproxy_process_connections_total 0
+haproxy_process_connections_total 41
 # HELP haproxy_process_requests_total Total number of requests on this worker process since started
 # TYPE haproxy_process_requests_total counter
-haproxy_process_requests_total 0
+haproxy_process_requests_total 15
 # HELP haproxy_process_max_ssl_connections Hard limit on the number of per-process SSL endpoints (front+back), 0=unlimited
 # TYPE haproxy_process_max_ssl_connections gauge
 haproxy_process_max_ssl_connections 0
@@ -54,22 +54,22 @@ haproxy_process_pipes_used_total 0
 haproxy_process_pipes_free_total 0
 # HELP haproxy_process_current_connection_rate Number of front connections created on this worker process over the last second
 # TYPE haproxy_process_current_connection_rate gauge
-haproxy_process_current_connection_rate 0
+haproxy_process_current_connection_rate 1
 # HELP haproxy_process_limit_connection_rate Hard limit for ConnRate (global.maxconnrate)
 # TYPE haproxy_process_limit_connection_rate gauge
 haproxy_process_limit_connection_rate 0
 # HELP haproxy_process_max_connection_rate Highest ConnRate reached on this worker process since started (in connections per second)
 # TYPE haproxy_process_max_connection_rate gauge
-haproxy_process_max_connection_rate 0
+haproxy_process_max_connection_rate 2
 # HELP haproxy_process_current_session_rate Number of sessions created on this worker process over the last second
 # TYPE haproxy_process_current_session_rate gauge
-haproxy_process_current_session_rate 0
+haproxy_process_current_session_rate 1
 # HELP haproxy_process_limit_session_rate Hard limit for SessRate (global.maxsessrate)
 # TYPE haproxy_process_limit_session_rate gauge
 haproxy_process_limit_session_rate 0
 # HELP haproxy_process_max_session_rate Highest SessRate reached on this worker process since started (in sessions per second)
 # TYPE haproxy_process_max_session_rate gauge
-haproxy_process_max_session_rate 0
+haproxy_process_max_session_rate 2
 # HELP haproxy_process_current_ssl_rate Number of SSL connections created on this worker process over the last second
 # TYPE haproxy_process_current_ssl_rate gauge
 haproxy_process_current_ssl_rate 0
@@ -111,31 +111,31 @@ haproxy_process_http_comp_bytes_out_total 0
 haproxy_process_limit_http_comp 0
 # HELP haproxy_process_current_zlib_memory Amount of memory currently used by HTTP compression on the current worker process (in bytes)
 # TYPE haproxy_process_current_zlib_memory gauge
-haproxy_process_current_zlib_memory 0
+haproxy_process_current_zlib_memory NaN
 # HELP haproxy_process_max_zlib_memory Limit on the amount of memory used by HTTP compression above which it is automatically disabled (in bytes, see global.maxzlibmem)
 # TYPE haproxy_process_max_zlib_memory gauge
-haproxy_process_max_zlib_memory 0
+haproxy_process_max_zlib_memory NaN
 # HELP haproxy_process_current_tasks Total number of tasks in the current worker process (active + sleeping)
 # TYPE haproxy_process_current_tasks gauge
-haproxy_process_current_tasks 0
+haproxy_process_current_tasks 35
 # HELP haproxy_process_current_run_queue Total number of active tasks+tasklets in the current worker process
 # TYPE haproxy_process_current_run_queue gauge
 haproxy_process_current_run_queue 0
 # HELP haproxy_process_idle_time_percent Percentage of last second spent waiting in the current worker thread
 # TYPE haproxy_process_idle_time_percent gauge
-haproxy_process_idle_time_percent 0
+haproxy_process_idle_time_percent 100
 # HELP haproxy_process_stopping 1 if the worker process is currently stopping, otherwise zero
 # TYPE haproxy_process_stopping gauge
 haproxy_process_stopping 0
 # HELP haproxy_process_jobs Current number of active jobs on the current worker process (frontend connections, master connections, listeners)
 # TYPE haproxy_process_jobs gauge
-haproxy_process_jobs 0
+haproxy_process_jobs 4
 # HELP haproxy_process_unstoppable_jobs Current number of unstoppable jobs on the current worker process (master connections)
 # TYPE haproxy_process_unstoppable_jobs gauge
-haproxy_process_unstoppable_jobs 0
+haproxy_process_unstoppable_jobs 1
 # HELP haproxy_process_listeners Current number of active listeners on the current worker process
 # TYPE haproxy_process_listeners gauge
-haproxy_process_listeners 0
+haproxy_process_listeners 3
 # HELP haproxy_process_active_peers Current number of verified active peers connections on the current worker process
 # TYPE haproxy_process_active_peers gauge
 haproxy_process_active_peers 0
@@ -153,49 +153,49 @@ haproxy_process_busy_polling_enabled 0
 haproxy_process_failed_resolutions 0
 # HELP haproxy_process_bytes_out_total Total number of bytes emitted by current worker process since started
 # TYPE haproxy_process_bytes_out_total counter
-haproxy_process_bytes_out_total 0
+haproxy_process_bytes_out_total 798978
 # HELP haproxy_process_spliced_bytes_out_total Total number of bytes emitted by current worker process through a kernel pipe since started
 # TYPE haproxy_process_spliced_bytes_out_total counter
 haproxy_process_spliced_bytes_out_total 0
 # HELP haproxy_process_bytes_out_rate Number of bytes emitted by current worker process over the last second
 # TYPE haproxy_process_bytes_out_rate gauge
-haproxy_process_bytes_out_rate 0
+haproxy_process_bytes_out_rate 25600
 # HELP haproxy_process_recv_logs_total Total number of log messages received by log-forwarding listeners on this worker process since started
 # TYPE haproxy_process_recv_logs_total counter
 haproxy_process_recv_logs_total 0
 # HELP haproxy_process_build_info Build info
 # TYPE haproxy_process_build_info gauge
-haproxy_process_build_info{version="2.0.0"} 0
+haproxy_process_build_info{version="2.7.11-030a4a9"} 1
 # HELP haproxy_process_max_memory_bytes Worker process's hard limit on memory usage in byes (-m on command line)
 # TYPE haproxy_process_max_memory_bytes gauge
 haproxy_process_max_memory_bytes 0
 # HELP haproxy_process_pool_allocated_bytes Amount of memory allocated in pools (in bytes)
 # TYPE haproxy_process_pool_allocated_bytes gauge
-haproxy_process_pool_allocated_bytes 0
+haproxy_process_pool_allocated_bytes 578784
 # HELP haproxy_process_pool_used_bytes Amount of pool memory currently used (in bytes)
 # TYPE haproxy_process_pool_used_bytes gauge
-haproxy_process_pool_used_bytes 0
+haproxy_process_pool_used_bytes 578784
 # HELP haproxy_process_start_time_seconds Start time in seconds
 # TYPE haproxy_process_start_time_seconds gauge
-haproxy_process_start_time_seconds 0
+haproxy_process_start_time_seconds 1785617685
 # HELP haproxy_frontend_current_sessions Number of current sessions on the frontend, backend or server
 # TYPE haproxy_frontend_current_sessions gauge
-haproxy_frontend_current_sessions{proxy="myproxy"} 0
+haproxy_frontend_current_sessions{proxy="myproxy"} 1
 # HELP haproxy_frontend_max_sessions Highest value of current sessions encountered since process started
 # TYPE haproxy_frontend_max_sessions gauge
-haproxy_frontend_max_sessions{proxy="myproxy"} 0
+haproxy_frontend_max_sessions{proxy="myproxy"} 3
 # HELP haproxy_frontend_limit_sessions Frontend/listener/server's maxconn, backend's fullconn
 # TYPE haproxy_frontend_limit_sessions gauge
-haproxy_frontend_limit_sessions{proxy="myproxy"} 0
+haproxy_frontend_limit_sessions{proxy="myproxy"} 524260
 # HELP haproxy_frontend_sessions_total Total number of sessions since process started
 # TYPE haproxy_frontend_sessions_total counter
-haproxy_frontend_sessions_total{proxy="myproxy"} 0
+haproxy_frontend_sessions_total{proxy="myproxy"} 15
 # HELP haproxy_frontend_bytes_in_total Total number of request bytes since process started
 # TYPE haproxy_frontend_bytes_in_total counter
-haproxy_frontend_bytes_in_total{proxy="myproxy"} 0
+haproxy_frontend_bytes_in_total{proxy="myproxy"} 608
 # HELP haproxy_frontend_bytes_out_total Total number of response bytes since process started
 # TYPE haproxy_frontend_bytes_out_total counter
-haproxy_frontend_bytes_out_total{proxy="myproxy"} 0
+haproxy_frontend_bytes_out_total{proxy="myproxy"} 809081
 # HELP haproxy_frontend_requests_denied_total Total number of denied requests since process started
 # TYPE haproxy_frontend_requests_denied_total counter
 haproxy_frontend_requests_denied_total{proxy="myproxy"} 0
@@ -208,21 +208,27 @@ haproxy_frontend_request_errors_total{proxy="myproxy"} 0
 # HELP haproxy_frontend_status Current status of the service, per state label value.
 # TYPE haproxy_frontend_status gauge
 haproxy_frontend_status{proxy="myproxy",state="DOWN"} 0
+haproxy_frontend_status{proxy="myproxy",state="UP"} 1
 # HELP haproxy_frontend_limit_session_rate Limit on the number of sessions accepted in a second (frontend only, 'rate-limit sessions' setting)
 # TYPE haproxy_frontend_limit_session_rate gauge
 haproxy_frontend_limit_session_rate{proxy="myproxy"} 0
 # HELP haproxy_frontend_max_session_rate Highest value of sessions per second observed since the worker process started
 # TYPE haproxy_frontend_max_session_rate gauge
-haproxy_frontend_max_session_rate{proxy="myproxy"} 0
+haproxy_frontend_max_session_rate{proxy="myproxy"} 2
 # HELP haproxy_frontend_http_responses_total Total number of HTTP responses with status 100-199 returned by this object since the worker process started
 # TYPE haproxy_frontend_http_responses_total counter
 haproxy_frontend_http_responses_total{proxy="myproxy",code="1xx"} 0
+haproxy_frontend_http_responses_total{proxy="myproxy",code="2xx"} 14
+haproxy_frontend_http_responses_total{proxy="myproxy",code="3xx"} 0
+haproxy_frontend_http_responses_total{proxy="myproxy",code="4xx"} 0
+haproxy_frontend_http_responses_total{proxy="myproxy",code="5xx"} 0
+haproxy_frontend_http_responses_total{proxy="myproxy",code="other"} 0
 # HELP haproxy_frontend_http_requests_rate_max Highest value of http requests observed since the worker process started
 # TYPE haproxy_frontend_http_requests_rate_max gauge
-haproxy_frontend_http_requests_rate_max{proxy="myproxy"} 0
+haproxy_frontend_http_requests_rate_max{proxy="myproxy"} 2
 # HELP haproxy_frontend_http_requests_total Total number of HTTP requests processed by this object since the worker process started
 # TYPE haproxy_frontend_http_requests_total counter
-haproxy_frontend_http_requests_total{proxy="myproxy"} 0
+haproxy_frontend_http_requests_total{proxy="myproxy"} 15
 # HELP haproxy_frontend_http_comp_bytes_in_total Total number of bytes submitted to the HTTP compressor for this object since the worker process started
 # TYPE haproxy_frontend_http_comp_bytes_in_total counter
 haproxy_frontend_http_comp_bytes_in_total{proxy="myproxy"} 0
@@ -237,13 +243,13 @@ haproxy_frontend_http_comp_bytes_bypassed_total{proxy="myproxy"} 0
 haproxy_frontend_http_comp_responses_total{proxy="myproxy"} 0
 # HELP haproxy_frontend_connections_rate_max Highest value of connections per second observed since the worker process started
 # TYPE haproxy_frontend_connections_rate_max gauge
-haproxy_frontend_connections_rate_max{proxy="myproxy"} 0
+haproxy_frontend_connections_rate_max{proxy="myproxy"} 2
 # HELP haproxy_frontend_connections_total Total number of new connections accepted on this frontend since the worker process started
 # TYPE haproxy_frontend_connections_total counter
-haproxy_frontend_connections_total{proxy="myproxy"} 0
+haproxy_frontend_connections_total{proxy="myproxy"} 15
 # HELP haproxy_frontend_intercepted_requests_total Total number of HTTP requests intercepted on the frontend (redirects/stats/services) since the worker process started
 # TYPE haproxy_frontend_intercepted_requests_total counter
-haproxy_frontend_intercepted_requests_total{proxy="myproxy"} 0
+haproxy_frontend_intercepted_requests_total{proxy="myproxy"} 15
 # HELP haproxy_frontend_denied_connections_total Total number of incoming connections blocked on a listener/frontend by a tcp-request connection rule since the worker process started
 # TYPE haproxy_frontend_denied_connections_total counter
 haproxy_frontend_denied_connections_total{proxy="myproxy"} 0
@@ -276,7 +282,7 @@ haproxy_backend_current_sessions{proxy="myproxy"} 0
 haproxy_backend_max_sessions{proxy="myproxy"} 0
 # HELP haproxy_backend_limit_sessions Frontend/listener/server's maxconn, backend's fullconn
 # TYPE haproxy_backend_limit_sessions gauge
-haproxy_backend_limit_sessions{proxy="myproxy"} 0
+haproxy_backend_limit_sessions{proxy="myproxy"} 52426
 # HELP haproxy_backend_sessions_total Total number of sessions since process started
 # TYPE haproxy_backend_sessions_total counter
 haproxy_backend_sessions_total{proxy="myproxy"} 0
@@ -307,12 +313,13 @@ haproxy_backend_redispatch_warnings_total{proxy="myproxy"} 0
 # HELP haproxy_backend_status Current status of the service, per state label value.
 # TYPE haproxy_backend_status gauge
 haproxy_backend_status{proxy="myproxy",state="DOWN"} 0
+haproxy_backend_status{proxy="myproxy",state="UP"} 1
 # HELP haproxy_backend_weight Server's effective weight, or sum of active servers' effective weights for a backend
 # TYPE haproxy_backend_weight gauge
-haproxy_backend_weight{proxy="myproxy"} 0
+haproxy_backend_weight{proxy="myproxy"} 1
 # HELP haproxy_backend_active_servers Total number of active UP servers with a non-zero weight
 # TYPE haproxy_backend_active_servers gauge
-haproxy_backend_active_servers{proxy="myproxy"} 0
+haproxy_backend_active_servers{proxy="myproxy"} 1
 # HELP haproxy_backend_backup_servers Total number of backup UP servers with a non-zero weight
 # TYPE haproxy_backend_backup_servers gauge
 haproxy_backend_backup_servers{proxy="myproxy"} 0
@@ -321,7 +328,7 @@ haproxy_backend_backup_servers{proxy="myproxy"} 0
 haproxy_backend_check_up_down_total{proxy="myproxy"} 0
 # HELP haproxy_backend_check_last_change_seconds How long ago the last server state changed, in seconds
 # TYPE haproxy_backend_check_last_change_seconds gauge
-haproxy_backend_check_last_change_seconds{proxy="myproxy"} 0
+haproxy_backend_check_last_change_seconds{proxy="myproxy"} 26
 # HELP haproxy_backend_downtime_seconds_total Total time spent in DOWN state, for server or backend
 # TYPE haproxy_backend_downtime_seconds_total counter
 haproxy_backend_downtime_seconds_total{proxy="myproxy"} 0
@@ -334,6 +341,11 @@ haproxy_backend_max_session_rate{proxy="myproxy"} 0
 # HELP haproxy_backend_http_responses_total Total number of HTTP responses with status 100-199 returned by this object since the worker process started
 # TYPE haproxy_backend_http_responses_total counter
 haproxy_backend_http_responses_total{proxy="myproxy",code="1xx"} 0
+haproxy_backend_http_responses_total{proxy="myproxy",code="2xx"} 0
+haproxy_backend_http_responses_total{proxy="myproxy",code="3xx"} 0
+haproxy_backend_http_responses_total{proxy="myproxy",code="4xx"} 0
+haproxy_backend_http_responses_total{proxy="myproxy",code="5xx"} 0
+haproxy_backend_http_responses_total{proxy="myproxy",code="other"} 0
 # HELP haproxy_backend_http_requests_total Total number of HTTP requests processed by this object since the worker process started
 # TYPE haproxy_backend_http_requests_total counter
 haproxy_backend_http_requests_total{proxy="myproxy"} 0
@@ -357,19 +369,19 @@ haproxy_backend_http_comp_bytes_bypassed_total{proxy="myproxy"} 0
 haproxy_backend_http_comp_responses_total{proxy="myproxy"} 0
 # HELP haproxy_backend_last_session_seconds How long ago some traffic was seen on this object on this worker process, in seconds
 # TYPE haproxy_backend_last_session_seconds gauge
-haproxy_backend_last_session_seconds{proxy="myproxy"} 0
+haproxy_backend_last_session_seconds{proxy="myproxy"} -1
 # HELP haproxy_backend_queue_time_average_seconds Avg. queue time for last 1024 successful connections.
 # TYPE haproxy_backend_queue_time_average_seconds gauge
-haproxy_backend_queue_time_average_seconds{proxy="myproxy"} 0
+haproxy_backend_queue_time_average_seconds{proxy="myproxy"} 0.000000
 # HELP haproxy_backend_connect_time_average_seconds Avg. connect time for last 1024 successful connections.
 # TYPE haproxy_backend_connect_time_average_seconds gauge
-haproxy_backend_connect_time_average_seconds{proxy="myproxy"} 0
+haproxy_backend_connect_time_average_seconds{proxy="myproxy"} 0.000000
 # HELP haproxy_backend_response_time_average_seconds Avg. response time for last 1024 successful connections.
 # TYPE haproxy_backend_response_time_average_seconds gauge
-haproxy_backend_response_time_average_seconds{proxy="myproxy"} 0
+haproxy_backend_response_time_average_seconds{proxy="myproxy"} 0.000000
 # HELP haproxy_backend_total_time_average_seconds Avg. total time for last 1024 successful connections.
 # TYPE haproxy_backend_total_time_average_seconds gauge
-haproxy_backend_total_time_average_seconds{proxy="myproxy"} 0
+haproxy_backend_total_time_average_seconds{proxy="myproxy"} 0.000000
 # HELP haproxy_backend_failed_header_rewriting_total Total number of failed HTTP header rewrites since the worker process started
 # TYPE haproxy_backend_failed_header_rewriting_total counter
 haproxy_backend_failed_header_rewriting_total{proxy="myproxy"} 0
@@ -387,31 +399,54 @@ haproxy_backend_http_cache_lookups_total{proxy="myproxy"} 0
 haproxy_backend_http_cache_hits_total{proxy="myproxy"} 0
 # HELP haproxy_backend_max_queue_time_seconds Maximum observed time spent in the queue
 # TYPE haproxy_backend_max_queue_time_seconds gauge
-haproxy_backend_max_queue_time_seconds{proxy="myproxy"} 0
+haproxy_backend_max_queue_time_seconds{proxy="myproxy"} 0.000000
 # HELP haproxy_backend_max_connect_time_seconds Maximum observed time spent waiting for a connection to complete
 # TYPE haproxy_backend_max_connect_time_seconds gauge
-haproxy_backend_max_connect_time_seconds{proxy="myproxy"} 0
+haproxy_backend_max_connect_time_seconds{proxy="myproxy"} 0.000000
 # HELP haproxy_backend_max_response_time_seconds Maximum observed time spent waiting for a server response
 # TYPE haproxy_backend_max_response_time_seconds gauge
-haproxy_backend_max_response_time_seconds{proxy="myproxy"} 0
+haproxy_backend_max_response_time_seconds{proxy="myproxy"} 0.000000
 # HELP haproxy_backend_max_total_time_seconds Maximum observed total request+response time (request+queue+connect+response+processing)
 # TYPE haproxy_backend_max_total_time_seconds gauge
-haproxy_backend_max_total_time_seconds{proxy="myproxy"} 0
+haproxy_backend_max_total_time_seconds{proxy="myproxy"} 0.000000
 # HELP haproxy_backend_internal_errors_total Total number of internal errors since process started
 # TYPE haproxy_backend_internal_errors_total counter
 haproxy_backend_internal_errors_total{proxy="myproxy"} 0
 # HELP haproxy_backend_uweight Server's user weight, or sum of active servers' user weights for a backend
 # TYPE haproxy_backend_uweight gauge
-haproxy_backend_uweight{proxy="myproxy"} 0
+haproxy_backend_uweight{proxy="myproxy"} 1
 # HELP haproxy_backend_agg_server_status Backend's aggregated gauge of servers' status
 # TYPE haproxy_backend_agg_server_status gauge
-haproxy_backend_agg_server_status{proxy="myproxy",state="DOWN"} 0
+haproxy_backend_agg_server_status{proxy="myproxy",state="DOWN"} 1
+haproxy_backend_agg_server_status{proxy="myproxy",state="UP"} 1
+haproxy_backend_agg_server_status{proxy="myproxy",state="MAINT"} 1
+haproxy_backend_agg_server_status{proxy="myproxy",state="DRAIN"} 0
+haproxy_backend_agg_server_status{proxy="myproxy",state="NOLB"} 0
 # HELP haproxy_backend_agg_server_check_status Backend's aggregated gauge of servers' state check status
 # TYPE haproxy_backend_agg_server_check_status gauge
-haproxy_backend_agg_server_check_status{proxy="myproxy",state="DOWN"} 0
+haproxy_backend_agg_server_check_status{proxy="myproxy",state="DOWN"} 1
+haproxy_backend_agg_server_check_status{proxy="myproxy",state="UP"} 1
+haproxy_backend_agg_server_check_status{proxy="myproxy",state="MAINT"} 1
+haproxy_backend_agg_server_check_status{proxy="myproxy",state="DRAIN"} 0
+haproxy_backend_agg_server_check_status{proxy="myproxy",state="NOLB"} 0
 # HELP haproxy_backend_agg_check_status Backend's aggregated gauge of servers' state check status
 # TYPE haproxy_backend_agg_check_status gauge
 haproxy_backend_agg_check_status{proxy="myproxy",state="HANA"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="SOCKERR"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L4OK"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L4TOUT"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L4CON"} 1
+haproxy_backend_agg_check_status{proxy="myproxy",state="L6OK"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L6TOUT"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L6RSP"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L7TOUT"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L7RSP"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L7OK"} 1
+haproxy_backend_agg_check_status{proxy="myproxy",state="L7OKC"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="L7STS"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="PROCERR"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="PROCTOUT"} 0
+haproxy_backend_agg_check_status{proxy="myproxy",state="PROCOK"} 0
 # HELP haproxy_server_current_queue Number of current queued connections
 # TYPE haproxy_server_current_queue gauge
 haproxy_server_current_queue{proxy="myproxy",server="myserver"} 0
@@ -454,9 +489,13 @@ haproxy_server_redispatch_warnings_total{proxy="myproxy",server="myserver"} 0
 # HELP haproxy_server_status Current status of the service, per state label value.
 # TYPE haproxy_server_status gauge
 haproxy_server_status{proxy="myproxy",server="myserver",state="DOWN"} 0
+haproxy_server_status{proxy="myproxy",server="myserver",state="UP"} 1
+haproxy_server_status{proxy="myproxy",server="myserver",state="MAINT"} 0
+haproxy_server_status{proxy="myproxy",server="myserver",state="DRAIN"} 0
+haproxy_server_status{proxy="myproxy",server="myserver",state="NOLB"} 0
 # HELP haproxy_server_weight Server's effective weight, or sum of active servers' effective weights for a backend
 # TYPE haproxy_server_weight gauge
-haproxy_server_weight{proxy="myproxy",server="myserver"} 0
+haproxy_server_weight{proxy="myproxy",server="myserver"} 1
 # HELP haproxy_server_check_failures_total Total number of failed individual health checks per server/backend, since the worker process started
 # TYPE haproxy_server_check_failures_total counter
 haproxy_server_check_failures_total{proxy="myproxy",server="myserver"} 0
@@ -465,7 +504,7 @@ haproxy_server_check_failures_total{proxy="myproxy",server="myserver"} 0
 haproxy_server_check_up_down_total{proxy="myproxy",server="myserver"} 0
 # HELP haproxy_server_check_last_change_seconds How long ago the last server state changed, in seconds
 # TYPE haproxy_server_check_last_change_seconds gauge
-haproxy_server_check_last_change_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_check_last_change_seconds{proxy="myproxy",server="myserver"} 26
 # HELP haproxy_server_downtime_seconds_total Total time spent in DOWN state, for server or backend
 # TYPE haproxy_server_downtime_seconds_total counter
 haproxy_server_downtime_seconds_total{proxy="myproxy",server="myserver"} 0
@@ -484,15 +523,35 @@ haproxy_server_max_session_rate{proxy="myproxy",server="myserver"} 0
 # HELP haproxy_server_check_status Status of last health check, per state label value.
 # TYPE haproxy_server_check_status gauge
 haproxy_server_check_status{proxy="myproxy",server="myserver",state="HANA"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="SOCKERR"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L4OK"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L4TOUT"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L4CON"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L6OK"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L6TOUT"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L6RSP"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L7TOUT"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L7RSP"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L7OK"} 1
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L7OKC"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="L7STS"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="PROCERR"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="PROCTOUT"} 0
+haproxy_server_check_status{proxy="myproxy",server="myserver",state="PROCOK"} 0
 # HELP haproxy_server_check_code layer5-7 code, if available of the last health check.
 # TYPE haproxy_server_check_code gauge
-haproxy_server_check_code{proxy="myproxy",server="myserver"} 0
+haproxy_server_check_code{proxy="myproxy",server="myserver"} 200
 # HELP haproxy_server_check_duration_seconds Total duration of the latest server health check, in seconds.
 # TYPE haproxy_server_check_duration_seconds gauge
-haproxy_server_check_duration_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_check_duration_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_http_responses_total Total number of HTTP responses with status 100-199 returned by this object since the worker process started
 # TYPE haproxy_server_http_responses_total counter
 haproxy_server_http_responses_total{proxy="myproxy",server="myserver",code="1xx"} 0
+haproxy_server_http_responses_total{proxy="myproxy",server="myserver",code="2xx"} 0
+haproxy_server_http_responses_total{proxy="myproxy",server="myserver",code="3xx"} 0
+haproxy_server_http_responses_total{proxy="myproxy",server="myserver",code="4xx"} 0
+haproxy_server_http_responses_total{proxy="myproxy",server="myserver",code="5xx"} 0
+haproxy_server_http_responses_total{proxy="myproxy",server="myserver",code="other"} 0
 # HELP haproxy_server_client_aborts_total Total number of requests or connections aborted by the client since the worker process started
 # TYPE haproxy_server_client_aborts_total counter
 haproxy_server_client_aborts_total{proxy="myproxy",server="myserver"} 0
@@ -501,19 +560,19 @@ haproxy_server_client_aborts_total{proxy="myproxy",server="myserver"} 0
 haproxy_server_server_aborts_total{proxy="myproxy",server="myserver"} 0
 # HELP haproxy_server_last_session_seconds How long ago some traffic was seen on this object on this worker process, in seconds
 # TYPE haproxy_server_last_session_seconds gauge
-haproxy_server_last_session_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_last_session_seconds{proxy="myproxy",server="myserver"} -1
 # HELP haproxy_server_queue_time_average_seconds Avg. queue time for last 1024 successful connections.
 # TYPE haproxy_server_queue_time_average_seconds gauge
-haproxy_server_queue_time_average_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_queue_time_average_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_connect_time_average_seconds Avg. connect time for last 1024 successful connections.
 # TYPE haproxy_server_connect_time_average_seconds gauge
-haproxy_server_connect_time_average_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_connect_time_average_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_response_time_average_seconds Avg. response time for last 1024 successful connections.
 # TYPE haproxy_server_response_time_average_seconds gauge
-haproxy_server_response_time_average_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_response_time_average_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_total_time_average_seconds Avg. total time for last 1024 successful connections.
 # TYPE haproxy_server_total_time_average_seconds gauge
-haproxy_server_total_time_average_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_total_time_average_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_failed_header_rewriting_total Total number of failed HTTP header rewrites since the worker process started
 # TYPE haproxy_server_failed_header_rewriting_total counter
 haproxy_server_failed_header_rewriting_total{proxy="myproxy",server="myserver"} 0
@@ -531,16 +590,16 @@ haproxy_server_idle_connections_current{proxy="myproxy",server="myserver"} 0
 haproxy_server_idle_connections_limit{proxy="myproxy",server="myserver"} NaN
 # HELP haproxy_server_max_queue_time_seconds Maximum observed time spent in the queue
 # TYPE haproxy_server_max_queue_time_seconds gauge
-haproxy_server_max_queue_time_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_max_queue_time_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_max_connect_time_seconds Maximum observed time spent waiting for a connection to complete
 # TYPE haproxy_server_max_connect_time_seconds gauge
-haproxy_server_max_connect_time_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_max_connect_time_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_max_response_time_seconds Maximum observed time spent waiting for a server response
 # TYPE haproxy_server_max_response_time_seconds gauge
-haproxy_server_max_response_time_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_max_response_time_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_max_total_time_seconds Maximum observed total request+response time (request+queue+connect+response+processing)
 # TYPE haproxy_server_max_total_time_seconds gauge
-haproxy_server_max_total_time_seconds{proxy="myproxy",server="myserver"} 0
+haproxy_server_max_total_time_seconds{proxy="myproxy",server="myserver"} 0.000000
 # HELP haproxy_server_internal_errors_total Total number of internal errors since process started
 # TYPE haproxy_server_internal_errors_total counter
 haproxy_server_internal_errors_total{proxy="myproxy",server="myserver"} 0
@@ -555,13 +614,13 @@ haproxy_server_safe_idle_connections_current{proxy="myproxy",server="myserver"} 
 haproxy_server_used_connections_current{proxy="myproxy",server="myserver"} 0
 # HELP haproxy_server_need_connections_current Estimated needed number of connections
 # TYPE haproxy_server_need_connections_current gauge
-haproxy_server_need_connections_current{proxy="myproxy",server="myserver"} 0
+haproxy_server_need_connections_current{proxy="myproxy",server="myserver"} 1
 # HELP haproxy_server_uweight Server's user weight, or sum of active servers' user weights for a backend
 # TYPE haproxy_server_uweight gauge
-haproxy_server_uweight{proxy="myproxy",server="myserver"} 0
+haproxy_server_uweight{proxy="myproxy",server="myserver"} 1
 # HELP haproxy_sticktable_size Stick table size.
 # TYPE haproxy_sticktable_size gauge
-haproxy_sticktable_size{name="myname",type="string"} 0
+haproxy_sticktable_size{name="myproxy",type="ip"} 102400
 # HELP haproxy_sticktable_used Number of entries used in this stick table.
 # TYPE haproxy_sticktable_used gauge
-haproxy_sticktable_used{name="myname",type="string"} 0
+haproxy_sticktable_used{name="myproxy",type="ip"} 0

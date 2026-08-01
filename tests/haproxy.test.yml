@@ -277,3 +277,40 @@ tests:
             exp_annotations:
               summary: "HAProxy high HTTP 5xx error rate — busy @ h1"
               description: "Too many HTTP requests with status 5xx (> 5%) on busy @ h1"
+
+  # haproxy_frontend_status only ever carries DOWN and UP -- verified against
+  # real 2.7.11 and 3.2.21 scrapes. The alert used to test state="OPEN", which
+  # promex never emits, so it could not fire.
+  - interval: 1m
+    name: a down frontend pages
+    input_series:
+      - series: 'haproxy_frontend_status{proxy="myproxy",state="DOWN",instance="h1",job="hap"}'
+        values: '1x10'
+      - series: 'haproxy_frontend_status{proxy="myproxy",state="UP",instance="h1",job="hap"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: HAproxyFrontendDown
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyFrontendDown
+              proxy: myproxy
+              state: DOWN
+              instance: h1
+              job: hap
+              severity: critical
+            exp_annotations:
+              summary: "HAProxy frontend down — myproxy @ h1"
+              description: "Frontend myproxy @ h1 is DOWN and not accepting connections"
+
+  - interval: 1m
+    name: a healthy frontend pages nothing
+    input_series:
+      - series: 'haproxy_frontend_status{proxy="myproxy",state="DOWN",instance="h1",job="hap"}'
+        values: '0x10'
+      - series: 'haproxy_frontend_status{proxy="myproxy",state="UP",instance="h1",job="hap"}'
+        values: '1x10'
+    alert_rule_test:
+      - alertname: HAproxyFrontendDown
+        eval_time: 5m
+        exp_alerts: []
