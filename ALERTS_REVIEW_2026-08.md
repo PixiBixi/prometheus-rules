@@ -4,7 +4,7 @@ Review complète des **378 alertes / 23 fichiers** et **3 fichiers de recording 
 menée par 5 agents en parallèle, chaque constat re-vérifié contre les fixtures
 `exporters/` et, quand c'était reproductible, contre `promtool test rules`.
 
-**État : la majorité est corrigée** (32 commits, `f4276f2`..`7377bd7`). Ce document ne
+**État : la majorité est corrigée** (40 commits, `f4276f2`..`0673736`). Ce document ne
 conserve que ce qui reste ouvert, plus le contexte nécessaire pour l'arbitrer.
 
 Le compte d'alertes passe de **378 à 372** : 4 alertes mortes supprimées, 2 paires de
@@ -25,7 +25,7 @@ doublons fusionnées.
 | 2 alertes keepalived inversées | Comptaient les BACKUP au lieu des MASTER (R1) |
 | 2 paires de doublons | Fusionnées |
 | Scripts Python | `build.py` 2× plus rapide, `validate_rules.py` 4× |
-| **`tests/`** | **13 fichiers `promtool test rules`, joués contre la révision avant *et* après chaque correctif** |
+| **`tests/`** | **16 fichiers `promtool test rules`, joués contre la révision avant *et* après chaque correctif** |
 
 ### Deux régressions issues de l'audit précédent, annulées
 
@@ -96,13 +96,26 @@ Alertmanager, ou un chaînage `unless`. Aucun n'est en place.
 - k8s : `KubernetesStatefulsetDown` (critical) et `…ReplicasMismatch` (warning) se
   recouvrent sur un StatefulSet dégradé
 
-### R4 — Hygiène des fixtures
+### R4 — Hygiène des fixtures → la fixture keydb est corrigée
 
-- **`exporters/keydb_exporter` contient du JMX Kafka/KSQL** — 0 ligne `redis_*`, 139
-  lignes `kafka_`/`ksql_`/`jvm_`. Les 12 alertes KeyDB ne sont validables contre rien, et
-  `build.py` présente KeyDB avec des métriques Kafka dans `docs/data.json` (la vue
-  « uncovered metrics » est donc fausse pour cet exporter). Seul des 20 fichiers dont le
-  contenu ne correspond pas au nom. À régénérer depuis un vrai `redis_exporter`.
+`exporters/keydb_exporter` est désormais un vrai scrape d'`oliver006/redis_exporter`
+**v1.52.0** contre KeyDB, fusionné depuis trois rôles (primaire avec AOF et maxmemory,
+réplique, nœud en mode cluster). 188 métriques, dont les 11 référencées par les alertes —
+il y en avait zéro auparavant. Croisé avec le Prometheus de prod : aucune métrique
+parasite, et l'écart restant est le latency-tracking et les io-threads, indisponibles sur
+KeyDB 6.3.4.
+
+> **Piège de version, à retenir.** v1.52 expose `redis_config_maxclients` ; les versions
+> actuelles l'ont renommée en `redis_max_clients`. Une fixture générée depuis `:latest`
+> fait passer `RedisTooManyConnections` pour morte alors qu'elle fonctionne en prod.
+> C'est exactement l'erreur que j'ai faite au premier essai. `tests/keydb.test.yml` fige
+> désormais les noms que ce déploiement émet réellement.
+>
+> La flotte tourne 210 instances en v1.52.0 et 11 en v1.58.0 ; `redis_config_maxclients`
+> est présente sur 220 des 221.
+
+Reste ouvert :
+
 - Les fixtures HAProxy ne respectent pas la règle de dédup annoncée dans `CLAUDE.md`
   (« Enum labels (`mode`, `state`, etc.): all values kept ») pour les métriques
   `*_status` : une seule valeur d'état est conservée. C'est ce qui empêche de trancher
