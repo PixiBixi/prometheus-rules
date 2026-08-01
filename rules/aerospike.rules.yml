@@ -52,7 +52,13 @@
         summary: "AS - Low Memory for {{ $labels.ns }} @ {{ $labels.instance }} (< 20%)"
         description: "AS Low Memory for {{ $labels.ns }} @ {{ $labels.instance }}, if it continues, cluster will be down for OOM, please dig"
     - alert: DeviceCloseToStopWrite
-      expr: 100-(sum(aerospike_namespace_memory_free_pct+15) by (instance,ns)) > (sum(aerospike_namespace_stop_writes_pct) by (instance,ns))
+      # Alert when used_pct comes within 15 points of the stop-writes threshold.
+      # The +15 used to sit on the free_pct side, which expands to
+      # used_pct > stop_writes_pct + 15 -- the opposite of the intent, and
+      # unreachable with the usual stop_writes_pct of 90 (would need used > 105).
+      expr: |
+        100 - (sum(aerospike_namespace_memory_free_pct) by (instance,ns))
+        > (sum(aerospike_namespace_stop_writes_pct) by (instance,ns)) - 15
       for: 1m
       labels:
         severity: critical
