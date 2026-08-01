@@ -1,0 +1,52 @@
+# Regression tests for the TSDB cardinality record and alert.
+#
+# The record used to scan {__name__=~".+"} including its own output, and the
+# alert compared against a bare > 10000, which is unremarkable on a Prometheus
+# scraping kube-state-metrics or cadvisor.
+#
+# Note: the group declares interval: 10m, so eval_time must be a multiple of it
+# for the records to have been evaluated.
+rule_files:
+  - prometheus.records.yml
+  - prometheus.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # One metric with many series among several small ones: it dominates and is
+  # above the floor, so it should be flagged.
+  - interval: 1m
+    name: a dominating metric is flagged
+    input_series:
+      - series: 'noisy_metric{id="a"}'
+        values: '1x40'
+      - series: 'noisy_metric{id="b"}'
+        values: '1x40'
+      - series: 'quiet_metric{id="a"}'
+        values: '1x40'
+    promql_expr_test:
+      # Scoped to the injected metrics: other alerts in the file fire on this
+      # synthetic data and create ALERTS / ALERTS_FOR_STATE series, which a real
+      # Prometheus counts too.
+      - expr: 'name:tsdb_series:count{name=~"noisy_metric|quiet_metric"}'
+        eval_time: 20m
+        exp_samples:
+          - labels: 'name:tsdb_series:count{name="noisy_metric"}'
+            value: 2
+          - labels: 'name:tsdb_series:count{name="quiet_metric"}'
+            value: 1
+      # Neither record may count itself: both are monitoring artifacts.
+      - expr: 'name:tsdb_series:count{name=~"name:tsdb_series:count|tsdb_series:total"}'
+        eval_time: 20m
+        exp_samples: []
+
+  # Below the absolute floor: dominating but tiny, must stay quiet.
+  - interval: 1m
+    name: a dominating but tiny metric does not alert
+    input_series:
+      - series: 'small_metric{id="a"}'
+        values: '1x40'
+    alert_rule_test:
+      - alertname: PrometheusTimeseriesCardinality
+        eval_time: 20m
+        exp_alerts: []

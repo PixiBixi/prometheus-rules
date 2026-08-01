@@ -224,12 +224,20 @@
         summary: "Prometheus TSDB WAL truncations failed (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} TSDB WAL truncation failures"
     - alert: PrometheusTimeseriesCardinality
-      expr: name:tsdb_series:count > 10000
+      # Two conditions, because neither alone is portable: an absolute floor so
+      # a small TSDB stays quiet, and a share of the total so a metric is only
+      # flagged when it actually dominates. 10k series is unremarkable next to
+      # kube-state-metrics or cadvisor, which is why the bare > 10000 was noisy.
+      # $labels.instance is not available here -- the record aggregates it away.
+      expr: |
+        name:tsdb_series:count > 10000
+        and
+        name:tsdb_series:count / scalar(tsdb_series:total) > 0.10
       labels:
         severity: warning
       annotations:
-        summary: "Prometheus timeseries cardinality (instance {{ $labels.instance }})"
-        description: "The \"{{ $labels.name }}\" timeseries cardinality is getting very high: {{ $value }}"
+        summary: "Prometheus timeseries cardinality — {{ $labels.name }}"
+        description: "The \"{{ $labels.name }}\" metric accounts for {{ $value }} series, over 10% of the whole TSDB"
     - alert: PrometheusRemoteWriteDroppedSamples
       # reason="dropped_series" is intentional filtering via write_relabel_configs,
       # not an incident -- excluding it keeps this alert about genuine sample loss.
