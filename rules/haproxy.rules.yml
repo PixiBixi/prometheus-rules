@@ -258,7 +258,12 @@
         description: "More than 5% of connection attempts failing on {{ $labels.proxy }} @ {{ $labels.instance }} ({{ $value | humanizePercentage }}) — check backend health or network connectivity"
 
     - alert: HAproxyHighHttp5xxErrorRateBackend
-      expr: haproxy:backend_5xx_error_rate:ratio5m > 5
+      # A backend traffic below 1 req/s makes any error ratio meaningless: one
+      # failed request out of one is 100%.
+      expr: |
+        haproxy:backend_5xx_error_rate:ratio5m > 5
+        and
+        sum by (namespace, proxy, instance, job) (haproxy:backend_http_responses:rate5m) > 1
       for: 5m
       labels:
         severity: critical
@@ -267,7 +272,10 @@
         description: "Too many HTTP requests with status 5xx (> 5%) on {{ $labels.proxy }} @ {{ $labels.instance }}"
 
     - alert: HAproxyHighHttp4xxErrorRateBackend
-      expr: haproxy:backend_4xx_error_rate:ratio5m{proxy!~".*default-local-service.*"} > 50
+      expr: |
+        haproxy:backend_4xx_error_rate:ratio5m{proxy!~".*default-local-service.*"} > 50
+        and
+        sum by (namespace, proxy, instance, job) (haproxy:backend_http_responses:rate5m{proxy!~".*default-local-service.*"}) > 1
       for: 5m
       labels:
         severity: critical
@@ -276,7 +284,10 @@
         description: "Too many HTTP requests with status 4xx (> 50%) on {{ $labels.proxy }} @ {{ $labels.instance }}"
 
     - alert: HAproxyHighHttp4xxErrorRateBackendWarning
-      expr: haproxy:backend_4xx_error_rate:ratio5m{proxy!~".*default-local-service.*"} > 15
+      expr: |
+        haproxy:backend_4xx_error_rate:ratio5m{proxy!~".*default-local-service.*"} > 15
+        and
+        sum by (namespace, proxy, instance, job) (haproxy:backend_http_responses:rate5m{proxy!~".*default-local-service.*"}) > 1
       for: 5m
       labels:
         severity: warning
@@ -371,6 +382,8 @@
         haproxy:backend_retries:rate5m
         / (haproxy:backend_connection_attempts:rate5m > 0)
         > 0.05
+        and
+        haproxy:backend_connection_attempts:rate5m > 1
       for: 5m
       labels:
         severity: warning
@@ -385,6 +398,8 @@
           /
           sum by (namespace) (haproxy:backend_http_responses:rate5m)
         ) * 100 > 0.5
+        and
+        sum by (namespace) (haproxy:backend_http_responses:rate5m) > 1
       for: 5m
       labels:
         severity: warning
@@ -399,6 +414,8 @@
           /
           sum by (namespace) (haproxy:backend_http_responses:rate5m)
         ) * 100 > 2
+        and
+        sum by (namespace) (haproxy:backend_http_responses:rate5m) > 1
       for: 5m
       labels:
         severity: critical
@@ -444,6 +461,8 @@
             sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m),
             0.01
           ) * 100 > 5
+        and
+        sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m) > 1
       for: 5m
       labels:
         severity: critical
@@ -458,6 +477,8 @@
             sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m),
             0.01
           ) * 100 > 50
+        and
+        sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m) > 1
       for: 5m
       labels:
         severity: critical
@@ -472,6 +493,8 @@
             sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m),
             0.01
           ) * 100 > 15
+        and
+        sum by (namespace, proxy, server, instance, job) (haproxy:server_http_responses:rate5m) > 1
       for: 5m
       labels:
         severity: warning

@@ -163,17 +163,19 @@ tests:
   - interval: 1m
     name: server-level ratios are computed per proxy, not blended across backends
     input_series:
-      # api/srv001 is 100% 5xx, web/srv001 is perfectly healthy
+      # api/srv001 is 100% 5xx, web/srv001 is perfectly healthy.
+      # 120/min = 2 req/s, above the volume guard, so the guard is not what is
+      # under test here -- the per-proxy split is.
       - series: 'haproxy_server_http_responses_total{code="5xx",namespace="ns",proxy="api",server="srv001",instance="h1",job="hap"}'
-        values: '0+10x20'
+        values: '0+120x20'
       - series: 'haproxy_server_http_responses_total{code="2xx",namespace="ns",proxy="web",server="srv001",instance="h1",job="hap"}'
-        values: '0+10x20'
+        values: '0+120x20'
     promql_expr_test:
       - expr: 'haproxy:server_http_responses:rate5m{code="5xx"}'
         eval_time: 15m
         exp_samples:
           - labels: 'haproxy:server_http_responses:rate5m{code="5xx",namespace="ns",proxy="api",server="srv001",instance="h1",job="hap"}'
-            value: 0.16666666666666666
+            value: 2
     alert_rule_test:
       - alertname: HAproxyHighHttp5xxErrorRateServer
         eval_time: 15m
@@ -240,3 +242,38 @@ tests:
       - alertname: HAproxyProcessStopping
         eval_time: 8m
         exp_alerts: []
+
+  # A backend serving one failed request in five minutes produced a 100% error
+  # ratio and paged critical. The volume guard keeps low-traffic backends quiet.
+  - interval: 1m
+    name: a single failed request on an idle backend does not page
+    input_series:
+      # one 5xx over the whole window, nothing else
+      - series: 'haproxy_backend_http_responses_total{code="5xx",namespace="ns",proxy="idle",instance="h1",job="hap"}'
+        values: '0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - alertname: HAproxyHighHttp5xxErrorRateBackend
+        eval_time: 15m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a busy backend at 10% 5xx still pages
+    input_series:
+      - series: 'haproxy_backend_http_responses_total{code="5xx",namespace="ns",proxy="busy",instance="h1",job="hap"}'
+        values: '0+12x20'
+      - series: 'haproxy_backend_http_responses_total{code="2xx",namespace="ns",proxy="busy",instance="h1",job="hap"}'
+        values: '0+108x20'
+    alert_rule_test:
+      - alertname: HAproxyHighHttp5xxErrorRateBackend
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyHighHttp5xxErrorRateBackend
+              namespace: ns
+              proxy: busy
+              instance: h1
+              job: hap
+              severity: critical
+            exp_annotations:
+              summary: "HAProxy high HTTP 5xx error rate — busy @ h1"
+              description: "Too many HTTP requests with status 5xx (> 5%) on busy @ h1"
