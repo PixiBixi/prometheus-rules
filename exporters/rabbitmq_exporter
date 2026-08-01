@@ -1,0 +1,820 @@
+# HELP telemetry_scrape_duration_seconds_count 
+telemetry_scrape_duration_seconds_count{registry="default",content_type="text/plain; version=0.0.4"} 1
+# HELP telemetry_scrape_duration_seconds_sum 
+telemetry_scrape_duration_seconds_sum{registry="default",content_type="text/plain; version=0.0.4"} 0.021975792
+# HELP telemetry_scrape_size_bytes_count 
+telemetry_scrape_size_bytes_count{registry="default",content_type="text/plain; version=0.0.4"} 1
+# HELP telemetry_scrape_size_bytes_sum 
+telemetry_scrape_size_bytes_sum{registry="default",content_type="text/plain; version=0.0.4"} 200049
+# HELP erlang_vm_memory_atom_bytes The total amount of memory currently allocated for atoms. This memory is part of the memory presented as system memory.
+# TYPE erlang_vm_memory_atom_bytes gauge
+erlang_vm_memory_atom_bytes{usage="used"} 1053131
+# HELP erlang_vm_memory_bytes The total amount of memory currently allocated. This is the same as the sum of the memory size for processes and system.
+# TYPE erlang_vm_memory_bytes gauge
+erlang_vm_memory_bytes{kind="system"} 48514601
+# HELP erlang_vm_memory_dets_tables Erlang VM DETS Tables count.
+# TYPE erlang_vm_memory_dets_tables gauge
+erlang_vm_memory_dets_tables 5
+# HELP erlang_vm_memory_ets_tables Erlang VM ETS Tables count.
+# TYPE erlang_vm_memory_ets_tables gauge
+erlang_vm_memory_ets_tables 177
+# HELP erlang_vm_memory_processes_bytes The total amount of memory currently allocated for the Erlang processes.
+# TYPE erlang_vm_memory_processes_bytes gauge
+erlang_vm_memory_processes_bytes{usage="used"} 16853864
+# HELP erlang_vm_memory_system_bytes The total amount of memory currently allocated for the emulator that is not directly related to any Erlang process. Memory presented as processes is not included in this memory.
+# TYPE erlang_vm_memory_system_bytes gauge
+erlang_vm_memory_system_bytes{usage="atom"} 1081617
+# HELP erlang_vm_msacc_aux_seconds_total Total time in seconds spent handling auxiliary jobs.
+# TYPE erlang_vm_msacc_aux_seconds_total counter
+erlang_vm_msacc_aux_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_aux_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_aux_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_aux_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_aux_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_aux_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_check_io_seconds_total Total time in seconds spent checking for new I/O events.
+# TYPE erlang_vm_msacc_check_io_seconds_total counter
+erlang_vm_msacc_check_io_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_check_io_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_check_io_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_check_io_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_check_io_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_check_io_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_emulator_seconds_total Total time in seconds spent executing Erlang processes.
+# TYPE erlang_vm_msacc_emulator_seconds_total counter
+erlang_vm_msacc_emulator_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_emulator_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_emulator_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_emulator_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_emulator_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_emulator_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_gc_seconds_total Total time in seconds spent doing garbage collection. When extra states are enabled this is the time spent doing non-fullsweep garbage collections.
+# TYPE erlang_vm_msacc_gc_seconds_total counter
+erlang_vm_msacc_gc_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_gc_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_gc_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_gc_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_gc_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_gc_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_other_seconds_total Total time in seconds spent doing unaccounted things.
+# TYPE erlang_vm_msacc_other_seconds_total counter
+erlang_vm_msacc_other_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_other_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_other_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_other_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_other_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_other_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_port_seconds_total Total time in seconds spent executing ports.
+# TYPE erlang_vm_msacc_port_seconds_total counter
+erlang_vm_msacc_port_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_port_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_port_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_port_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_port_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_port_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_sleep_seconds_total Total time in seconds spent sleeping.
+# TYPE erlang_vm_msacc_sleep_seconds_total counter
+erlang_vm_msacc_sleep_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_sleep_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_sleep_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_sleep_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_sleep_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_sleep_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_alloc_seconds_total Total time in seconds spent managing memory. Without extra states this time is spread out over all other states.
+# TYPE erlang_vm_msacc_alloc_seconds_total counter
+erlang_vm_msacc_alloc_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_alloc_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_alloc_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_alloc_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_alloc_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_alloc_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_bif_seconds_total Total time in seconds spent in BIFs. Without extra states this time is part of the 'emulator' state.
+# TYPE erlang_vm_msacc_bif_seconds_total counter
+erlang_vm_msacc_bif_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_bif_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_bif_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_bif_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_bif_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_bif_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_busy_wait_seconds_total Total time in seconds spent busy waiting. Without extra states this time is part of the 'other' state.
+# TYPE erlang_vm_msacc_busy_wait_seconds_total counter
+erlang_vm_msacc_busy_wait_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_busy_wait_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_busy_wait_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_busy_wait_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_busy_wait_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_busy_wait_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_ets_seconds_total Total time in seconds spent executing ETS BIFs. Without extra states this time is part of the 'emulator' state.
+# TYPE erlang_vm_msacc_ets_seconds_total counter
+erlang_vm_msacc_ets_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_ets_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_ets_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_ets_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_ets_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_ets_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_gc_full_seconds_total Total time in seconds spent doing fullsweep garbage collection. Without extra states this time is part of the 'gc' state.
+# TYPE erlang_vm_msacc_gc_full_seconds_total counter
+erlang_vm_msacc_gc_full_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_gc_full_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_gc_full_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_gc_full_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_gc_full_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_gc_full_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_nif_seconds_total Total time in seconds spent in NIFs. Without extra states this time is part of the 'emulator' state.
+# TYPE erlang_vm_msacc_nif_seconds_total counter
+erlang_vm_msacc_nif_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_nif_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_nif_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_nif_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_nif_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_nif_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_send_seconds_total Total time in seconds spent sending messages (processes only). Without extra states this time is part of the 'emulator' state.
+# TYPE erlang_vm_msacc_send_seconds_total counter
+erlang_vm_msacc_send_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_send_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_send_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_send_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_send_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_send_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_msacc_timers_seconds_total Total time in seconds spent managing timers. Without extra states this time is part of the 'other' state.
+# TYPE erlang_vm_msacc_timers_seconds_total counter
+erlang_vm_msacc_timers_seconds_total{type="scheduler",id="3"} 0.0
+erlang_vm_msacc_timers_seconds_total{type="aux",id="1"} 0.0
+erlang_vm_msacc_timers_seconds_total{type="poll",id="0"} 0.0
+erlang_vm_msacc_timers_seconds_total{type="dirty_io_scheduler",id="10"} 0.0
+erlang_vm_msacc_timers_seconds_total{type="dirty_cpu_scheduler",id="10"} 0.0
+erlang_vm_msacc_timers_seconds_total{type="async",id="0"} 0.0
+# HELP erlang_vm_statistics_bytes_output_total Total number of bytes output to ports.
+# TYPE erlang_vm_statistics_bytes_output_total counter
+erlang_vm_statistics_bytes_output_total 276109
+# HELP erlang_vm_statistics_bytes_received_total Total number of bytes received through ports.
+# TYPE erlang_vm_statistics_bytes_received_total counter
+erlang_vm_statistics_bytes_received_total 10001
+# HELP erlang_vm_statistics_context_switches_total Total number of context switches since the system started.
+# TYPE erlang_vm_statistics_context_switches_total counter
+erlang_vm_statistics_context_switches_total 128752
+# HELP erlang_vm_statistics_dirty_cpu_run_queue_length Length of the dirty CPU run-queue.
+# TYPE erlang_vm_statistics_dirty_cpu_run_queue_length gauge
+erlang_vm_statistics_dirty_cpu_run_queue_length 0
+# HELP erlang_vm_statistics_dirty_io_run_queue_length Length of the dirty IO run-queue.
+# TYPE erlang_vm_statistics_dirty_io_run_queue_length gauge
+erlang_vm_statistics_dirty_io_run_queue_length 0
+# HELP erlang_vm_statistics_garbage_collection_number_of_gcs_total Garbage collection: number of GCs.
+# TYPE erlang_vm_statistics_garbage_collection_number_of_gcs_total counter
+erlang_vm_statistics_garbage_collection_number_of_gcs_total 5605
+# HELP erlang_vm_statistics_garbage_collection_bytes_reclaimed_total Garbage collection: bytes reclaimed.
+# TYPE erlang_vm_statistics_garbage_collection_bytes_reclaimed_total counter
+erlang_vm_statistics_garbage_collection_bytes_reclaimed_total 381617856
+# HELP erlang_vm_statistics_garbage_collection_words_reclaimed_total Garbage collection: words reclaimed.
+# TYPE erlang_vm_statistics_garbage_collection_words_reclaimed_total counter
+erlang_vm_statistics_garbage_collection_words_reclaimed_total 47702232
+# HELP erlang_vm_statistics_reductions_total Total reductions.
+# TYPE erlang_vm_statistics_reductions_total counter
+erlang_vm_statistics_reductions_total 42792663
+# HELP erlang_vm_statistics_run_queues_length Length of normal run-queues.
+# TYPE erlang_vm_statistics_run_queues_length gauge
+erlang_vm_statistics_run_queues_length 0
+# HELP erlang_vm_statistics_runtime_seconds_total The sum of the runtime for all threads in the Erlang runtime system. Can be greater than wall clock time.
+# TYPE erlang_vm_statistics_runtime_seconds_total counter
+erlang_vm_statistics_runtime_seconds_total 1065
+# HELP erlang_vm_statistics_wallclock_time_seconds_total Information about wall clock. Same as erlang_vm_statistics_runtime_seconds except that real time is measured.
+# TYPE erlang_vm_statistics_wallclock_time_seconds_total counter
+erlang_vm_statistics_wallclock_time_seconds_total 55385
+# HELP erlang_vm_dirty_cpu_schedulers The number of scheduler dirty CPU scheduler threads used by the emulator.
+# TYPE erlang_vm_dirty_cpu_schedulers gauge
+erlang_vm_dirty_cpu_schedulers 10
+# HELP erlang_vm_dirty_cpu_schedulers_online The number of dirty CPU scheduler threads online.
+# TYPE erlang_vm_dirty_cpu_schedulers_online gauge
+erlang_vm_dirty_cpu_schedulers_online 10
+# HELP erlang_vm_dirty_io_schedulers The number of scheduler dirty I/O scheduler threads used by the emulator.
+# TYPE erlang_vm_dirty_io_schedulers gauge
+erlang_vm_dirty_io_schedulers 10
+# HELP erlang_vm_ets_limit The maximum number of ETS tables allowed.
+# TYPE erlang_vm_ets_limit gauge
+erlang_vm_ets_limit 50000
+# HELP erlang_vm_logical_processors The detected number of logical processors configured in the system.
+# TYPE erlang_vm_logical_processors gauge
+erlang_vm_logical_processors 10
+# HELP erlang_vm_logical_processors_available The detected number of logical processors available to the Erlang runtime system.
+# TYPE erlang_vm_logical_processors_available gauge
+erlang_vm_logical_processors_available 10
+# HELP erlang_vm_logical_processors_online The detected number of logical processors online on the system.
+# TYPE erlang_vm_logical_processors_online gauge
+erlang_vm_logical_processors_online 10
+# HELP erlang_vm_ports The number of ports currently existing at the local node.
+# TYPE erlang_vm_ports gauge
+erlang_vm_ports 10
+# HELP erlang_vm_port_limit The maximum number of simultaneously existing ports at the local node.
+# TYPE erlang_vm_port_limit gauge
+erlang_vm_port_limit 65536
+# HELP erlang_vm_processes The number of processes currently existing at the local node.
+# TYPE erlang_vm_processes gauge
+erlang_vm_processes 412
+# HELP erlang_vm_process_limit The maximum number of simultaneously existing processes at the local node.
+# TYPE erlang_vm_process_limit gauge
+erlang_vm_process_limit 1048576
+# HELP erlang_vm_schedulers The number of scheduler threads used by the emulator.
+# TYPE erlang_vm_schedulers gauge
+erlang_vm_schedulers 10
+# HELP erlang_vm_schedulers_online The number of schedulers online.
+# TYPE erlang_vm_schedulers_online gauge
+erlang_vm_schedulers_online 10
+# HELP erlang_vm_smp_support 1 if the emulator has been compiled with SMP support, otherwise 0.
+# TYPE erlang_vm_smp_support untyped
+erlang_vm_smp_support 1
+# HELP erlang_vm_threads 1 if the emulator has been compiled with thread support, otherwise 0.
+# TYPE erlang_vm_threads untyped
+erlang_vm_threads 1
+# HELP erlang_vm_thread_pool_size The number of async threads in the async thread pool used for asynchronous driver calls.
+# TYPE erlang_vm_thread_pool_size gauge
+erlang_vm_thread_pool_size 1
+# HELP erlang_vm_time_correction 1 if time correction is enabled, otherwise 0.
+# TYPE erlang_vm_time_correction untyped
+erlang_vm_time_correction 1
+# HELP erlang_vm_wordsize_bytes The size of Erlang term words in bytes.
+# TYPE erlang_vm_wordsize_bytes gauge
+erlang_vm_wordsize_bytes 8
+# HELP erlang_vm_atoms The number of atom currently existing at the local node.
+# TYPE erlang_vm_atoms gauge
+erlang_vm_atoms 32072
+# HELP erlang_vm_atom_limit The maximum number of simultaneously existing atom at the local node.
+# TYPE erlang_vm_atom_limit gauge
+erlang_vm_atom_limit 5000000
+# HELP erlang_vm_allocators Allocated (carriers_size) and used (blocks_size) memory for the different allocators in the VM. See erts_alloc(3).
+# TYPE erlang_vm_allocators gauge
+erlang_vm_allocators{alloc="temp_alloc",instance_no="0",kind="mbcs",usage="carriers"} 1
+# HELP rabbitmq_connections_opened_total Total number of connections opened
+# TYPE rabbitmq_connections_opened_total counter
+rabbitmq_connections_opened_total 0
+# HELP rabbitmq_connections_closed_total Total number of connections closed or terminated
+# TYPE rabbitmq_connections_closed_total counter
+rabbitmq_connections_closed_total 0
+# HELP rabbitmq_channels_opened_total Total number of channels opened
+# TYPE rabbitmq_channels_opened_total counter
+rabbitmq_channels_opened_total 0
+# HELP rabbitmq_channels_closed_total Total number of channels closed
+# TYPE rabbitmq_channels_closed_total counter
+rabbitmq_channels_closed_total 0
+# HELP rabbitmq_queues_declared_total Total number of queues declared
+# TYPE rabbitmq_queues_declared_total counter
+rabbitmq_queues_declared_total 0
+# HELP rabbitmq_queues_created_total Total number of queues created
+# TYPE rabbitmq_queues_created_total counter
+rabbitmq_queues_created_total 0
+# HELP rabbitmq_queues_deleted_total Total number of queues deleted
+# TYPE rabbitmq_queues_deleted_total counter
+rabbitmq_queues_deleted_total 0
+# HELP rabbitmq_process_open_fds Open file descriptors
+# TYPE rabbitmq_process_open_fds gauge
+rabbitmq_process_open_fds 36
+# HELP rabbitmq_process_resident_memory_bytes Memory used in bytes
+# TYPE rabbitmq_process_resident_memory_bytes gauge
+rabbitmq_process_resident_memory_bytes 144265216
+# HELP rabbitmq_disk_space_available_bytes Disk space available in bytes
+# TYPE rabbitmq_disk_space_available_bytes gauge
+rabbitmq_disk_space_available_bytes 552637095936
+# HELP rabbitmq_erlang_processes_used Erlang processes used
+# TYPE rabbitmq_erlang_processes_used gauge
+rabbitmq_erlang_processes_used 410
+# HELP rabbitmq_erlang_gc_runs_total Total number of Erlang garbage collector runs
+# TYPE rabbitmq_erlang_gc_runs_total counter
+rabbitmq_erlang_gc_runs_total 5528
+# HELP rabbitmq_erlang_gc_reclaimed_bytes_total Total number of bytes of memory reclaimed by Erlang garbage collector
+# TYPE rabbitmq_erlang_gc_reclaimed_bytes_total counter
+rabbitmq_erlang_gc_reclaimed_bytes_total 380048760
+# HELP rabbitmq_erlang_scheduler_context_switches_total Total number of Erlang scheduler context switches
+# TYPE rabbitmq_erlang_scheduler_context_switches_total counter
+rabbitmq_erlang_scheduler_context_switches_total 128455
+# HELP rabbitmq_process_max_fds Open file descriptors limit
+# TYPE rabbitmq_process_max_fds gauge
+rabbitmq_process_max_fds 1048576
+# HELP rabbitmq_resident_memory_limit_bytes Memory high watermark in bytes
+# TYPE rabbitmq_resident_memory_limit_bytes gauge
+rabbitmq_resident_memory_limit_bytes 7553234534
+# HELP rabbitmq_disk_space_available_limit_bytes Free disk space low watermark in bytes
+# TYPE rabbitmq_disk_space_available_limit_bytes gauge
+rabbitmq_disk_space_available_limit_bytes 50000000
+# HELP rabbitmq_erlang_processes_limit Erlang processes limit
+# TYPE rabbitmq_erlang_processes_limit gauge
+rabbitmq_erlang_processes_limit 1048576
+# HELP rabbitmq_erlang_scheduler_run_queue Erlang scheduler run queue
+# TYPE rabbitmq_erlang_scheduler_run_queue gauge
+rabbitmq_erlang_scheduler_run_queue 1
+# HELP rabbitmq_erlang_net_ticktime_seconds Inter-node heartbeat interval
+# TYPE rabbitmq_erlang_net_ticktime_seconds gauge
+rabbitmq_erlang_net_ticktime_seconds 60
+# HELP rabbitmq_erlang_uptime_seconds Node uptime
+# TYPE rabbitmq_erlang_uptime_seconds gauge
+rabbitmq_erlang_uptime_seconds 51.563
+# HELP rabbitmq_io_read_ops_total Total number of I/O read operations
+# TYPE rabbitmq_io_read_ops_total counter
+rabbitmq_io_read_ops_total 0
+# HELP rabbitmq_io_read_bytes_total Total number of I/O bytes read
+# TYPE rabbitmq_io_read_bytes_total counter
+rabbitmq_io_read_bytes_total 0
+# HELP rabbitmq_io_write_ops_total Total number of I/O write operations
+# TYPE rabbitmq_io_write_ops_total counter
+rabbitmq_io_write_ops_total 0
+# HELP rabbitmq_io_write_bytes_total Total number of I/O bytes written
+# TYPE rabbitmq_io_write_bytes_total counter
+rabbitmq_io_write_bytes_total 0
+# HELP rabbitmq_io_sync_ops_total Total number of I/O sync operations
+# TYPE rabbitmq_io_sync_ops_total counter
+rabbitmq_io_sync_ops_total 0
+# HELP rabbitmq_io_seek_ops_total Total number of I/O seek operations
+# TYPE rabbitmq_io_seek_ops_total counter
+rabbitmq_io_seek_ops_total 0
+# HELP rabbitmq_io_reopen_ops_total Total number of times files have been reopened
+# TYPE rabbitmq_io_reopen_ops_total counter
+rabbitmq_io_reopen_ops_total 0
+# HELP rabbitmq_schema_db_ram_tx_total Total number of Schema DB memory transactions
+# TYPE rabbitmq_schema_db_ram_tx_total counter
+rabbitmq_schema_db_ram_tx_total 0
+# HELP rabbitmq_schema_db_disk_tx_total Total number of Schema DB disk transactions
+# TYPE rabbitmq_schema_db_disk_tx_total counter
+rabbitmq_schema_db_disk_tx_total 0
+# HELP rabbitmq_msg_store_read_total Total number of Message Store read operations
+# TYPE rabbitmq_msg_store_read_total counter
+rabbitmq_msg_store_read_total 0
+# HELP rabbitmq_msg_store_write_total Total number of Message Store write operations
+# TYPE rabbitmq_msg_store_write_total counter
+rabbitmq_msg_store_write_total 0
+# HELP rabbitmq_queue_index_read_ops_total Total number of Queue Index read operations
+# TYPE rabbitmq_queue_index_read_ops_total counter
+rabbitmq_queue_index_read_ops_total 0
+# HELP rabbitmq_queue_index_write_ops_total Total number of Queue Index write operations
+# TYPE rabbitmq_queue_index_write_ops_total counter
+rabbitmq_queue_index_write_ops_total 0
+# HELP rabbitmq_io_read_time_seconds_total Total I/O read time
+# TYPE rabbitmq_io_read_time_seconds_total counter
+rabbitmq_io_read_time_seconds_total 0.0
+# HELP rabbitmq_io_write_time_seconds_total Total I/O write time
+# TYPE rabbitmq_io_write_time_seconds_total counter
+rabbitmq_io_write_time_seconds_total 0.0
+# HELP rabbitmq_io_sync_time_seconds_total Total I/O sync time
+# TYPE rabbitmq_io_sync_time_seconds_total counter
+rabbitmq_io_sync_time_seconds_total 0.0
+# HELP rabbitmq_io_seek_time_seconds_total Total I/O seek time
+# TYPE rabbitmq_io_seek_time_seconds_total counter
+rabbitmq_io_seek_time_seconds_total 0.0
+# HELP rabbitmq_queue_messages_ready Messages ready to be delivered to consumers
+# TYPE rabbitmq_queue_messages_ready gauge
+rabbitmq_queue_messages_ready 0
+# HELP rabbitmq_queue_messages_unacked Messages delivered to consumers but not yet acknowledged
+# TYPE rabbitmq_queue_messages_unacked gauge
+rabbitmq_queue_messages_unacked 0
+# HELP rabbitmq_queue_messages Sum of ready and unacknowledged messages - total queue depth
+# TYPE rabbitmq_queue_messages gauge
+rabbitmq_queue_messages 0
+# HELP rabbitmq_queue_process_reductions_total Total number of queue process reductions
+# TYPE rabbitmq_queue_process_reductions_total counter
+rabbitmq_queue_process_reductions_total 0
+# HELP rabbitmq_queue_consumers Consumers on a queue
+# TYPE rabbitmq_queue_consumers gauge
+rabbitmq_queue_consumers 0
+# HELP rabbitmq_queue_consumer_utilisation Same as consumer capacity
+# TYPE rabbitmq_queue_consumer_utilisation gauge
+rabbitmq_queue_consumer_utilisation 0
+# HELP rabbitmq_queue_process_memory_bytes Memory in bytes used by the Erlang queue process
+# TYPE rabbitmq_queue_process_memory_bytes gauge
+rabbitmq_queue_process_memory_bytes 0
+# HELP rabbitmq_queue_messages_ram Ready and unacknowledged messages stored in memory
+# TYPE rabbitmq_queue_messages_ram gauge
+rabbitmq_queue_messages_ram 0
+# HELP rabbitmq_queue_messages_ram_bytes Size of ready and unacknowledged messages stored in memory
+# TYPE rabbitmq_queue_messages_ram_bytes gauge
+rabbitmq_queue_messages_ram_bytes 0
+# HELP rabbitmq_queue_messages_ready_ram Ready messages stored in memory
+# TYPE rabbitmq_queue_messages_ready_ram gauge
+rabbitmq_queue_messages_ready_ram 0
+# HELP rabbitmq_queue_messages_unacked_ram Unacknowledged messages stored in memory
+# TYPE rabbitmq_queue_messages_unacked_ram gauge
+rabbitmq_queue_messages_unacked_ram 0
+# HELP rabbitmq_queue_messages_persistent Persistent messages
+# TYPE rabbitmq_queue_messages_persistent gauge
+rabbitmq_queue_messages_persistent 0
+# HELP rabbitmq_queue_messages_bytes Size in bytes of ready and unacknowledged messages
+# TYPE rabbitmq_queue_messages_bytes gauge
+rabbitmq_queue_messages_bytes 0
+# HELP rabbitmq_queue_messages_ready_bytes Size in bytes of ready messages
+# TYPE rabbitmq_queue_messages_ready_bytes gauge
+rabbitmq_queue_messages_ready_bytes 0
+# HELP rabbitmq_queue_messages_unacked_bytes Size in bytes of all unacknowledged messages
+# TYPE rabbitmq_queue_messages_unacked_bytes gauge
+rabbitmq_queue_messages_unacked_bytes 0
+# HELP rabbitmq_queue_disk_reads_total Total number of times queue read messages from disk
+# TYPE rabbitmq_queue_disk_reads_total counter
+rabbitmq_queue_disk_reads_total 0
+# HELP rabbitmq_queue_disk_writes_total Total number of times queue wrote messages to disk
+# TYPE rabbitmq_queue_disk_writes_total counter
+rabbitmq_queue_disk_writes_total 0
+# HELP rabbitmq_stream_segments Total number of stream segment files
+# TYPE rabbitmq_stream_segments counter
+rabbitmq_stream_segments 0
+# HELP rabbitmq_channel_consumers Consumers on a channel
+# TYPE rabbitmq_channel_consumers gauge
+rabbitmq_channel_consumers 0
+# HELP rabbitmq_channel_messages_unacked Delivered but not yet acknowledged messages
+# TYPE rabbitmq_channel_messages_unacked gauge
+rabbitmq_channel_messages_unacked 0
+# HELP rabbitmq_channel_messages_unconfirmed Published but not yet confirmed messages
+# TYPE rabbitmq_channel_messages_unconfirmed gauge
+rabbitmq_channel_messages_unconfirmed 0
+# HELP rabbitmq_channel_messages_uncommitted Messages received in a transaction but not yet committed
+# TYPE rabbitmq_channel_messages_uncommitted gauge
+rabbitmq_channel_messages_uncommitted 0
+# HELP rabbitmq_channel_acks_uncommitted Message acknowledgements in a transaction not yet committed
+# TYPE rabbitmq_channel_acks_uncommitted gauge
+rabbitmq_channel_acks_uncommitted 0
+# HELP rabbitmq_consumer_prefetch Limit of unacknowledged messages for each consumer
+# TYPE rabbitmq_consumer_prefetch gauge
+rabbitmq_consumer_prefetch 0
+# HELP rabbitmq_channel_prefetch Deprecated and will be removed in a future version
+# TYPE rabbitmq_channel_prefetch gauge
+rabbitmq_channel_prefetch 0
+# HELP rabbitmq_channel_messages_published_total Total number of messages published into an exchange on a channel
+# TYPE rabbitmq_channel_messages_published_total counter
+rabbitmq_channel_messages_published_total 0
+# HELP rabbitmq_channel_messages_confirmed_total Total number of messages published into an exchange and confirmed on the channel
+# TYPE rabbitmq_channel_messages_confirmed_total counter
+rabbitmq_channel_messages_confirmed_total 0
+# HELP rabbitmq_channel_messages_unroutable_returned_total Total number of messages published as mandatory into an exchange and returned to the publisher as unroutable
+# TYPE rabbitmq_channel_messages_unroutable_returned_total counter
+rabbitmq_channel_messages_unroutable_returned_total 0
+# HELP rabbitmq_channel_messages_unroutable_dropped_total Total number of messages published as non-mandatory into an exchange and dropped as unroutable
+# TYPE rabbitmq_channel_messages_unroutable_dropped_total counter
+rabbitmq_channel_messages_unroutable_dropped_total 0
+# HELP rabbitmq_channel_process_reductions_total Total number of channel process reductions
+# TYPE rabbitmq_channel_process_reductions_total counter
+rabbitmq_channel_process_reductions_total 0
+# HELP rabbitmq_channel_get_ack_total Total number of messages fetched with basic.get in manual acknowledgement mode
+# TYPE rabbitmq_channel_get_ack_total counter
+rabbitmq_channel_get_ack_total 0
+# HELP rabbitmq_channel_get_total Total number of messages fetched with basic.get in automatic acknowledgement mode
+# TYPE rabbitmq_channel_get_total counter
+rabbitmq_channel_get_total 0
+# HELP rabbitmq_channel_messages_delivered_ack_total Total number of messages delivered to consumers in manual acknowledgement mode
+# TYPE rabbitmq_channel_messages_delivered_ack_total counter
+rabbitmq_channel_messages_delivered_ack_total 0
+# HELP rabbitmq_channel_messages_delivered_total Total number of messages delivered to consumers in automatic acknowledgement mode
+# TYPE rabbitmq_channel_messages_delivered_total counter
+rabbitmq_channel_messages_delivered_total 0
+# HELP rabbitmq_channel_messages_redelivered_total Total number of messages redelivered to consumers
+# TYPE rabbitmq_channel_messages_redelivered_total counter
+rabbitmq_channel_messages_redelivered_total 0
+# HELP rabbitmq_channel_messages_acked_total Total number of messages acknowledged by consumers
+# TYPE rabbitmq_channel_messages_acked_total counter
+rabbitmq_channel_messages_acked_total 0
+# HELP rabbitmq_channel_get_empty_total Total number of times basic.get operations fetched no message
+# TYPE rabbitmq_channel_get_empty_total counter
+rabbitmq_channel_get_empty_total 0
+# HELP rabbitmq_connection_incoming_bytes_total Total number of bytes received on a connection
+# TYPE rabbitmq_connection_incoming_bytes_total counter
+rabbitmq_connection_incoming_bytes_total 0
+# HELP rabbitmq_connection_outgoing_bytes_total Total number of bytes sent on a connection
+# TYPE rabbitmq_connection_outgoing_bytes_total counter
+rabbitmq_connection_outgoing_bytes_total 0
+# HELP rabbitmq_connection_process_reductions_total Total number of connection process reductions
+# TYPE rabbitmq_connection_process_reductions_total counter
+rabbitmq_connection_process_reductions_total 0
+# HELP rabbitmq_connection_incoming_packets_total Total number of packets received on a connection
+# TYPE rabbitmq_connection_incoming_packets_total counter
+rabbitmq_connection_incoming_packets_total 0
+# HELP rabbitmq_connection_outgoing_packets_total Total number of packets sent on a connection
+# TYPE rabbitmq_connection_outgoing_packets_total counter
+rabbitmq_connection_outgoing_packets_total 0
+# HELP rabbitmq_connection_pending_packets Number of packets waiting to be sent on a connection
+# TYPE rabbitmq_connection_pending_packets gauge
+rabbitmq_connection_pending_packets 0
+# HELP rabbitmq_connection_channels Channels on a connection
+# TYPE rabbitmq_connection_channels gauge
+rabbitmq_connection_channels 0
+# HELP rabbitmq_queue_messages_published_total Total number of messages published into a queue through an exchange on a channel
+# TYPE rabbitmq_queue_messages_published_total counter
+rabbitmq_queue_messages_published_total 0
+# HELP rabbitmq_exchange_messages_published_total Total number of messages published into an exchange
+# TYPE rabbitmq_exchange_messages_published_total counter
+rabbitmq_exchange_messages_published_total 0
+# HELP rabbitmq_exchange_messages_confirmed_total Total number of messages published into an exchange and confirmed
+# TYPE rabbitmq_exchange_messages_confirmed_total counter
+rabbitmq_exchange_messages_confirmed_total 0
+# HELP rabbitmq_exchange_messages_unroutable_returned_total Total number of messages published as mandatory into an exchange and returned to the publisher as unroutable
+# TYPE rabbitmq_exchange_messages_unroutable_returned_total counter
+rabbitmq_exchange_messages_unroutable_returned_total 0
+# HELP rabbitmq_exchange_messages_unroutable_dropped_total Total number of messages published as non-mandatory into an exchange and dropped as unroutable
+# TYPE rabbitmq_exchange_messages_unroutable_dropped_total counter
+rabbitmq_exchange_messages_unroutable_dropped_total 0
+# HELP rabbitmq_queue_get_ack_total Total number of messages fetched from a queue with basic.get in manual acknowledgement mode
+# TYPE rabbitmq_queue_get_ack_total counter
+rabbitmq_queue_get_ack_total 0
+# HELP rabbitmq_queue_get_total Total number of messages fetched from a queue with basic.get in automatic acknowledgement mode
+# TYPE rabbitmq_queue_get_total counter
+rabbitmq_queue_get_total 0
+# HELP rabbitmq_queue_messages_delivered_ack_total Total number of messages delivered from a queue to consumers in manual acknowledgement mode
+# TYPE rabbitmq_queue_messages_delivered_ack_total counter
+rabbitmq_queue_messages_delivered_ack_total 0
+# HELP rabbitmq_queue_messages_delivered_total Total number of messages delivered from a queue to consumers in automatic acknowledgement mode
+# TYPE rabbitmq_queue_messages_delivered_total counter
+rabbitmq_queue_messages_delivered_total 0
+# HELP rabbitmq_queue_messages_redelivered_total Total number of messages redelivered from a queue to consumers
+# TYPE rabbitmq_queue_messages_redelivered_total counter
+rabbitmq_queue_messages_redelivered_total 0
+# HELP rabbitmq_queue_messages_acked_total Total number of messages acknowledged by consumers on a queue
+# TYPE rabbitmq_queue_messages_acked_total counter
+rabbitmq_queue_messages_acked_total 0
+# HELP rabbitmq_queue_get_empty_total Total number of times basic.get operations fetched no message on a queue
+# TYPE rabbitmq_queue_get_empty_total counter
+rabbitmq_queue_get_empty_total 0
+# HELP rabbitmq_queue_exchange_messages_published_total Total number of messages published into a queue through an exchange
+# TYPE rabbitmq_queue_exchange_messages_published_total counter
+rabbitmq_queue_exchange_messages_published_total 0
+# HELP rabbitmq_connections Connections currently open
+# TYPE rabbitmq_connections gauge
+rabbitmq_connections 0
+# HELP rabbitmq_channels Channels currently open
+# TYPE rabbitmq_channels gauge
+rabbitmq_channels 0
+# HELP rabbitmq_consumers Consumers currently connected
+# TYPE rabbitmq_consumers gauge
+rabbitmq_consumers 0
+# HELP rabbitmq_queues Queues available
+# TYPE rabbitmq_queues gauge
+rabbitmq_queues 0
+# HELP rabbitmq_build_info RabbitMQ & Erlang/OTP version info
+# TYPE rabbitmq_build_info untyped
+rabbitmq_build_info{rabbitmq_version="4.3.4",prometheus_plugin_version="4.3.4",prometheus_client_version="6.1.1",erlang_version="27.3.4.15"} 1
+# HELP rabbitmq_identity_info RabbitMQ node & cluster identity info
+# TYPE rabbitmq_identity_info untyped
+rabbitmq_identity_info{rabbitmq_node="rabbit@0bbb41cd12af",rabbitmq_cluster="rabbit@0bbb41cd12af",rabbitmq_cluster_permanent_id="rabbitmq-cluster-id-NqVqD2dSKI87ZQ2S1dVziQ",rabbitmq_endpoint="aggregated"} 1
+# HELP rabbitmq_global_consumers Current number of consumers
+# TYPE rabbitmq_global_consumers gauge
+rabbitmq_global_consumers{protocol="amqp091"} 0.0
+# HELP rabbitmq_global_messages_acknowledged_total Total number of messages acknowledged by consumers
+# TYPE rabbitmq_global_messages_acknowledged_total counter
+rabbitmq_global_messages_acknowledged_total{protocol="amqp091",queue_type="rabbit_classic_queue"} 0.0
+# HELP rabbitmq_global_messages_confirmed_total Total number of messages confirmed to publishers
+# TYPE rabbitmq_global_messages_confirmed_total counter
+rabbitmq_global_messages_confirmed_total{protocol="amqp091"} 0.0
+# HELP rabbitmq_global_messages_dead_lettered_confirmed_total Total number of messages dead-lettered and confirmed by target queues
+# TYPE rabbitmq_global_messages_dead_lettered_confirmed_total counter
+rabbitmq_global_messages_dead_lettered_confirmed_total{queue_type="rabbit_quorum_queue",dead_letter_strategy="at_least_once"} 0.0
+# HELP rabbitmq_global_messages_dead_lettered_delivery_limit_total Total number of messages dead-lettered due to delivery-limit exceeded
+# TYPE rabbitmq_global_messages_dead_lettered_delivery_limit_total counter
+rabbitmq_global_messages_dead_lettered_delivery_limit_total{queue_type="rabbit_quorum_queue",dead_letter_strategy="at_least_once"} 0.0
+# HELP rabbitmq_global_messages_dead_lettered_expired_total Total number of messages dead-lettered due to message TTL exceeded
+# TYPE rabbitmq_global_messages_dead_lettered_expired_total counter
+rabbitmq_global_messages_dead_lettered_expired_total{queue_type="rabbit_classic_queue",dead_letter_strategy="at_most_once"} 0.0
+# HELP rabbitmq_global_messages_dead_lettered_maxlen_total Total number of messages dead-lettered due to overflow drop-head or reject-publish-dlx
+# TYPE rabbitmq_global_messages_dead_lettered_maxlen_total counter
+rabbitmq_global_messages_dead_lettered_maxlen_total{queue_type="rabbit_classic_queue",dead_letter_strategy="at_most_once"} 0.0
+# HELP rabbitmq_global_messages_dead_lettered_rejected_total Total number of messages dead-lettered due to basic.reject or basic.nack
+# TYPE rabbitmq_global_messages_dead_lettered_rejected_total counter
+rabbitmq_global_messages_dead_lettered_rejected_total{queue_type="rabbit_classic_queue",dead_letter_strategy="at_most_once"} 0.0
+# HELP rabbitmq_global_messages_delivered_consume_auto_ack_total Total number of messages delivered to consumers using basic.consume with automatic acknowledgment
+# TYPE rabbitmq_global_messages_delivered_consume_auto_ack_total counter
+rabbitmq_global_messages_delivered_consume_auto_ack_total{protocol="amqp091",queue_type="rabbit_classic_queue"} 0.0
+# HELP rabbitmq_global_messages_delivered_consume_manual_ack_total Total number of messages delivered to consumers using basic.consume with manual acknowledgment
+# TYPE rabbitmq_global_messages_delivered_consume_manual_ack_total counter
+rabbitmq_global_messages_delivered_consume_manual_ack_total{protocol="amqp091",queue_type="rabbit_classic_queue"} 0.0
+# HELP rabbitmq_global_messages_delivered_get_auto_ack_total Total number of messages delivered to consumers using basic.get with automatic acknowledgment
+# TYPE rabbitmq_global_messages_delivered_get_auto_ack_total counter
+rabbitmq_global_messages_delivered_get_auto_ack_total{protocol="amqp091",queue_type="rabbit_classic_queue"} 0.0
+# HELP rabbitmq_global_messages_delivered_get_manual_ack_total Total number of messages delivered to consumers using basic.get with manual acknowledgment
+# TYPE rabbitmq_global_messages_delivered_get_manual_ack_total counter
+rabbitmq_global_messages_delivered_get_manual_ack_total{protocol="amqp091",queue_type="rabbit_classic_queue"} 0.0
+# HELP rabbitmq_global_messages_delivered_total Total number of messages delivered to consumers
+# TYPE rabbitmq_global_messages_delivered_total counter
+rabbitmq_global_messages_delivered_total{protocol="amqp091",queue_type="rabbit_classic_queue"} 0.0
+# HELP rabbitmq_global_messages_get_empty_total Total number of times basic.get operations fetched no message
+# TYPE rabbitmq_global_messages_get_empty_total counter
+rabbitmq_global_messages_get_empty_total{protocol="amqp091",queue_type="rabbit_classic_queue"} 0.0
+# HELP rabbitmq_global_messages_received_confirm_total Total number of messages received from publishers expecting confirmations
+# TYPE rabbitmq_global_messages_received_confirm_total counter
+rabbitmq_global_messages_received_confirm_total{protocol="amqp091"} 0.0
+# HELP rabbitmq_global_messages_received_total Total number of messages received from publishers
+# TYPE rabbitmq_global_messages_received_total counter
+rabbitmq_global_messages_received_total{protocol="amqp091"} 0.0
+# HELP rabbitmq_global_messages_redelivered_total Total number of messages redelivered to consumers
+# TYPE rabbitmq_global_messages_redelivered_total counter
+rabbitmq_global_messages_redelivered_total{protocol="amqp091",queue_type="rabbit_classic_queue"} 0.0
+# HELP rabbitmq_global_messages_routed_total Total number of messages routed to queues or streams
+# TYPE rabbitmq_global_messages_routed_total counter
+rabbitmq_global_messages_routed_total{protocol="amqp091"} 0.0
+# HELP rabbitmq_global_messages_unroutable_dropped_total Total number of messages published as non-mandatory into an exchange and dropped as unroutable
+# TYPE rabbitmq_global_messages_unroutable_dropped_total counter
+rabbitmq_global_messages_unroutable_dropped_total{protocol="amqp091"} 0.0
+# HELP rabbitmq_global_messages_unroutable_returned_total Total number of messages published as mandatory into an exchange and returned to the publisher as unroutable
+# TYPE rabbitmq_global_messages_unroutable_returned_total counter
+rabbitmq_global_messages_unroutable_returned_total{protocol="amqp091"} 0.0
+# HELP rabbitmq_global_publishers Current number of publishers
+# TYPE rabbitmq_global_publishers gauge
+rabbitmq_global_publishers{protocol="amqp091"} 0.0
+# HELP rabbitmq_message_size_bytes_bucket 
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="100"} 0
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="1000"} 0
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="10000"} 0
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="100000"} 0
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="1000000"} 0
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="10000000"} 0
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="50000000"} 0
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="100000000"} 0
+rabbitmq_message_size_bytes_bucket{protocol="amqp091",le="+Inf"} 0
+# HELP rabbitmq_message_size_bytes_count 
+rabbitmq_message_size_bytes_count{protocol="amqp091"} 0
+# HELP rabbitmq_message_size_bytes_sum 
+rabbitmq_message_size_bytes_sum{protocol="amqp091"} 0
+# HELP rabbitmq_raft_segments Number of segments written
+# TYPE rabbitmq_raft_segments counter
+rabbitmq_raft_segments{module="ra_log_segment_writer",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_forced_gcs Number of forced garbage collection runs
+# TYPE rabbitmq_raft_forced_gcs counter
+rabbitmq_raft_forced_gcs{module="rabbit_khepri",ra_system="coordination"} 1.0
+# HELP rabbitmq_raft_commit_index The current commit index.
+# TYPE rabbitmq_raft_commit_index counter
+rabbitmq_raft_commit_index{module="rabbit_khepri",ra_system="coordination"} 54.0
+# HELP rabbitmq_raft_wal_files Number of write-ahead log files created
+# TYPE rabbitmq_raft_wal_files counter
+rabbitmq_raft_wal_files{module="ra_log_wal",ra_system="coordination"} 1.0
+# HELP rabbitmq_raft_commands Total number of commands received by a leader
+# TYPE rabbitmq_raft_commands counter
+rabbitmq_raft_commands{module="rabbit_khepri",ra_system="coordination"} 54.0
+# HELP rabbitmq_raft_term_and_voted_for_updates Total number of updates of term and voted for
+# TYPE rabbitmq_raft_term_and_voted_for_updates counter
+rabbitmq_raft_term_and_voted_for_updates{module="rabbit_khepri",ra_system="coordination"} 2.0
+# HELP rabbitmq_raft_aux_commands Total number of aux commands received
+# TYPE rabbitmq_raft_aux_commands counter
+rabbitmq_raft_aux_commands{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_num_segments The number of non-empty segment files.
+# TYPE rabbitmq_raft_num_segments gauge
+rabbitmq_raft_num_segments{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_major_compaction_segments_written Number of segments written during major compactions
+# TYPE rabbitmq_raft_major_compaction_segments_written counter
+rabbitmq_raft_major_compaction_segments_written{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_read_segment Total number of read segments
+# TYPE rabbitmq_raft_read_segment counter
+rabbitmq_raft_read_segment{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_major_compactions Number of requested major compactions
+# TYPE rabbitmq_raft_major_compactions counter
+rabbitmq_raft_major_compactions{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_last_written_index The last fully written and fsynced index of the log.
+# TYPE rabbitmq_raft_last_written_index counter
+rabbitmq_raft_last_written_index{module="rabbit_khepri",ra_system="coordination"} 54.0
+# HELP rabbitmq_raft_read_ops Total number of read ops
+# TYPE rabbitmq_raft_read_ops counter
+rabbitmq_raft_read_ops{module="rabbit_khepri",ra_system="coordination"} 54.0
+# HELP rabbitmq_raft_term The current term.
+# TYPE rabbitmq_raft_term counter
+rabbitmq_raft_term{module="rabbit_khepri",ra_system="coordination"} 1.0
+# HELP rabbitmq_raft_snapshot_bytes_written Number of snapshot bytes written (not installed)
+# TYPE rabbitmq_raft_snapshot_bytes_written counter
+rabbitmq_raft_snapshot_bytes_written{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_command_flushes Total number of low priority command batches written
+# TYPE rabbitmq_raft_command_flushes counter
+rabbitmq_raft_command_flushes{module="rabbit_khepri",ra_system="coordination"} 4.0
+# HELP rabbitmq_raft_commit_latency_seconds Approximate time taken from an entry being written to the log until it is committed.
+# TYPE rabbitmq_raft_commit_latency_seconds gauge
+rabbitmq_raft_commit_latency_seconds{module="rabbit_khepri",ra_system="coordination"} 0.002
+# HELP rabbitmq_raft_local_queries Total number of local queries
+# TYPE rabbitmq_raft_local_queries counter
+rabbitmq_raft_local_queries{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_aer_received_follower_empty Total number of empty append entries received by a follower
+# TYPE rabbitmq_raft_aer_received_follower_empty counter
+rabbitmq_raft_aer_received_follower_empty{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_msgs_sent All messages sent (except messages sent to wal)
+# TYPE rabbitmq_raft_msgs_sent counter
+rabbitmq_raft_msgs_sent{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_aer_replies_success Total number of successful append entries received
+# TYPE rabbitmq_raft_aer_replies_success counter
+rabbitmq_raft_aer_replies_success{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_write_ops Total number of write ops
+# TYPE rabbitmq_raft_write_ops counter
+rabbitmq_raft_write_ops{module="rabbit_khepri",ra_system="coordination"} 55.0
+# HELP rabbitmq_raft_checkpoint_bytes_written Number of checkpoint bytes written
+# TYPE rabbitmq_raft_checkpoint_bytes_written counter
+rabbitmq_raft_checkpoint_bytes_written{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_read_mem_table Total number of reads from mem tables
+# TYPE rabbitmq_raft_read_mem_table counter
+rabbitmq_raft_read_mem_table{module="rabbit_khepri",ra_system="coordination"} 54.0
+# HELP rabbitmq_raft_read_cache Unused. Total number of cache reads
+# TYPE rabbitmq_raft_read_cache counter
+rabbitmq_raft_read_cache{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_bytes_written Number of bytes written
+# TYPE rabbitmq_raft_bytes_written counter
+rabbitmq_raft_bytes_written{module="ra_log_segment_writer",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_open_segments Number of open segments
+# TYPE rabbitmq_raft_open_segments gauge
+rabbitmq_raft_open_segments{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_snapshots_written Total number of snapshots written
+# TYPE rabbitmq_raft_snapshots_written counter
+rabbitmq_raft_snapshots_written{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_last_applied The last applied index. Can go backwards if a ra server is restarted.
+# TYPE rabbitmq_raft_last_applied gauge
+rabbitmq_raft_last_applied{module="rabbit_khepri",ra_system="coordination"} 54.0
+# HELP rabbitmq_raft_max_file_size Maximum WAL file size in bytes
+# TYPE rabbitmq_raft_max_file_size gauge
+rabbitmq_raft_max_file_size{module="ra_log_wal",ra_system="coordination"} 49713958.0
+# HELP rabbitmq_raft_invalid_reply_mode_commands Total number of commands received with an invalid reply-mode
+# TYPE rabbitmq_raft_invalid_reply_mode_commands counter
+rabbitmq_raft_invalid_reply_mode_commands{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_snapshots_sent Total number of snapshots sent
+# TYPE rabbitmq_raft_snapshots_sent counter
+rabbitmq_raft_snapshots_sent{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_checkpoints_written Total number of checkpoints written
+# TYPE rabbitmq_raft_checkpoints_written counter
+rabbitmq_raft_checkpoints_written{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_send_msg_effects_sent Total number of send_msg effects executed
+# TYPE rabbitmq_raft_send_msg_effects_sent counter
+rabbitmq_raft_send_msg_effects_sent{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_write_resends Total number of write resends
+# TYPE rabbitmq_raft_write_resends counter
+rabbitmq_raft_write_resends{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_last_index The last index of the log.
+# TYPE rabbitmq_raft_last_index counter
+rabbitmq_raft_last_index{module="rabbit_khepri",ra_system="coordination"} 54.0
+# HELP rabbitmq_raft_entries Number of entries written
+# TYPE rabbitmq_raft_entries counter
+rabbitmq_raft_entries{module="ra_log_segment_writer",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_checkpoint_index The current checkpoint index.
+# TYPE rabbitmq_raft_checkpoint_index counter
+rabbitmq_raft_checkpoint_index{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_read_closed_mem_tbl Unused. Total number of closed memory tables
+# TYPE rabbitmq_raft_read_closed_mem_tbl counter
+rabbitmq_raft_read_closed_mem_tbl{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_rpcs_sent Total number of rpcs, incl append_entries_rpcs
+# TYPE rabbitmq_raft_rpcs_sent counter
+rabbitmq_raft_rpcs_sent{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_dropped_sends Total number of message sends that return noconnect or nosuspend are dropped
+# TYPE rabbitmq_raft_dropped_sends counter
+rabbitmq_raft_dropped_sends{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_effective_machine_version The current effective version number of the machine.
+# TYPE rabbitmq_raft_effective_machine_version gauge
+rabbitmq_raft_effective_machine_version{module="rabbit_khepri",ra_system="coordination"} 3.0
+# HELP rabbitmq_raft_batches Number of batches written
+# TYPE rabbitmq_raft_batches counter
+rabbitmq_raft_batches{module="ra_log_wal",ra_system="coordination"} 56.0
+# HELP rabbitmq_raft_release_cursors Total number of updates of the release cursor
+# TYPE rabbitmq_raft_release_cursors counter
+rabbitmq_raft_release_cursors{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_checkpoints The number of checkpoint effects executed
+# TYPE rabbitmq_raft_checkpoints counter
+rabbitmq_raft_checkpoints{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_snapshot_installed Total number of snapshots installed
+# TYPE rabbitmq_raft_snapshot_installed counter
+rabbitmq_raft_snapshot_installed{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_pre_vote_elections Total number of pre-vote elections
+# TYPE rabbitmq_raft_pre_vote_elections counter
+rabbitmq_raft_pre_vote_elections{module="rabbit_khepri",ra_system="coordination"} 1.0
+# HELP rabbitmq_raft_major_compaction_segments_compacted Number of segments compacted during major compactions
+# TYPE rabbitmq_raft_major_compaction_segments_compacted counter
+rabbitmq_raft_major_compaction_segments_compacted{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_aer_replies_fail Total number of failed append entries
+# TYPE rabbitmq_raft_aer_replies_fail counter
+rabbitmq_raft_aer_replies_fail{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_snapshot_index The current snapshot index.
+# TYPE rabbitmq_raft_snapshot_index counter
+rabbitmq_raft_snapshot_index{module="rabbit_khepri",ra_system="coordination"} -1.0
+# HELP rabbitmq_raft_mem_tables Number of in-memory tables handled
+# TYPE rabbitmq_raft_mem_tables counter
+rabbitmq_raft_mem_tables{module="ra_log_segment_writer",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_minor_compactions Number of requested minor compactions
+# TYPE rabbitmq_raft_minor_compactions counter
+rabbitmq_raft_minor_compactions{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_current_file_size Current WAL file size in bytes
+# TYPE rabbitmq_raft_current_file_size gauge
+rabbitmq_raft_current_file_size{module="ra_log_wal",ra_system="coordination"} 64902.0
+# HELP rabbitmq_raft_fetch_term Total number of terms fetched
+# TYPE rabbitmq_raft_fetch_term counter
+rabbitmq_raft_fetch_term{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_reserved_2 Reserved counter
+# TYPE rabbitmq_raft_reserved_2 counter
+rabbitmq_raft_reserved_2{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_reserved_1 Reserved counter
+# TYPE rabbitmq_raft_reserved_1 counter
+rabbitmq_raft_reserved_1{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_consistent_queries Total number of consistent query requests
+# TYPE rabbitmq_raft_consistent_queries counter
+rabbitmq_raft_consistent_queries{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_checkpoints_promoted Number of checkpoints promoted to snapshots
+# TYPE rabbitmq_raft_checkpoints_promoted counter
+rabbitmq_raft_checkpoints_promoted{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_writes Number of entries written
+# TYPE rabbitmq_raft_writes counter
+rabbitmq_raft_writes{module="ra_log_wal",ra_system="coordination"} 55.0
+# HELP rabbitmq_raft_aer_received_follower Total number of append entries received by a follower
+# TYPE rabbitmq_raft_aer_received_follower counter
+rabbitmq_raft_aer_received_follower{module="rabbit_khepri",ra_system="coordination"} 0.0
+# HELP rabbitmq_raft_elections Total number of elections
+# TYPE rabbitmq_raft_elections counter
+rabbitmq_raft_elections{module="rabbit_khepri",ra_system="coordination"} 1.0
+# HELP rabbitmq_alarms_free_disk_space_watermark is 1 if free disk space watermark alarm is in effect
+# TYPE rabbitmq_alarms_free_disk_space_watermark untyped
+rabbitmq_alarms_free_disk_space_watermark 0
+# HELP rabbitmq_alarms_memory_used_watermark is 1 if VM memory watermark alarm is in effect
+# TYPE rabbitmq_alarms_memory_used_watermark untyped
+rabbitmq_alarms_memory_used_watermark 0
+# HELP rabbitmq_unreachable_cluster_peers_count Number of peers in the cluster the current node cannot reach.
+# TYPE rabbitmq_unreachable_cluster_peers_count gauge
+rabbitmq_unreachable_cluster_peers_count 0
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1785622020

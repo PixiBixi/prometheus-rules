@@ -1,0 +1,103 @@
+- name: rabbitmq.rules
+  rules:
+    # RabbitMQ 3.8+ ships the rabbitmq_prometheus plugin, so there is no third
+    # party exporter: metrics come from the broker itself on :15692.
+
+    - alert: RabbitmqDown
+      expr: |
+        group by (job, instance) (up{job=~".*rabbitmq.*"} == 0)
+        or
+        (
+          group by (job, instance) (last_over_time(up{job=~".*rabbitmq.*"}[1h]))
+          unless
+          group by (job, instance) (last_over_time(up{job=~".*rabbitmq.*"}[5m]))
+        )
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "RabbitMQ down — {{ $labels.job }} @ {{ $labels.instance }}"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+    # ── Broker alarms ─────────────────────────────────────────────────────────
+    # When either alarm is set, RabbitMQ blocks all publishing connections. This
+    # is the broker telling you it is already refusing writes -- not a warning
+    # that it might.
+
+    - alert: RabbitmqMemoryAlarm
+      expr: rabbitmq_alarms_memory_used_watermark == 1
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "RabbitMQ memory alarm on {{ $labels.instance }} — publishers blocked"
+        description: "RabbitMQ on {{ $labels.instance }} has crossed its memory watermark and is blocking all publishing connections."
+
+    - alert: RabbitmqDiskAlarm
+      expr: rabbitmq_alarms_free_disk_space_watermark == 1
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "RabbitMQ disk alarm on {{ $labels.instance }} — publishers blocked"
+        description: "Free disk space on {{ $labels.instance }} has crossed the watermark. RabbitMQ is blocking all publishing connections."
+
+    # ── Resource saturation ───────────────────────────────────────────────────
+
+    - alert: RabbitmqFileDescriptorsSaturation
+      # RabbitMQ holds one descriptor per connection and per queue index file.
+      # Exhaustion drops connections rather than degrading gracefully.
+      expr: |
+        rabbitmq_process_open_fds / (rabbitmq_process_max_fds > 0) > 0.80
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "RabbitMQ file descriptors near limit on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "More than 80% of the file descriptor limit is in use on {{ $labels.instance }}. Connections will be dropped at the limit."
+
+    - alert: RabbitmqErlangProcessesSaturation
+      expr: |
+        rabbitmq_erlang_processes_used / (rabbitmq_erlang_processes_limit > 0) > 0.80
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "RabbitMQ Erlang processes near limit on {{ $labels.instance }} ({{ $value | humanizePercentage }})"
+        description: "More than 80% of the Erlang process limit is in use on {{ $labels.instance }}."
+
+    - alert: RabbitmqMemoryNearLimit
+      # Distinct from the alarm above: this fires before the broker starts
+      # blocking, giving room to act.
+      expr: |
+        rabbitmq_process_resident_memory_bytes / (rabbitmq_resident_memory_limit_bytes > 0) > 0.80
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "RabbitMQ memory at {{ $value | humanizePercentage }} of its limit on {{ $labels.instance }}"
+        description: "RabbitMQ on {{ $labels.instance }} is approaching the memory watermark. Publishers are blocked once it is crossed."
+
+    # ── Queue health ──────────────────────────────────────────────────────────
+
+    - alert: RabbitmqQueueBacklog
+      # Ready messages piling up means consumers are not keeping pace. The
+      # threshold is deliberately generous; tune it per deployment.
+      expr: rabbitmq_queue_messages_ready > 10000
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "RabbitMQ backlog of {{ $value | humanize }} ready messages on {{ $labels.instance }}"
+        description: "Messages are accumulating faster than consumers drain them on {{ $labels.instance }}."
+
+    - alert: RabbitmqUnackedMessagesStuck
+      # Unacked messages are delivered but never acknowledged: usually a consumer
+      # that hung after receiving them. They are invisible to the ready count.
+      expr: rabbitmq_queue_messages_unacked > 1000
+      for: 30m
+      labels:
+        severity: warning
+      annotations:
+        summary: "RabbitMQ has {{ $value | humanize }} unacknowledged messages on {{ $labels.instance }}"
+        description: "Messages have been delivered but not acknowledged for 30 minutes on {{ $labels.instance }}. A consumer is likely stuck."
