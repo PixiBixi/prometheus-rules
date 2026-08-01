@@ -104,7 +104,10 @@
           Array "{{ $labels.device }}" needs attention and possibly a disk swap.
         summary: Failed device in RAID array
     - alert: RaidDegraded
-      expr: sum(node_md_disks) by (instance, device,job) < sum(node_md_disks_required) by (instance,device,job)
+      # node_md_disks is split by state (active/failed/spare); summing all states
+      # yields the number of disks *present*, which does not change when a disk
+      # goes active -> failed. Only count active disks.
+      expr: sum(node_md_disks{state="active"}) by (instance,device,job) < sum(node_md_disks_required) by (instance,device,job)
       for: 1m
       labels:
         severity: critical
