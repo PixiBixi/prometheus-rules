@@ -4,7 +4,7 @@ Review complète des **378 alertes / 23 fichiers** et **3 fichiers de recording 
 menée par 5 agents en parallèle, chaque constat re-vérifié contre les fixtures
 `exporters/` et, quand c'était reproductible, contre `promtool test rules`.
 
-**État : la majorité est corrigée** (40 commits, `f4276f2`..`0673736`). Ce document ne
+**État : la majorité est corrigée** (42 commits, `f4276f2`..`eb7fe67`). Ce document ne
 conserve que ce qui reste ouvert, plus le contexte nécessaire pour l'arbitrer.
 
 Le compte d'alertes passe de **378 à 372** : 4 alertes mortes supprimées, 2 paires de
@@ -65,6 +65,11 @@ Reproduit avant correction : un cluster sain levait un split-brain, un vrai spli
 
 Les fixtures ne permettent pas de trancher. Aucun n'est corrigé.
 
+> Deux constats de cette liste ont été **tranchés** par la reconstruction des fixtures
+> HAProxy (`eb7fe67`) : `HAproxyFrontendDown` était bel et bien morte — promex n'émet
+> jamais `state="OPEN"` — et les métriques `haproxy_sticktable_*` existent en 3.2, leur
+> absence de l'ancienne fixture n'étant qu'un artefact de config.
+
 | Constat | Fichier | À vérifier |
 |---|---|---|
 | `PromtailRequestErrors` : le regex `5..\|failed` ne matche pas les échecs réseau, qui remontent `status_code="-1"` | `promtail.rules.yml:5` | La valeur réelle sur votre version de promtail |
@@ -73,8 +78,6 @@ Les fixtures ne permettent pas de trancher. Aucun n'est corrigé.
 | `PostgreSQLRepliDown` / `PostgresqlUnusedReplicationSlot` : `pg_replication_slots_active` absent de la fixture | `postgresql.rules.yml:93,174` | Nom réel selon la version de postgres_exporter |
 | Métriques PG issues d'un `queries.yaml` custom : `pg_stat_user_tables_*`, `pg_bloat_*`, `pg_general_index_info_*`, `pg_replication_is_replica` | `postgresql.rules.yml` | Aucun `queries.yaml` dans `misc/`, contrairement aux configs JMX |
 | `cert-manager` : les annotations lisent `exported_namespace`, la fixture porte `namespace` | `cert-manager.rules.yml:29,42` | Dépend de votre scrape (Operator/ServiceMonitor ou non) |
-| `HAproxyFrontendDown` suppose que la série `state="OPEN"` est émise même quand ce n'est pas l'état courant | `haproxy.rules.yml:145` | Voir R4 — la fixture est dédupliquée, impossible à trancher |
-| `HAproxySticktable*` : `haproxy_sticktable_size`/`_used` présentes en 2x, absentes en 3x | `haproxy.rules.yml:484,496` | Artefact de fixture, ou vraiment supprimé en 3.x ? |
 | `Segfault` : `server_metrics{dimension="segfault"}` — counter cumulatif ou gauge remise à 0 ? | `basis.rules.yml:142` | Si counter, l'alerte reste bloquée à vie |
 | `k8s.records` : `+Inf` si un conteneur déclare `requests: 0` | `k8s.records.yml:17-21,35-39` | Risque faible (KSM n'émet la série que si déclarée) |
 
@@ -114,12 +117,13 @@ KeyDB 6.3.4.
 > La flotte tourne 210 instances en v1.52.0 et 11 en v1.58.0 ; `redis_config_maxclients`
 > est présente sur 220 des 221.
 
-Reste ouvert :
+Les deux fixtures HAProxy sont également refaites (`eb7fe67`), depuis des scrapes promex
+réels de **2.7.11** et **3.2.21** — les versions de la flotte (102 et 24 instances) —
+avec toutes les valeurs de `state` conservées, comme l'exige `CLAUDE.md`. La config de
+génération couvre un frontend, un backend avec un serveur UP, un DOWN et un MAINT, et une
+`stick-table` déclarée.
 
-- Les fixtures HAProxy ne respectent pas la règle de dédup annoncée dans `CLAUDE.md`
-  (« Enum labels (`mode`, `state`, etc.): all values kept ») pour les métriques
-  `*_status` : une seule valeur d'état est conservée. C'est ce qui empêche de trancher
-  `HAproxyFrontendDown` en R2.
+**R4 est clos.**
 
 ### R5 — Reliquat P2/P3 — traité, sauf trois points
 
