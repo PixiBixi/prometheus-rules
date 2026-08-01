@@ -115,3 +115,77 @@ tests:
         exp_samples:
           - labels: 'haproxy:backend_error_rate:ratio5m{namespace="ns",proxy="p",instance="h1",job="hap"}'
             value: 50
+
+  # End-to-end: raw counters -> recording rules -> alerts. Proves the alerts
+  # actually consume the records and that proxy survives on server-level ones.
+  - interval: 1m
+    name: backend and server error-rate alerts fire through the recording rules
+    input_series:
+      - series: 'haproxy_backend_http_responses_total{code="5xx",namespace="ns",proxy="api",instance="h1",job="hap"}'
+        values: '0+10x20'
+      - series: 'haproxy_backend_http_responses_total{code="2xx",namespace="ns",proxy="api",instance="h1",job="hap"}'
+        values: '0+90x20'
+      - series: 'haproxy_server_http_responses_total{code="5xx",namespace="ns",proxy="api",server="srv001",instance="h1",job="hap"}'
+        values: '0+10x20'
+      - series: 'haproxy_server_http_responses_total{code="2xx",namespace="ns",proxy="api",server="srv001",instance="h1",job="hap"}'
+        values: '0+90x20'
+    alert_rule_test:
+      - alertname: HAproxyHighHttp5xxErrorRateBackend
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyHighHttp5xxErrorRateBackend
+              namespace: ns
+              proxy: api
+              instance: h1
+              job: hap
+              severity: critical
+            exp_annotations:
+              summary: "HAProxy high HTTP 5xx error rate — api @ h1"
+              description: "Too many HTTP requests with status 5xx (> 5%) on api @ h1"
+      - alertname: HAproxyHighHttp5xxErrorRateServer
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyHighHttp5xxErrorRateServer
+              namespace: ns
+              proxy: api
+              server: srv001
+              instance: h1
+              job: hap
+              severity: critical
+            exp_annotations:
+              summary: "HAProxy high HTTP 5xx error rate — api/srv001 @ h1"
+              description: "Too many HTTP requests with status 5xx (> 5%) on api/srv001 @ h1"
+
+  # Two backends reusing the same server slot name -- the case `by (server,
+  # instance)` used to blend into a single meaningless ratio.
+  - interval: 1m
+    name: server-level ratios are computed per proxy, not blended across backends
+    input_series:
+      # api/srv001 is 100% 5xx, web/srv001 is perfectly healthy
+      - series: 'haproxy_server_http_responses_total{code="5xx",namespace="ns",proxy="api",server="srv001",instance="h1",job="hap"}'
+        values: '0+10x20'
+      - series: 'haproxy_server_http_responses_total{code="2xx",namespace="ns",proxy="web",server="srv001",instance="h1",job="hap"}'
+        values: '0+10x20'
+    promql_expr_test:
+      - expr: 'haproxy:server_http_responses:rate5m{code="5xx"}'
+        eval_time: 15m
+        exp_samples:
+          - labels: 'haproxy:server_http_responses:rate5m{code="5xx",namespace="ns",proxy="api",server="srv001",instance="h1",job="hap"}'
+            value: 0.16666666666666666
+    alert_rule_test:
+      - alertname: HAproxyHighHttp5xxErrorRateServer
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyHighHttp5xxErrorRateServer
+              namespace: ns
+              proxy: api
+              server: srv001
+              instance: h1
+              job: hap
+              severity: critical
+            exp_annotations:
+              summary: "HAProxy high HTTP 5xx error rate — api/srv001 @ h1"
+              description: "Too many HTTP requests with status 5xx (> 5%) on api/srv001 @ h1"
