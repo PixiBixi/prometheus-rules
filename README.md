@@ -174,6 +174,29 @@ Be aware some of these module use "a lot" of CPU time, specially `--collector.cp
 
 Also, some collector have been disabled because I don't use them
 
+#### apache_exporter
+
+**Exporter link :** [apache_exporter](https://github.com/Lusitaniae/apache_exporter)
+**Version used :** 1.1.1 (tested against Apache 2.4.68)
+
+Requires `mod_status` with extended status, and the exporter pointed at it:
+
+```apache
+<Location "/server-status">
+    SetHandler server-status
+    Require all granted
+</Location>
+ExtendedStatus On
+```
+
+```
+apache_exporter --scrape_uri=http://localhost/server-status?auto
+```
+
+Without `ExtendedStatus On` the exporter still reports worker and scoreboard state, but
+`apache_accesses_total`, `apache_duration_ms_total` and `apache_sent_kilobytes_total` stay
+at zero — which silently disables `ApacheSlowRequests`.
+
 #### aerospike-prometheus-exporter
 
 **Exporter link :** [aerospike-prometheus-exporter](https://github.com/aerospike/aerospike-prometheus-exporter)
