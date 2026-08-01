@@ -189,3 +189,54 @@ tests:
             exp_annotations:
               summary: "HAProxy high HTTP 5xx error rate — api/srv001 @ h1"
               description: "Too many HTTP requests with status 5xx (> 5%) on api/srv001 @ h1"
+
+  # server-template slots that are not provisioned sit in MAINT, so
+  # {state="UP"} == 0 was permanently true for them.
+  - interval: 1m
+    name: an unprovisioned MAINT slot does not page as a down server
+    input_series:
+      - series: 'haproxy_server_status{namespace="ns",proxy="api",server="srv009",state="MAINT",instance="h1",job="hap"}'
+        values: '1x10'
+      - series: 'haproxy_server_status{namespace="ns",proxy="api",server="srv009",state="UP",instance="h1",job="hap"}'
+        values: '0x10'
+      - series: 'haproxy_server_status{namespace="ns",proxy="api",server="srv009",state="DOWN",instance="h1",job="hap"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: HAproxyServerDown
+        eval_time: 8m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a genuinely DOWN server still pages
+    input_series:
+      - series: 'haproxy_server_status{namespace="ns",proxy="api",server="srv001",state="DOWN",instance="h1",job="hap"}'
+        values: '1x10'
+      - series: 'haproxy_server_status{namespace="ns",proxy="api",server="srv001",state="UP",instance="h1",job="hap"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: HAproxyServerDown
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyServerDown
+              namespace: ns
+              proxy: api
+              server: srv001
+              state: DOWN
+              instance: h1
+              job: hap
+              severity: critical
+            exp_annotations:
+              summary: "HAProxy server down — api/srv001 @ h1"
+              description: "Server api/srv001 @ h1 is DOWN"
+
+  # stopping=1 is the normal state of a draining worker during a seamless reload
+  - interval: 1m
+    name: a short reload drain does not page
+    input_series:
+      - series: 'haproxy_process_stopping{instance="h1",job="hap"}'
+        values: '0 1 1 0 0 0 0 0 0 0'
+    alert_rule_test:
+      - alertname: HAproxyProcessStopping
+        eval_time: 8m
+        exp_alerts: []
