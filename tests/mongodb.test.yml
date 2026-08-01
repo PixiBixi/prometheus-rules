@@ -1,0 +1,85 @@
+# Tests for rules/mongodb.rules.yml
+#
+# Fixture is a real scrape of percona/mongodb_exporter 0.52.0 against MongoDB 8.
+# That exporter names serverStatus metrics mongodb_ss_* and carries dimensions
+# as labels: connections are mongodb_ss_connections{conn_type="current"}, not
+# mongodb_connections_current as several community alert sets assume.
+#
+# Replica-set metrics (mongodb_mongod_replset_*) are absent because the test
+# instance is standalone, so no rule here depends on them.
+rule_files:
+  - mongodb.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: connections near the limit alert
+    input_series:
+      # 900 current of 1000 total slots
+      - series: 'mongodb_ss_connections{conn_type="current",instance="m1",job="mongodb"}'
+        values: '900x20'
+      - series: 'mongodb_ss_connections{conn_type="available",instance="m1",job="mongodb"}'
+        values: '100x20'
+    alert_rule_test:
+      - alertname: MongodbConnectionsSaturation
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels: {alertname: MongodbConnectionsSaturation, instance: m1, job: mongodb, severity: critical}
+            exp_annotations:
+              summary: "MongoDB connections near limit on m1 (90%)"
+              description: "More than 80% of the available connection slots are in use on m1."
+
+  - interval: 1m
+    name: a lightly loaded server raises nothing
+    input_series:
+      - series: 'mongodb_ss_connections{conn_type="current",instance="m1",job="mongodb"}'
+        values: '3x20'
+      - series: 'mongodb_ss_connections{conn_type="available",instance="m1",job="mongodb"}'
+        values: '8189x20'
+    alert_rule_test:
+      - alertname: MongodbConnectionsSaturation
+        eval_time: 15m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a read queue on the global lock alerts
+    input_series:
+      - series: 'mongodb_ss_globalLock_currentQueue{count_type="readers",instance="m1",job="mongodb"}'
+        values: '250x20'
+    alert_rule_test:
+      - alertname: MongodbHighReadQueue
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels: {alertname: MongodbHighReadQueue, instance: m1, job: mongodb, count_type: readers, severity: warning}
+            exp_annotations:
+              summary: "MongoDB read queue on m1 (250 waiting)"
+              description: "250 readers are queued on the global lock on m1."
+
+  - interval: 1m
+    name: a full WiredTiger cache alerts
+    input_series:
+      - series: 'mongodb_ss_wt_cache_bytes_currently_in_the_cache{instance="m1",job="mongodb"}'
+        values: '970000000x25'
+      - series: 'mongodb_ss_wt_cache_maximum_bytes_configured{instance="m1",job="mongodb"}'
+        values: '1000000000x25'
+    alert_rule_test:
+      - alertname: MongodbWiredTigerCacheSaturation
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels: {alertname: MongodbWiredTigerCacheSaturation, instance: m1, job: mongodb, severity: warning}
+            exp_annotations:
+              summary: "MongoDB WiredTiger cache at 97% on m1"
+              description: "The WiredTiger cache on m1 is above 95% full. Eviction pressure will show up as read latency."
+
+  - interval: 1m
+    name: a zero cache limit does not produce +Inf
+    input_series:
+      - series: 'mongodb_ss_wt_cache_bytes_currently_in_the_cache{instance="m1",job="mongodb"}'
+        values: '970000000x25'
+      - series: 'mongodb_ss_wt_cache_maximum_bytes_configured{instance="m1",job="mongodb"}'
+        values: '0x25'
+    alert_rule_test:
+      - alertname: MongodbWiredTigerCacheSaturation
+        eval_time: 20m
+        exp_alerts: []
