@@ -127,6 +127,13 @@ or a dead rule look fine. Both have happened here:
   of 221 production instances.
 - CoreDNS 1.11.0 renamed `coredns_forward_*` to `coredns_proxy_*`, and both versions run
   here — so a fix targeting either naming alone is a regression for the other.
+- postgres_exporter 0.15 renamed `pg_replication_lag` to `pg_replication_lag_seconds`. Both
+  exporter versions run here — 20 instances emit both names, 2 only the old, 1 only the new
+  — so both lag alerts match either name.
+- The same release dropped the legacy query mode that emitted
+  `pg_stat_database_checksum_failures`. Exactly the 16 instances still on 0.12.0 expose it
+  and none of the 21 on 0.15.0 do, so upgrading the rest of the fleet would silently kill
+  `PostgresChecksumFailures` — a rename you cannot work around, only notice.
 
 **The script compares two numbers; the third is the one that matters.** What you actually
 run is neither the fixture's version nor upstream's, and only a query against your own
