@@ -1,3 +1,7 @@
+# ipsec_exporter, version unknown
+#
+# No version metric is exposed. The Ansible role pins 0.4.0, which is also the
+# latest upstream release, but that was not verified against this capture.
 # HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
 # TYPE go_gc_duration_seconds summary
 go_gc_duration_seconds{quantile="0"} 2.3026e-05
