@@ -831,3 +831,44 @@
       annotations:
         summary: "UDP receive buffer errors on {{ $labels.instance }}"
         description: "{{ $labels.instance }} is dropping UDP packets due to full receive buffers — consider increasing net.core.rmem_max."
+
+    - alert: NodeHighTcpRetransmitRatio
+      # Absolute retransmit counts are meaningless -- a busy host retransmits
+      # more simply because it sends more. The ratio against total segments is
+      # the signal, and it points at the network rather than the host.
+      #
+      # Measured across the fleet: median 0.002%, p95 0.66%, worst host 1.34%.
+      # 2% sits above everything currently observed, so this stays quiet until
+      # something genuinely degrades.
+      expr: |
+        rate(node_netstat_Tcp_RetransSegs[30m])
+        /
+        rate(node_netstat_Tcp_OutSegs[30m])
+        > 0.02
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High TCP retransmit ratio on {{ $labels.instance }}"
+        description: "{{ $value | humanizePercentage }} of TCP segments sent by {{ $labels.instance }} are retransmissions, against a fleet median of 0.002%. Points at the network path rather than the host."
+
+    - alert: RDSTasksBlocked
+      # The RDS counterpart of NodeProcsBlocked above. Managed instances do not
+      # run node_exporter, so node_procs_blocked never exists for them and that
+      # alert silently covers only the hosts we own.
+      #
+      # Tasks in uninterruptible sleep are almost always storage that stopped
+      # answering, occasionally a lock storm. Nothing else catches it: a blocked
+      # instance looks idle, because blocked tasks burn no CPU.
+      #
+      # No magnitude threshold here, unlike its sibling. Across seven days the
+      # fleet never exceeded zero, and one task blocked continuously for ten
+      # minutes is already a hung device -- the `for` clause is what filters
+      # transients, which suits this signal better than a count.
+      expr: rdsosmetrics_tasks_blocked > 0
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "RDS tasks blocked on {{ $labels.instance }}"
+        description: "{{ $value | printf \"%.0f\" }} tasks blocked in uninterruptible sleep on {{ $labels.instance }} ({{ $labels.region }}) for 10 minutes. Usually storage that stopped answering. The instance looks idle because blocked tasks burn no CPU."

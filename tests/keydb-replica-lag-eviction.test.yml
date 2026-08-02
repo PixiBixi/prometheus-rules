@@ -1,0 +1,99 @@
+# Tests for RedisReplicaLagHigh and RedisEvictingKeys in rules/keydb.rules.yml
+#
+# Both cover a state the existing keydb alerts structurally cannot see:
+#
+#   - the replication alerts count connected replicas and catch one leaving.
+#     A replica that stays attached and falls far behind trips none of them.
+#   - RedisOutOfConfiguredMaxmemory warns as memory approaches the limit. It
+#     says nothing once the limit is enforced and keys start being discarded.
+rule_files:
+  - keydb.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a connected but lagging replica alerts
+    input_series:
+      - series: 'redis_connected_slave_lag_seconds{slave_ip="10.0.0.2",slave_port="6379",slave_state="online",instance="keydb-1",job="keydb"}'
+        values: '120x20'
+    alert_rule_test:
+      - alertname: RedisReplicaLagHigh
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: RedisReplicaLagHigh
+              slave_ip: 10.0.0.2
+              slave_port: "6379"
+              slave_state: online
+              instance: keydb-1
+              job: keydb
+              severity: warning
+            exp_annotations:
+              summary: "Redis replica 10.0.0.2 lagging on keydb-1"
+              description: "Replica 10.0.0.2:6379 of keydb-1 is 2m 0s behind. It is connected, so the disconnection alerts stay quiet, but it serves stale reads and would lose that much data if promoted."
+
+  # Normal lag on this fleet peaks at 1s. A replica a second or two behind is
+  # healthy and must not alert, or the signal is worthless.
+  - interval: 1m
+    name: a replica a couple of seconds behind stays quiet
+    input_series:
+      - series: 'redis_connected_slave_lag_seconds{slave_ip="10.0.0.2",slave_port="6379",slave_state="online",instance="keydb-1",job="keydb"}'
+        values: '1 2 1 1 3 1 1 2 1 1x12'
+    alert_rule_test:
+      - alertname: RedisReplicaLagHigh
+        eval_time: 10m
+        exp_alerts: []
+
+  # A brief spike past the threshold must be absorbed by `for: 5m` -- a
+  # replica catching up after a burst of writes is not an incident.
+  - interval: 1m
+    name: a brief lag spike does not alert
+    input_series:
+      - series: 'redis_connected_slave_lag_seconds{slave_ip="10.0.0.2",slave_port="6379",slave_state="online",instance="keydb-1",job="keydb"}'
+        values: '1 1 90 90 1 1 1 1 1 1x12'
+    alert_rule_test:
+      - alertname: RedisReplicaLagHigh
+        eval_time: 15m
+        exp_alerts: []
+
+  - interval: 1m
+    name: keys being evicted alerts
+    input_series:
+      - series: 'redis_evicted_keys_total{instance="keydb-1",job="keydb"}'
+        values: '0+40x20'
+    alert_rule_test:
+      - alertname: RedisEvictingKeys
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: RedisEvictingKeys
+              instance: keydb-1
+              job: keydb
+              severity: warning
+            exp_annotations:
+              summary: "Redis is evicting keys on keydb-1"
+              description: "200 keys evicted in 5m on keydb-1. maxmemory is being enforced and data is being discarded — not a cache-by-design fleet, so this is loss rather than housekeeping."
+
+  # The state of all 221 production instances: a counter that has never moved.
+  - interval: 1m
+    name: an instance that has never evicted stays quiet
+    input_series:
+      - series: 'redis_evicted_keys_total{instance="keydb-1",job="keydb"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: RedisEvictingKeys
+        eval_time: 10m
+        exp_alerts: []
+
+  # A counter carrying evictions from some past incident, now flat. Only the
+  # slope is an incident, not the accumulated total.
+  - interval: 1m
+    name: a flat counter holding an old eviction total stays quiet
+    input_series:
+      - series: 'redis_evicted_keys_total{instance="keydb-1",job="keydb"}'
+        values: '98423x20'
+    alert_rule_test:
+      - alertname: RedisEvictingKeys
+        eval_time: 10m
+        exp_alerts: []

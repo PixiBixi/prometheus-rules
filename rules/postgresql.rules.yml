@@ -331,3 +331,20 @@
         summary: "PostgreSQL database size growth high (database {{ $labels.datname }})"
         description: "Database {{ $labels.datname }} projected to grow by more than 20% of its current size in 24h ({{ $value | humanizePercentage }})"
 
+
+    - alert: PostgresqlStandbyQueryConflicts
+      # On a standby, recovery and long-running read queries compete: replaying
+      # WAL can require dropping a tuple, a lock or a tablespace a query still
+      # needs, and Postgres resolves that by cancelling the query. The client
+      # sees an error, the standby stays healthy, and nothing else here notices
+      # -- the replication lag alerts are watching a different failure.
+      #
+      # Seven conflicts in the last seven days across the fleet, so an hourly
+      # window keeps this rare enough to be worth reading.
+      expr: increase(pg_stat_database_conflicts[1h]) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Postgres standby cancelled queries on {{ $labels.datname }} @ {{ $labels.instance }}"
+        description: "{{ $value | printf \"%.0f\" }} queries were cancelled on {{ $labels.datname }} @ {{ $labels.instance }} in the last hour by conflicts with WAL recovery. Clients saw errors; the standby itself looks healthy. Consider hot_standby_feedback or max_standby_streaming_delay."

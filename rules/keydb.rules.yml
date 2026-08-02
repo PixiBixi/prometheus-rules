@@ -105,3 +105,38 @@
       annotations:
         summary: "Redis rejected connections (instance {{ $labels.instance }})"
         description: "Some connections to Redis were rejected on {{ $labels.instance }}\n  VALUE = {{ $value }}"
+
+    - alert: RedisReplicaLagHigh
+      # The replication alerts above watch whether replicas are *connected*:
+      # RedisDisconnectedSlaves counts them, RedisReplicationBroken catches one
+      # leaving. None of them notices a replica that is attached and simply
+      # far behind, which is the state that silently serves stale reads and
+      # loses the most data on a failover.
+      #
+      # Threshold matches the Postgres convention (30s / 300s). Across the
+      # fleet today the maximum lag is 1s and the p99 is 1s, so 30s is well
+      # clear of normal.
+      expr: redis_connected_slave_lag_seconds > 30
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Redis replica {{ $labels.slave_ip }} lagging on {{ $labels.instance }}"
+        description: "Replica {{ $labels.slave_ip }}:{{ $labels.slave_port }} of {{ $labels.instance }} is {{ $value | humanizeDuration }} behind. It is connected, so the disconnection alerts stay quiet, but it serves stale reads and would lose that much data if promoted."
+
+    - alert: RedisEvictingKeys
+      # RedisOutOfConfiguredMaxmemory warns when memory approaches the limit;
+      # this fires once the limit is being enforced and keys are actually being
+      # thrown away. That is the damage rather than the warning sign.
+      #
+      # `> 0` is only defensible because eviction is not how this estate is
+      # operated: across 221 instances, zero keys were evicted in the last
+      # seven days. On a fleet deliberately running allkeys-lru as a cache,
+      # eviction is normal and this alert would need a rate threshold instead.
+      expr: increase(redis_evicted_keys_total[5m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Redis is evicting keys on {{ $labels.instance }}"
+        description: "{{ $value | printf \"%.0f\" }} keys evicted in 5m on {{ $labels.instance }}. maxmemory is being enforced and data is being discarded — not a cache-by-design fleet, so this is loss rather than housekeeping."
