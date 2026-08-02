@@ -1,9 +1,19 @@
-# Regression tests for rules/cert-manager.rules.yml
+# Tests for rules/cert-manager.rules.yml
 #
-# CertManagerACMEHighErrorRate divided without aggregating, so the division
-# matched on the full label set -- `status` included -- and each error series
-# was divided by itself. The ratio was exactly 1.0 whenever any 4xx/5xx
-# existed, and a badNonce 400 is routine with Let's Encrypt.
+# Label shapes come from a real cert-manager v1.21.1 scrape and were
+# cross-checked against production. Two things they settled:
+#
+#   - `exported_namespace` does not exist on our scrape. Prometheus only renames
+#     a scraped `namespace` to `exported_namespace` when the target already
+#     carries one, which a Prometheus Operator ServiceMonitor does and ours does
+#     not. Production shows namespace="teleport" and no exported_namespace.
+#     The annotations prefer exported_namespace and fall back to namespace.
+#     Concatenating is wrong: on an Operator scrape both exist and you get
+#     "teleportmonitoring".
+#
+#   - certmanager_issuer_ready_status and certmanager_clusterissuer_ready_status
+#     are separate metrics. A cluster with only ClusterIssuers emits just the
+#     second.
 rule_files:
   - cert-manager.rules.yml
 
@@ -11,34 +21,96 @@ evaluation_interval: 1m
 
 tests:
   - interval: 1m
-    name: a 1% ACME error rate does not trip the 5% threshold
+    name: an Issuer that is not ready alerts and names its namespace
     input_series:
-      - series: 'certmanager_http_acme_client_request_duration_seconds_count{instance="cm",job="cm",host="acme",status="200",method="GET",path="/d",scheme="https"}'
-        values: '0+99x10'
-      - series: 'certmanager_http_acme_client_request_duration_seconds_count{instance="cm",job="cm",host="acme",status="400",method="GET",path="/d",scheme="https"}'
-        values: '0+1x10'
+      - series: 'certmanager_issuer_ready_status{condition="False",name="letsencrypt",namespace="cert-manager",job="cert-manager",instance="cm1"}'
+        values: '1x20'
+      - series: 'certmanager_issuer_ready_status{condition="True",name="letsencrypt",namespace="cert-manager",job="cert-manager",instance="cm1"}'
+        values: '0x20'
     alert_rule_test:
-      - alertname: CertManagerACMEHighErrorRate
-        eval_time: 10m
+      - alertname: CertManagerIssuerNotReady
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: CertManagerIssuerNotReady
+              name: letsencrypt
+              namespace: cert-manager
+              condition: "False"
+              severity: critical
+            exp_annotations:
+              summary: "cert-manager Issuer letsencrypt not ready"
+              description: "Issuer letsencrypt in namespace cert-manager is not ready (condition=False). Every certificate it backs has stopped renewing."
+
+  - interval: 1m
+    name: a healthy Issuer alerts on nothing
+    input_series:
+      - series: 'certmanager_issuer_ready_status{condition="True",name="letsencrypt",namespace="cert-manager",job="cert-manager",instance="cm1"}'
+        values: '1x20'
+      - series: 'certmanager_issuer_ready_status{condition="False",name="letsencrypt",namespace="cert-manager",job="cert-manager",instance="cm1"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: CertManagerIssuerNotReady
+        eval_time: 15m
         exp_alerts: []
 
   - interval: 1m
-    name: a genuinely high ACME error rate still alerts
+    name: a ClusterIssuer that is not ready alerts separately
     input_series:
-      - series: 'certmanager_http_acme_client_request_duration_seconds_count{instance="cm",job="cm",host="acme",status="200",method="GET",path="/d",scheme="https"}'
-        values: '0+50x10'
-      - series: 'certmanager_http_acme_client_request_duration_seconds_count{instance="cm",job="cm",host="acme",status="500",method="GET",path="/d",scheme="https"}'
-        values: '0+50x10'
+      - series: 'certmanager_clusterissuer_ready_status{condition="Unknown",name="letsencrypt-prod",job="cert-manager",instance="cm1"}'
+        values: '1x20'
     alert_rule_test:
-      - alertname: CertManagerACMEHighErrorRate
-        eval_time: 10m
+      - alertname: CertManagerClusterIssuerNotReady
+        eval_time: 15m
         exp_alerts:
           - exp_labels:
-              alertname: CertManagerACMEHighErrorRate
-              instance: cm
-              job: cm
-              host: acme
-              severity: warning
+              alertname: CertManagerClusterIssuerNotReady
+              name: letsencrypt-prod
+              condition: Unknown
+              severity: critical
             exp_annotations:
-              summary: "Cert Manager ACME client high error rate on acme"
-              description: "cert-manager ACME client has more than 5% error rate (50%) talking to acme."
+              summary: "cert-manager ClusterIssuer letsencrypt-prod not ready"
+              description: "ClusterIssuer letsencrypt-prod is not ready (condition=Unknown). Certificates across every namespace it backs have stopped renewing."
+
+  # The annotation must name the namespace on our scrape, where the label is
+  # plain `namespace`. This is the case that used to render blank.
+  - interval: 1m
+    name: a not-ready certificate names its namespace without exported_namespace
+    input_series:
+      - series: 'certmanager_certificate_ready_status{condition="False",name="teleport",namespace="teleport",job="cert-manager",instance="cm1"}'
+        values: '1x20'
+    alert_rule_test:
+      - alertname: CertManagerCertNotReady
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: CertManagerCertNotReady
+              name: teleport
+              namespace: teleport
+              condition: "False"
+              severity: critical
+            exp_annotations:
+              summary: "Certificate teleport not ready"
+              description: "Certificate teleport in namespace teleport is not ready (condition=False) for more than 10 minutes."
+              runbook_url: "https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagercertnotready"
+
+  # And on an Operator-style scrape, where it is exported_namespace instead.
+  - interval: 1m
+    name: the same annotation works on an Operator-style scrape
+    input_series:
+      - series: 'certmanager_certificate_ready_status{condition="False",name="teleport",exported_namespace="teleport",namespace="monitoring",job="cert-manager",instance="cm1"}'
+        values: '1x20'
+    alert_rule_test:
+      - alertname: CertManagerCertNotReady
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: CertManagerCertNotReady
+              name: teleport
+              exported_namespace: teleport
+              namespace: monitoring
+              condition: "False"
+              severity: critical
+            exp_annotations:
+              summary: "Certificate teleport not ready"
+              description: "Certificate teleport in namespace teleport is not ready (condition=False) for more than 10 minutes."
+              runbook_url: "https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagercertnotready"
