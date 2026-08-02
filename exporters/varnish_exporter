@@ -1,3 +1,6 @@
+# Captured 2026-08-01 from jonnenauha/prometheus_varnish_exporter 1.6.1 against
+# Varnish 9.0.3. Both are the latest release as of that date.
+# Upstream publishes amd64 binaries only, so this was captured under emulation.
 # HELP varnish_backend_bereq_bodybytes Request body bytes
 # TYPE varnish_backend_bereq_bodybytes counter
 varnish_backend_bereq_bodybytes{backend="default",server="unknown"} 0
