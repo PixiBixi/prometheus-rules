@@ -1,0 +1,63 @@
+# Tests for the PostgreSQL replication-lag alerts.
+#
+# postgres_exporter 0.15 renamed pg_replication_lag to pg_replication_lag_seconds.
+# Both names are live in this estate: measured across the fleet, 20 instances
+# emit both, 2 only the old name, and 1 only the new. A rule reading either name
+# alone leaves instances uncovered, so these pin both.
+rule_files:
+  - postgresql.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: lag is caught on an exporter emitting the old name
+    input_series:
+      - series: 'pg_replication_lag{server="pg1:5432",instance="pg1",job="pg"}'
+        values: '120x20'
+    alert_rule_test:
+      - alertname: PostgresReplicationLagHigh
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels: {alertname: PostgresReplicationLagHigh, server: "pg1:5432", instance: pg1, job: pg, severity: warning}
+            exp_annotations:
+              summary: "PostgreSQL replication lag high (server pg1:5432)"
+              description: "Replication lag on pg1:5432 is 2m 0s. Replica is falling behind."
+
+  - interval: 1m
+    name: lag is caught on an exporter emitting only the new name
+    input_series:
+      - series: 'pg_replication_lag_seconds{server="pg2:5432",instance="pg2",job="pg"}'
+        values: '120x20'
+    alert_rule_test:
+      - alertname: PostgresReplicationLagHigh
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels: {alertname: PostgresReplicationLagHigh, server: "pg2:5432", instance: pg2, job: pg, severity: warning}
+            exp_annotations:
+              summary: "PostgreSQL replication lag high (server pg2:5432)"
+              description: "Replication lag on pg2:5432 is 2m 0s. Replica is falling behind."
+
+  - interval: 1m
+    name: an instance emitting both names raises one alert, not two
+    input_series:
+      - series: 'pg_replication_lag{server="pg3:5432",instance="pg3",job="pg"}'
+        values: '120x20'
+      - series: 'pg_replication_lag_seconds{server="pg3:5432",instance="pg3",job="pg"}'
+        values: '120x20'
+    promql_expr_test:
+      - expr: 'count(ALERTS{alertname="PostgresReplicationLagHigh",alertstate="firing"})'
+        eval_time: 15m
+        exp_samples:
+          - labels: '{}'
+            value: 1
+
+  - interval: 1m
+    name: a healthy replica raises nothing
+    input_series:
+      - series: 'pg_replication_lag_seconds{server="pg1:5432",instance="pg1",job="pg"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: PostgresReplicationLagHigh
+        eval_time: 15m
+        exp_alerts: []
