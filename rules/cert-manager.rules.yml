@@ -1,4 +1,16 @@
 - name: cert-manager.rules
+  # The aggregations below keep both `namespace` and `exported_namespace` on
+  # purpose. Prometheus renames a scraped `namespace` label to
+  # `exported_namespace` only when the target already carries one, which is what
+  # a Prometheus Operator ServiceMonitor does. Our scrape does not: production
+  # shows certmanager_certificate_ready_status{name="...",namespace="..."} with
+  # no exported_namespace at all.
+  #
+  # The annotations therefore prefer exported_namespace and fall back to
+  # namespace. Concatenating the two is wrong: on an Operator scrape BOTH exist
+  # -- exported_namespace is the certificate's, namespace is the cert-manager
+  # pod's -- and you get "teleportmonitoring". Printing only exported_namespace,
+  # as they used to, left the namespace blank on ours.
   rules:
     - alert: CertManagerAbsent
       expr: absent(up{job="cert-manager"})
@@ -26,7 +38,7 @@
         severity: warning
       annotations:
         summary: "Certificate {{ $labels.name }} expiring soon ({{ $value | humanizeDuration }})"
-        description: "Certificate {{ $labels.name }} in namespace {{ $labels.exported_namespace }} has not been renewed and is {{ $value | humanizeDuration }} from expiry."
+        description: "Certificate {{ $labels.name }} in namespace {{ if $labels.exported_namespace }}{{ $labels.exported_namespace }}{{ else }}{{ $labels.namespace }}{{ end }} has not been renewed and is {{ $value | humanizeDuration }} from expiry."
         runbook_url: https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagercertexpirysoon
 
     - alert: CertManagerCertNotReady
@@ -39,8 +51,40 @@
         severity: critical
       annotations:
         summary: "Certificate {{ $labels.name }} not ready"
-        description: "Certificate {{ $labels.name }} in namespace {{ $labels.exported_namespace }} is not ready (condition={{ $labels.condition }}) for more than 10 minutes."
+        description: "Certificate {{ $labels.name }} in namespace {{ if $labels.exported_namespace }}{{ $labels.exported_namespace }}{{ else }}{{ $labels.namespace }}{{ end }} is not ready (condition={{ $labels.condition }}) for more than 10 minutes."
         runbook_url: https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagercertnotready
+
+    - alert: CertManagerIssuerNotReady
+      # An issuer that stops being ready silently stops renewing every
+      # certificate it backs -- expired ACME account, broken DNS solver
+      # credentials, unreachable CA. Nothing else here catches that until
+      # CertManagerCertExpirySoon fires days later, or a certificate actually
+      # expires.
+      expr: |
+        max by (name, exported_namespace, namespace, condition) (
+          certmanager_issuer_ready_status{condition!="True"} == 1
+        )
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "cert-manager Issuer {{ $labels.name }} not ready"
+        description: "Issuer {{ $labels.name }} in namespace {{ if $labels.exported_namespace }}{{ $labels.exported_namespace }}{{ else }}{{ $labels.namespace }}{{ end }} is not ready (condition={{ $labels.condition }}). Every certificate it backs has stopped renewing."
+
+    - alert: CertManagerClusterIssuerNotReady
+      # Same failure, cluster scope, and worse: a ClusterIssuer usually backs
+      # certificates across every namespace. certmanager_clusterissuer_ready_status
+      # is a separate metric from the namespaced one, added in recent releases.
+      expr: |
+        max by (name, condition) (
+          certmanager_clusterissuer_ready_status{condition!="True"} == 1
+        )
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "cert-manager ClusterIssuer {{ $labels.name }} not ready"
+        description: "ClusterIssuer {{ $labels.name }} is not ready (condition={{ $labels.condition }}). Certificates across every namespace it backs have stopped renewing."
 
     - alert: CertManagerHittingRateLimits
       expr: |
