@@ -1,3 +1,13 @@
+# prometheus-community/postgres_exporter 0.12.0
+# Version read from postgres_exporter_build_info.
+#
+# Production runs BOTH 0.12.0 (16 instances) and 0.15.0 (21), so this fixture is
+# the older of the two. It is also ~72 metric names short of what production
+# exposes.
+#
+# The pg_bloat_*, pg_stat_user_tables_* and pg_general_index_info_* families come
+# from a custom queries.yaml that is not deployed, so the rules reading them have
+# no data.
 # HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
 # TYPE go_gc_duration_seconds summary
 go_gc_duration_seconds{quantile="0"} 1.7706e-05

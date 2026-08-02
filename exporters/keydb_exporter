@@ -1,3 +1,12 @@
+# oliver006/redis_exporter v1.52.0
+#
+# Captured 2026-08-01 from redis_exporter v1.52.0 against KeyDB, merged from a
+# primary (AOF + maxmemory), a replica, and a cluster-enabled node. v1.52.0 runs
+# on 210 of 221 production instances, v1.58.0 on the rest.
+#
+# VERSION MATTERS HERE: v1.52 exposes redis_config_maxclients; current releases
+# renamed it to redis_max_clients. A fixture regenerated from :latest makes
+# RedisTooManyConnections look dead when it works fine in production.
 # HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
 # TYPE go_gc_duration_seconds summary
 go_gc_duration_seconds{quantile="0"} 0

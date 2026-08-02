@@ -1,3 +1,9 @@
+# prometheus/mysqld_exporter 0.15.0
+# Version read from mysqld_exporter_build_info.
+#
+# MySQL server in this capture is 8.0.34-26. Production runs 8.0.41 and 8.4.10,
+# so the capture is behind. This fixture also carries ~177 metric names
+# production does not, meaning it was taken with more collectors enabled.
 # HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
 # TYPE go_gc_duration_seconds summary
 go_gc_duration_seconds{quantile="0"} 1.8341e-05

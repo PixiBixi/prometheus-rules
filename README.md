@@ -106,6 +106,34 @@ Two worth acting on:
 `haproxy_*` and `keydb_exporter` were both regenerated from real scrapes on 2026-08-01
 and match their deployed versions.
 
+### Checking fixture freshness
+
+Every fixture opens with a provenance header: which exporter and software version it was
+captured from, when, and anything that would not be obvious from the metrics themselves.
+
+```bash
+python3 check_versions.py            # compare each fixture against upstream releases
+python3 check_versions.py --offline  # just list what the fixtures claim, no network
+```
+
+Exits non-zero when any fixture is behind upstream, so it can be run on a schedule.
+
+The header exists because a stale fixture fails silently and in both directions. A metric
+renamed between the captured version and the deployed one makes a working rule look dead —
+or a dead rule look fine. Both have happened here:
+
+- `redis_config_maxclients` was renamed to `redis_max_clients` after v1.58. A fixture
+  regenerated from `:latest` made `RedisTooManyConnections` look dead when it works on 220
+  of 221 production instances.
+- CoreDNS 1.11.0 renamed `coredns_forward_*` to `coredns_proxy_*`, and both versions run
+  here — so a fix targeting either naming alone is a regression for the other.
+
+**The script compares two numbers; the third is the one that matters.** What you actually
+run is neither the fixture's version nor upstream's, and only a query against your own
+Prometheus answers it — look for `*_build_info`. Several exporters expose no version metric
+at all (`nvme`, `phpfpm`, `ping`, `ipsec`, aerospike), which is exactly why the header is
+the only record for those.
+
 ### Rules with no data on our own Prometheus
 
 Audited 2026-08-01 by testing all 394 metrics the rules reference against the live

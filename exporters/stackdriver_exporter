@@ -1,3 +1,8 @@
+# prometheus-community/stackdriver_exporter 0.18.0
+# Version read from stackdriver_exporter_build_info.
+#
+# Not scraped in production -- zero stackdriver_* families are present there --
+# so this could not be cross-checked and the rules reading it have no data.
 # HELP go_gc_duration_seconds A summary of the wall-time pause (stop-the-world) duration in garbage collection cycles.
 # TYPE go_gc_duration_seconds summary
 go_gc_duration_seconds{quantile="0"} 0.00011517
