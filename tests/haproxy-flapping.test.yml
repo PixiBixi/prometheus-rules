@@ -1,0 +1,70 @@
+# Tests for HAProxyBackendFlapping in rules/haproxy.rules.yml
+#
+# The alert exists because a flapping backend is invisible to the down alerts:
+# between two transitions the backend is up, so anything reading a current
+# status gauge sees nothing wrong. haproxy_backend_check_up_down_total is a
+# counter of UP→DOWN transitions, so the flapping shows up as slope.
+#
+# The threshold (>5 in 6h) was measured across 1199 production backends, where
+# 38 exceed 2 transitions per 6h but only 5 exceed 5.
+rule_files:
+  - haproxy.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # A backend that transitions steadily: 12 over six hours, well past the knee.
+  - interval: 5m
+    name: a backend flapping past the threshold alerts
+    input_series:
+      - series: 'haproxy_backend_check_up_down_total{proxy="be_internal_nginx_local",instance="proxy-1",job="haproxy"}'
+        values: '0+0.16x72'
+    alert_rule_test:
+      - alertname: HAProxyBackendFlapping
+        eval_time: 6h
+        exp_alerts:
+          - exp_labels:
+              alertname: HAProxyBackendFlapping
+              proxy: be_internal_nginx_local
+              instance: proxy-1
+              severity: warning
+            exp_annotations:
+              summary: "HAProxy backend be_internal_nginx_local flapping @ proxy-1"
+              description: "Backend be_internal_nginx_local on proxy-1 recorded 12 UP→DOWN check transitions in 6h. Each one drops in-flight connections. The backend looks healthy between transitions, so the down alerts stay silent."
+
+  # The long tail: a couple of transitions from a deploy must stay quiet, or the
+  # alert fires on 38 backends instead of 5 and gets muted.
+  - interval: 5m
+    name: a backend with a couple of transitions stays quiet
+    input_series:
+      - series: 'haproxy_backend_check_up_down_total{proxy="be_api",instance="proxy-1",job="haproxy"}'
+        values: '0 0 1 1 1 1 2 2x66'
+    alert_rule_test:
+      - alertname: HAProxyBackendFlapping
+        eval_time: 6h
+        exp_alerts: []
+
+  # A backend that went down once and stayed down. The counter never moves
+  # again, so this alert must not fire -- that failure belongs to the down
+  # alerts, and double-alerting on one incident is how people learn to ignore
+  # a channel.
+  - interval: 5m
+    name: a backend down once and staying down does not flap
+    input_series:
+      - series: 'haproxy_backend_check_up_down_total{proxy="be_api",instance="proxy-1",job="haproxy"}'
+        values: '0 1 1x70'
+    alert_rule_test:
+      - alertname: HAProxyBackendFlapping
+        eval_time: 6h
+        exp_alerts: []
+
+  # A perfectly healthy backend never increments at all.
+  - interval: 5m
+    name: a stable backend alerts on nothing
+    input_series:
+      - series: 'haproxy_backend_check_up_down_total{proxy="be_api",instance="proxy-1",job="haproxy"}'
+        values: '0x72'
+    alert_rule_test:
+      - alertname: HAProxyBackendFlapping
+        eval_time: 6h
+        exp_alerts: []

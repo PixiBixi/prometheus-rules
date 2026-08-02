@@ -1,0 +1,93 @@
+# Tests for PrometheusNotificationsDropped in rules/prometheus.rules.yml
+#
+# prometheus_notifications_dropped_total changed shape between the versions
+# running here, which is the whole reason the expression aggregates
+# `without (alertmanager)` instead of `by (instance)`:
+#
+#   2.55.0, 3.0.0   plain Counter, no labels beyond the target's own
+#   3.13.1          CounterVec labelled by alertmanager
+#
+# Verified in notifier/metric.go and notifier/notifier.go upstream. Production
+# runs 2.55.0 on the main estate and 3.13.1 on another, so both shapes must
+# raise exactly one alert per Prometheus.
+rule_files:
+  - prometheus.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # The old shape: no alertmanager label at all. `without` is a no-op here.
+  - interval: 1m
+    name: dropped notifications alert on the 2.x metric shape
+    input_series:
+      - series: 'prometheus_notifications_dropped_total{instance="prom-1",job="prometheus"}'
+        values: '0+3x20'
+    alert_rule_test:
+      - alertname: PrometheusNotificationsDropped
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusNotificationsDropped
+              instance: prom-1
+              job: prometheus
+              severity: critical
+            exp_annotations:
+              summary: "Prometheus is dropping alert notifications (instance prom-1)"
+              description: "3 alerts/min are being dropped on the way to Alertmanager by prom-1. Alerts are firing and nobody is being told."
+
+  # The 3.13 shape with two Alertmanagers. Both queues dropping must produce
+  # ONE alert, not one per Alertmanager -- otherwise a two-AM setup pages twice
+  # for a single condition.
+  - interval: 1m
+    name: two alertmanagers dropping raise a single alert
+    input_series:
+      - series: 'prometheus_notifications_dropped_total{instance="prom-1",job="prometheus",alertmanager="http://am-1/api/v2/alerts"}'
+        values: '0+3x20'
+      - series: 'prometheus_notifications_dropped_total{instance="prom-1",job="prometheus",alertmanager="http://am-2/api/v2/alerts"}'
+        values: '0+3x20'
+    alert_rule_test:
+      - alertname: PrometheusNotificationsDropped
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusNotificationsDropped
+              instance: prom-1
+              job: prometheus
+              severity: critical
+            exp_annotations:
+              summary: "Prometheus is dropping alert notifications (instance prom-1)"
+              description: "6 alerts/min are being dropped on the way to Alertmanager by prom-1. Alerts are firing and nobody is being told."
+
+  # A counter sitting at a large value from a past incident must not alert. The
+  # production counters read 13888 and 14203 and are flat; only the slope is an
+  # incident.
+  - interval: 1m
+    name: a flat counter carrying an old total stays quiet
+    input_series:
+      - series: 'prometheus_notifications_dropped_total{instance="prom-1",job="prometheus"}'
+        values: '13888x20'
+    alert_rule_test:
+      - alertname: PrometheusNotificationsDropped
+        eval_time: 15m
+        exp_alerts: []
+
+  # Two separate Prometheis, only one dropping: the healthy one stays silent.
+  - interval: 1m
+    name: only the Prometheus that is dropping alerts
+    input_series:
+      - series: 'prometheus_notifications_dropped_total{instance="prom-1",job="prometheus"}'
+        values: '0+3x20'
+      - series: 'prometheus_notifications_dropped_total{instance="prom-2",job="prometheus"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: PrometheusNotificationsDropped
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusNotificationsDropped
+              instance: prom-1
+              job: prometheus
+              severity: critical
+            exp_annotations:
+              summary: "Prometheus is dropping alert notifications (instance prom-1)"
+              description: "3 alerts/min are being dropped on the way to Alertmanager by prom-1. Alerts are firing and nobody is being told."

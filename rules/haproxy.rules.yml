@@ -559,3 +559,22 @@
       annotations:
         summary: "HAProxy stick table near full — {{ $labels.name }} @ {{ $labels.instance }}"
         description: "HAProxy stick table {{ $labels.name }} @ {{ $labels.instance }} at 80% capacity — rate limiting and ACLs may malfunction"
+
+    - alert: HAProxyBackendFlapping
+      # A server that fails its health check and recovers, repeatedly, never
+      # trips the down alerts: between two transitions it is up. The damage is
+      # real anyway -- every transition drops the connections in flight and
+      # rebalances the pool -- and it is invisible on a status page.
+      #
+      # Threshold measured against the fleet rather than guessed. Over a 6h
+      # window across 1199 backends: 55 record at least one transition, 38
+      # exceed 2, 5 exceed 5, 1 exceeds 10. ">5 per 6h" is the knee -- a
+      # handful of genuinely sick backends, not the long tail of single
+      # transitions that healthy servers produce on deploys.
+      expr: sum by (proxy, instance) (increase(haproxy_backend_check_up_down_total[6h])) > 5
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy backend {{ $labels.proxy }} flapping @ {{ $labels.instance }}"
+        description: "Backend {{ $labels.proxy }} on {{ $labels.instance }} recorded {{ $value | printf \"%.0f\" }} UP→DOWN check transitions in 6h. Each one drops in-flight connections. The backend looks healthy between transitions, so the down alerts stay silent."
