@@ -25,3 +25,13 @@ repos:
         always_run: false
         files: ^(exporters/|rules/|build\.py)
         stages: [pre-commit]
+
+      # Offline by design: reads fixture headers and the DEPLOYED map only, so it
+      # never reaches the network from a commit hook.
+      - id: exporter-versions
+        name: Regenerate the version table in EXPORTERS.md
+        language: system
+        entry: bash -c 'python3 check_versions.py --markdown && git add EXPORTERS.md'
+        pass_filenames: false
+        files: ^(exporters/|check_versions\.py|EXPORTERS\.md)$
+        stages: [pre-commit]
