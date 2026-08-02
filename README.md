@@ -127,6 +127,9 @@ or a dead rule look fine. Both have happened here:
   of 221 production instances.
 - CoreDNS 1.11.0 renamed `coredns_forward_*` to `coredns_proxy_*`, and both versions run
   here — so a fix targeting either naming alone is a regression for the other.
+- Prometheus 3.0 removed `prometheus_remote_storage_samples_dropped_total`. The other
+  remote-write queue metrics survived, so the loss is easy to miss:
+  `PrometheusRemoteWriteDroppedSamples` simply cannot fire on 3.x.
 
 **The script compares two numbers; the third is the one that matters.** What you actually
 run is neither the fixture's version nor upstream's, and only a query against your own
