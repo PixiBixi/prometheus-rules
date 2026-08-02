@@ -392,7 +392,17 @@ Exposes Google Cloud metrics (GCP Load Balancer, Cloud SQL, GKE, etc.) via the S
 
 #### cert-manager
 
-Cert-manager exposes its own metrics endpoint natively (no separate exporter needed).
+Cert-manager exposes its own metrics endpoint natively (no separate exporter needed) on
+port 9402.
 
 **Cert-manager link :** [cert-manager](https://cert-manager.io/docs/observability/prometheus-metrics/)
-**Version used :** v1.14.x
+**Version used :** v1.21.1
+
+Three families in the fixture are carried over from the previous capture rather than
+observed: `certmanager_controller_sync_error_count` and the two
+`certmanager_http_acme_client_request_*` ones only appear once there is a sync error or
+real ACME activity. All three are confirmed present on our production Prometheus and are
+read by the rules, so dropping them would make working alerts look uncovered.
+
+`certmanager_issuer_ready_status` and `certmanager_clusterissuer_ready_status` are
+separate metrics — a cluster with only ClusterIssuers emits just the second.
