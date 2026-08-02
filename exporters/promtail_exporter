@@ -1,3 +1,9 @@
+# grafana/loki (promtail) 2.8.2
+# Version read from promtail_build_info.
+#
+# Confirmed against production, which also runs 2.8.2. Note status_code on
+# promtail_request_duration_seconds_count takes the values 204 and -1; the Loki
+# client uses -1 for a network failure and never emits the string 'failed'.
 # HELP deprecated_flags_inuse_total The number of deprecated flags currently set.
 # TYPE deprecated_flags_inuse_total counter
 deprecated_flags_inuse_total 0

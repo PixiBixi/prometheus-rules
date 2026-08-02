@@ -1,3 +1,7 @@
+# czerwonk/ping_exporter, version unknown
+#
+# No version metric is exposed. The Ansible role pins 1.0.1; upstream is at
+# 1.2.1.
 # HELP ping_loss_ratio Packet loss from 0.0 to 1.0
 # TYPE ping_loss_ratio gauge
 ping_loss_ratio{ip="10.0.0.1",ip_version="4",target="10.0.0.1"} 0

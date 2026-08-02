@@ -1,3 +1,7 @@
+# AWS RDS Enhanced Monitoring, version n/a
+#
+# Not an exporter: these come from the AWS RDS Enhanced Monitoring CloudWatch
+# stream, reshaped into Prometheus format. There is no version to record.
 # HELP node_cpu_average The percentage of CPU utilization.
 # TYPE node_cpu_average gauge
 node_cpu_average{cpu="All",instance="myinstance",mode="guest",region="us-east-1"} 0

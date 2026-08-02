@@ -1,3 +1,8 @@
+# blackbox_exporter 0.24.0
+# Version read from blackbox_exporter_build_info.
+#
+# Not scrapeable in production: only the probe endpoint is scraped, not the
+# exporter's own /metrics, so this could not be cross-checked.
 # HELP blackbox_exporter_build_info A metric with a constant '1' value labeled by version, revision, branch, goversion from which blackbox_exporter was built, and the goos and goarch for the build.
 # TYPE blackbox_exporter_build_info gauge
 blackbox_exporter_build_info{branch="HEAD",goarch="amd64",goos="linux",goversion="go1.20.4",revision="0b0467473916fd9e8526e2635c2a0b1c56011dff",tags="netgo",version="0.24.0"} 1

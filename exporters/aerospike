@@ -1,3 +1,8 @@
+# aerospike-prometheus-exporter, version unknown
+#
+# No version metric is exposed and none was found in production. The Ansible
+# role pins 1.9.0, which is the best guess but was not verified against this
+# capture. Re-capture and record the real version when convenient.
 # HELP aerospike_jobs_active_threads active threads
 # TYPE aerospike_jobs_active_threads gauge
 aerospike_jobs_active_threads{cluster_name="mycluster",job_type="basic",module="query",ns="mynamespace",service="10.0.0.1:3000",set="",sindex_name="",trid="1234567890123456789"} 0

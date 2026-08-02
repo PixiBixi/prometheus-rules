@@ -1,3 +1,13 @@
+# prometheus/node_exporter 1.7.0
+# Version read from node_exporter_build_info.
+#
+# Base capture is from a real host with systemd, textfile, hwmon, nvme, md and
+# bonding collectors active. The five 1.7.0-era metrics missing from the original
+# 1.5.0 capture were added separately: node_cpu_scaling_governor and the four
+# node_softnet_* series, both confirmed present in production.
+#
+# The Ansible role now pins 1.12.1; this fixture still reflects 1.7.0, which is
+# what all 526 hosts run until the rollout happens.
 # HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
 # TYPE go_gc_duration_seconds summary
 go_gc_duration_seconds{quantile="0"} 1.4109e-05
