@@ -120,9 +120,19 @@ def load_exporters():
         fpath = os.path.join(EXPORTERS_DIR, fname)
         if not os.path.isfile(fpath):
             continue
+        # Fixtures may open with plain "#" provenance comments recording which
+        # exporter and software version produced them. Skip past those to find
+        # the first real line before deciding whether this is a metrics file.
         with open(fpath) as f:
-            first = f.read(50)
-        if not RE_FIRST_LINE.match(first):
+            head = [line for _, line in zip(range(30), f)]
+        probe = next(
+            (
+                line for line in head
+                if not line.startswith("#") or line.startswith(("# HELP", "# TYPE"))
+            ),
+            "",
+        )
+        if not RE_FIRST_LINE.match(probe):
             continue
         metrics = parse_exporter(fpath, native=fname in NATIVE_EXPORTERS)
         if not metrics:
