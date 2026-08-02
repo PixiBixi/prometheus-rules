@@ -1,3 +1,8 @@
+# prometheus/jmx_exporter 0.17.2
+# Version read from jmx_exporter_build_info.
+#
+# Confirmed against production, which also runs jmx_exporter 0.17.2.
+# Metrics depend on misc/kafka_exporter_config.yaml, not just the exporter.
 # HELP jvm_threads_current Current thread count of a JVM
 # TYPE jvm_threads_current gauge
 jvm_threads_current 72.0

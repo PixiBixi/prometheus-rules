@@ -1,3 +1,8 @@
+# HAProxy promex (built in) 2.7.11
+#
+# Captured 2026-08-01 from a real HAProxy 2.7.11 with promex, the version 102
+# production instances run. Config: a frontend, a backend with one UP, one DOWN
+# and one MAINT server, and a declared stick-table. All state values kept.
 # HELP haproxy_process_nbthread Number of started threads (global.nbthread)
 # TYPE haproxy_process_nbthread gauge
 haproxy_process_nbthread 10

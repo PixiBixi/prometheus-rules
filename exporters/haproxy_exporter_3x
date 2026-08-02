@@ -1,3 +1,8 @@
+# HAProxy promex (built in) 3.2.21
+#
+# Captured 2026-08-01 from a real HAProxy 3.2.21 with promex, the version 24
+# production instances run. Same config as the 2x fixture. All state values kept.
+# haproxy_backend_agg_server_check_status is [DEPRECATED] here but still emitted.
 # HELP haproxy_process_nbthread Number of started threads (global.nbthread)
 # TYPE haproxy_process_nbthread gauge
 haproxy_process_nbthread 10
