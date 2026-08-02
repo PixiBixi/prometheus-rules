@@ -3,7 +3,7 @@
 Every exporter these rules are written against: which version the fixture came from,
 what has to be configured on the monitored side, and the traps specific to each one.
 
-For what the rules do with these metrics, see the [README](README.md). For how well the
+For what the rules do with these metrics, see the [README](../README.md). For how well the
 fixtures match production, see [AUDIT.md](AUDIT.md).
 
 ## Versions
@@ -18,16 +18,16 @@ version nobody runs describes metrics that may not exist on the fleet — which 
 already moved off.
 
 ```bash
-python3 check_versions.py             # both columns, plus a live upstream check
-python3 check_versions.py --offline   # skip the network
-python3 check_versions.py --markdown  # regenerate the table below
+python3 scripts/check_versions.py             # both columns, plus a live upstream check
+python3 scripts/check_versions.py --offline   # skip the network
+python3 scripts/check_versions.py --markdown  # regenerate the table below
 ```
 
 Upstream versions are deliberately not written into this file. A document asserting
 "upstream is 1.9.0" is wrong the moment upstream cuts a release, which is exactly the kind
 of staleness the script exists to catch. Ask for it when you need it.
 
-<!-- BEGIN GENERATED: python3 check_versions.py --markdown -->
+<!-- BEGIN GENERATED: python3 scripts/check_versions.py --markdown -->
 
 <!-- Do not edit by hand: this table is rewritten from the fixture
      provenance headers and the DEPLOYED map in check_versions.py. -->

@@ -8,7 +8,10 @@ always see byte-identical wrapped rules.
 
 import os
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+# These scripts live in scripts/, so the repo root is one level up. Everything
+# they read and write is addressed from here, which is what lets them be run
+# from any working directory.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RULES_DIR = os.path.join(ROOT, "rules")
 TESTS_DIR = os.path.join(ROOT, "tests")
 
