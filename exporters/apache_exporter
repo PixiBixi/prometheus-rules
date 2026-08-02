@@ -1,3 +1,6 @@
+# Captured 2026-08-01 from Lusitaniae/apache_exporter 1.1.1 against Apache 2.4.68
+# with mod_status ExtendedStatus on. Both are the latest release as of that date.
+# Without ExtendedStatus the request counters stay at zero.
 # HELP apache_accesses_total Current total apache accesses (*)
 # TYPE apache_accesses_total counter
 apache_accesses_total 121
