@@ -1,7 +1,11 @@
-# Trimmed fixture. mongodb_exporter --collector.diagnosticdata emits ~3460 metric
-# names; mongodb_ss_metrics_*, mongodb_ss_wt_* and mongodb_sys_netstat_* alone are
-# ~2800 of them. Those three families are sampled to 50 each here, keeping every
-# metric the rules use. All other families are complete.
+# Captured 2026-08-01 from percona/mongodb_exporter 0.52.0 against MongoDB 8.
+# Neither the exporter nor mongod exposes a version metric, so this header is
+# the only record of what produced this file. Keep it accurate.
+#
+# Trimmed: --collector.diagnosticdata emits ~3460 metric names, of which
+# mongodb_ss_metrics_*, mongodb_ss_wt_* and mongodb_sys_netstat_* are ~2800.
+# Those three families are sampled to 50 each; every metric the rules use is
+# kept and all other families are complete.
 # HELP collector_scrape_time_ms Time taken for scrape by collector
 # TYPE collector_scrape_time_ms gauge
 collector_scrape_time_ms{collector="dbstats",exporter="mongodb"} 0
