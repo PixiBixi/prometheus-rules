@@ -315,3 +315,24 @@
         summary: "Prometheus service discovery has failed configs (instance {{ $labels.instance }})"
         description: "{{ $value }} service discovery config(s) are failing (name={{ $labels.name }}). Targets from these configs will not be scraped."
 
+
+    - alert: PrometheusNotificationsDropped
+      # The failure that hides every other failure: alerts discarded on the way
+      # to Alertmanager. Nothing else here notices -- the rules still evaluate,
+      # the targets are still up, and no page arrives.
+      #
+      # Aggregating `without (alertmanager)` rather than `by (instance)` is
+      # deliberate. The metric is a plain Counter up to at least 3.0 and a
+      # CounterVec labelled by alertmanager in 3.13; both versions run here.
+      # `without` is a no-op on the old shape and collapses the queues on the
+      # new one, so this is one alert per Prometheus either way.
+      # Scaled to alerts/minute purely so the annotation reads as a number a
+      # human can act on: humanize renders 0.05/s as "50m", which at 3am is
+      # worse than useless. The > 0 threshold is unaffected by the scaling.
+      expr: sum without (alertmanager) (rate(prometheus_notifications_dropped_total[5m])) * 60 > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus is dropping alert notifications (instance {{ $labels.instance }})"
+        description: "{{ $value | humanize }} alerts/min are being dropped on the way to Alertmanager by {{ $labels.instance }}. Alerts are firing and nobody is being told."
