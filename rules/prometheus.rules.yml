@@ -239,8 +239,17 @@
         summary: "Prometheus timeseries cardinality — {{ $labels.name }}"
         description: "The \"{{ $labels.name }}\" metric accounts for {{ $value }} series, over 10% of the whole TSDB"
     - alert: PrometheusRemoteWriteDroppedSamples
-      # reason="dropped_series" is intentional filtering via write_relabel_configs,
-      # not an incident -- excluding it keeps this alert about genuine sample loss.
+      # PROMETHEUS 2.x ONLY. prometheus_remote_storage_samples_dropped_total was
+      # removed in Prometheus 3.0 and this alert cannot fire there. Verified
+      # against a real 3.13.1 with remote_write configured: shards, shards_max
+      # and samples_failed_total all appear, this one does not. 3.x has no
+      # equivalent -- relabel-dropped samples are no longer counted by the
+      # remote-write subsystem at all.
+      #
+      # Kept for anyone still on 2.x, where reason="dropped_series" is
+      # intentional write_relabel_configs filtering rather than an incident, so
+      # excluding it keeps the alert about genuine loss. On 3.x, rely on
+      # PrometheusRemoteWriteFailed instead.
       expr: rate(prometheus_remote_storage_samples_dropped_total{reason!="dropped_series"}[5m]) > 0
       labels:
         severity: critical
