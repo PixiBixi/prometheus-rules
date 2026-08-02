@@ -13,7 +13,8 @@ try:
 except ImportError:  # pragma: no cover - depends on local PyYAML build
     from yaml import SafeLoader as YamlLoader
 
-ROOT      = os.path.dirname(os.path.abspath(__file__))
+# scripts/ is one level below the repo root; see the note in ruleslib.py.
+ROOT      = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPORTERS_DIR = os.path.join(ROOT, "exporters")
 RULES_DIR     = os.path.join(ROOT, "rules")
 OUT           = os.path.join(ROOT, "docs", "data.json")

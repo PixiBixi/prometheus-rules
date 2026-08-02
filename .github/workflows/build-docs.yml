@@ -7,7 +7,7 @@ on:
     paths:
       - exporters/**
       - rules/**
-      - build.py
+      - scripts/**
       - docs/**
 
 jobs:
@@ -33,10 +33,10 @@ jobs:
             | tar -xz --strip-components=1 -C /usr/local/bin "prometheus-${PROM_VERSION}.linux-amd64/promtool"
 
       - name: Validate PromQL rules
-        run: python3 validate_rules.py
+        run: python3 scripts/validate_rules.py
 
       - name: Build data.json
-        run: python3 build.py
+        run: python3 scripts/build.py
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
