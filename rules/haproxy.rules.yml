@@ -578,3 +578,17 @@
       annotations:
         summary: "HAProxy backend {{ $labels.proxy }} flapping @ {{ $labels.instance }}"
         description: "Backend {{ $labels.proxy }} on {{ $labels.instance }} recorded {{ $value | printf \"%.0f\" }} UP→DOWN check transitions in 6h. Each one drops in-flight connections. The backend looks healthy between transitions, so the down alerts stay silent."
+    - alert: HAProxyBackendInternalErrors
+      # HAProxy counts as "internal" the errors that are its own fault rather
+      # than the backend's: memory allocation failures, buffer exhaustion,
+      # inconsistent internal state. They are never a normal consequence of
+      # traffic, so any of them is worth reading -- and none of the existing
+      # HAProxy alerts, which watch backend health and saturation, will show
+      # them. Fourteen occurred across the fleet in the last seven days.
+      expr: sum by (proxy, instance) (increase(haproxy_backend_internal_errors_total[1h])) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy internal errors on {{ $labels.proxy }} @ {{ $labels.instance }}"
+        description: "{{ $value | printf \"%.0f\" }} internal errors on backend {{ $labels.proxy }} @ {{ $labels.instance }} in the last hour. These are HAProxy's own failures — allocation, buffers, internal state — not backend problems, and they do not show up in the health or saturation alerts."

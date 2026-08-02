@@ -1,0 +1,150 @@
+# Tests for the remaining wave-2 alerts:
+#   PostgresqlStandbyQueryConflicts  rules/postgresql.rules.yml
+#   HAProxyBackendInternalErrors     rules/haproxy.rules.yml
+#   NodeHighTcpRetransmitRatio       rules/basis.rules.yml
+#   RDSTasksBlocked                  rules/basis.rules.yml
+#
+# Each covers a failure the existing rules structurally miss rather than a
+# variation on one they already catch:
+#
+#   - the Postgres replication alerts watch lag; a standby cancelling queries
+#     to let WAL replay proceed stays perfectly in sync while clients get errors
+#   - the HAProxy alerts watch backend health and saturation; internal errors
+#     are HAProxy's own failures and appear in neither
+#   - retransmits have no existing rule at all, and only make sense as a ratio
+#   - NodeProcsBlocked reads node_procs_blocked, which managed RDS instances
+#     never expose
+rule_files:
+  - postgresql.rules.yml
+  - haproxy.rules.yml
+  - basis.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a standby cancelling queries alerts
+    input_series:
+      - series: 'pg_stat_database_conflicts{datid="16384",datname="dynadmic",instance="dbpg-data-us3-1",job="dbpg",server="127.0.0.1:5432"}'
+        values: '0 0 0 0 0 1 1 1 2 2 3 3+0x60'
+    alert_rule_test:
+      - alertname: PostgresqlStandbyQueryConflicts
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alertname: PostgresqlStandbyQueryConflicts
+              datid: "16384"
+              datname: dynadmic
+              instance: dbpg-data-us3-1
+              job: dbpg
+              server: "127.0.0.1:5432"
+              severity: warning
+            exp_annotations:
+              summary: "Postgres standby cancelled queries on dynadmic @ dbpg-data-us3-1"
+              description: "3 queries were cancelled on dynadmic @ dbpg-data-us3-1 in the last hour by conflicts with WAL recovery. Clients saw errors; the standby itself looks healthy. Consider hot_standby_feedback or max_standby_streaming_delay."
+
+  # A primary, or a standby with no conflicts: the counter exists and is flat.
+  - interval: 1m
+    name: a database with no conflicts stays quiet
+    input_series:
+      - series: 'pg_stat_database_conflicts{datid="1",datname="template1",instance="dbpg-spare-us3-1",job="dbpg",server="127.0.0.1:5432"}'
+        values: '0x70'
+    alert_rule_test:
+      - alertname: PostgresqlStandbyQueryConflicts
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 1m
+    name: haproxy internal errors alert
+    input_series:
+      - series: 'haproxy_backend_internal_errors_total{proxy="be_node_bidder",instance="proxy-1",job="haproxy"}'
+        values: '0 0 1 1 2 2 3 3+0x60'
+    alert_rule_test:
+      - alertname: HAProxyBackendInternalErrors
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAProxyBackendInternalErrors
+              proxy: be_node_bidder
+              instance: proxy-1
+              severity: warning
+            exp_annotations:
+              summary: "HAProxy internal errors on be_node_bidder @ proxy-1"
+              description: "3 internal errors on backend be_node_bidder @ proxy-1 in the last hour. These are HAProxy's own failures — allocation, buffers, internal state — not backend problems, and they do not show up in the health or saturation alerts."
+
+  - interval: 1m
+    name: a backend with no internal errors stays quiet
+    input_series:
+      - series: 'haproxy_backend_internal_errors_total{proxy="be_node_bidder",instance="proxy-1",job="haproxy"}'
+        values: '0x70'
+    alert_rule_test:
+      - alertname: HAProxyBackendInternalErrors
+        eval_time: 20m
+        exp_alerts: []
+
+  # 5% of segments retransmitted: well past the 1.34% worst host observed.
+  - interval: 1m
+    name: a high retransmit ratio alerts
+    input_series:
+      - series: 'node_netstat_Tcp_RetransSegs{instance="host-1",job="node"}'
+        values: '0+50x60'
+      - series: 'node_netstat_Tcp_OutSegs{instance="host-1",job="node"}'
+        values: '0+1000x60'
+    alert_rule_test:
+      - alertname: NodeHighTcpRetransmitRatio
+        eval_time: 50m
+        exp_alerts:
+          - exp_labels:
+              alertname: NodeHighTcpRetransmitRatio
+              instance: host-1
+              job: node
+              severity: warning
+            exp_annotations:
+              summary: "High TCP retransmit ratio on host-1"
+              description: "5% of TCP segments sent by host-1 are retransmissions, against a fleet median of 0.002%. Points at the network path rather than the host."
+
+  # A very busy host retransmitting a lot in absolute terms but a normal 0.5%
+  # of its traffic. This is the case an absolute-count rule would get wrong,
+  # and the reason the expression is a ratio.
+  - interval: 1m
+    name: a busy host with a normal ratio stays quiet
+    input_series:
+      - series: 'node_netstat_Tcp_RetransSegs{instance="host-1",job="node"}'
+        values: '0+500x60'
+      - series: 'node_netstat_Tcp_OutSegs{instance="host-1",job="node"}'
+        values: '0+100000x60'
+    alert_rule_test:
+      - alertname: NodeHighTcpRetransmitRatio
+        eval_time: 50m
+        exp_alerts: []
+
+  - interval: 1m
+    name: blocked RDS tasks alert
+    input_series:
+      - series: 'rdsosmetrics_tasks_blocked{instance="dynpgarchive1",job="rds-enhanced",region="us-east-1"}'
+        values: '3x20'
+    alert_rule_test:
+      - alertname: RDSTasksBlocked
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: RDSTasksBlocked
+              instance: dynpgarchive1
+              job: rds-enhanced
+              region: us-east-1
+              severity: warning
+            exp_annotations:
+              summary: "RDS tasks blocked on dynpgarchive1"
+              description: "3 tasks blocked in uninterruptible sleep on dynpgarchive1 (us-east-1) for 10 minutes. Usually storage that stopped answering. The instance looks idle because blocked tasks burn no CPU."
+
+  # A momentary blocked task is ordinary I/O scheduling; `for: 10m` is what
+  # separates that from a hung device.
+  - interval: 1m
+    name: a momentary blocked task does not alert
+    input_series:
+      - series: 'rdsosmetrics_tasks_blocked{instance="dynpgarchive1",job="rds-enhanced",region="us-east-1"}'
+        values: '0 0 2 1 0 0 0 0 0 0x12'
+    alert_rule_test:
+      - alertname: RDSTasksBlocked
+        eval_time: 15m
+        exp_alerts: []
