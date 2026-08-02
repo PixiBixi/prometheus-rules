@@ -134,6 +134,13 @@ or a dead rule look fine. Both have happened here:
   `pg_stat_database_checksum_failures`. Exactly the 16 instances still on 0.12.0 expose it
   and none of the 21 on 0.15.0 do, so upgrading the rest of the fleet would silently kill
   `PostgresChecksumFailures` — a rename you cannot work around, only notice.
+The inverse trap is just as common, and cost three attempts on one metric here: **a metric
+missing from a scrape has not necessarily been removed.** A `CounterVec` emits no series
+until one of its label values is first observed, so
+`prometheus_remote_storage_samples_dropped_total` does not exist until a sample is actually
+dropped. Absence is the healthy state. Before recording a rename or a removal, read the
+declaration in the upstream source — and when checking against production, confirm the
+instance you are querying actually exercises the feature.
 
 **The script compares two numbers; the third is the one that matters.** What you actually
 run is neither the fixture's version nor upstream's, and only a query against your own
