@@ -228,7 +228,10 @@
         description: "postgres_exporter cannot scrape {{ $labels.instance }}"
 
     - alert: PostgresReplicationLagHigh
-      expr: pg_replication_lag > 30
+      # postgres_exporter 0.15 renamed pg_replication_lag to
+      # pg_replication_lag_seconds. Both are live in this estate -- 20 instances
+      # emit both, 2 only the old name, 1 only the new -- so match either.
+      expr: (pg_replication_lag or pg_replication_lag_seconds) > 30
       for: 5m
       labels:
         severity: warning
@@ -237,7 +240,10 @@
         description: "Replication lag on {{ $labels.server }} is {{ $value | humanizeDuration }}. Replica is falling behind."
 
     - alert: PostgresReplicationLagCritical
-      expr: pg_replication_lag > 300
+      # postgres_exporter 0.15 renamed pg_replication_lag to
+      # pg_replication_lag_seconds. Both are live in this estate -- 20 instances
+      # emit both, 2 only the old name, 1 only the new -- so match either.
+      expr: (pg_replication_lag or pg_replication_lag_seconds) > 300
       for: 2m
       labels:
         severity: critical
