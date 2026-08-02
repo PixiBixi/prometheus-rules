@@ -12,8 +12,8 @@ describes software we do not run; this ruleset is meant to be reusable.
 
 | Document | Date | What it covers |
 |---|---|---|
-| [AUDIT_PROD_2026-08-01.md](AUDIT_PROD_2026-08-01.md) | 2026-08-01 | every metric the rules reference, tested against the live Prometheus |
-| [ALERTS_REVIEW_2026-08.md](ALERTS_REVIEW_2026-08.md) | 2026-08 | full review of the rule set: dead expressions, vector-matching bugs, duplicates |
+| [AUDIT_PROD_2026-08-01.md](audits/AUDIT_PROD_2026-08-01.md) | 2026-08-01 | every metric the rules reference, tested against the live Prometheus |
+| [ALERTS_REVIEW_2026-08.md](audits/ALERTS_REVIEW_2026-08.md) | 2026-08 | full review of the rule set: dead expressions, vector-matching bugs, duplicates |
 
 ## Fixture completeness versus production
 
