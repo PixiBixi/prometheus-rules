@@ -6,8 +6,8 @@ A bunch of Prometheus rules using some exporters
 
 | | |
 |---|---|
-| **[EXPORTERS.md](EXPORTERS.md)** | every exporter: versions, required configuration, per-exporter traps |
-| **[AUDIT.md](AUDIT.md)** | how closely the fixtures and rules match the estate they were written against |
+| **[EXPORTERS.md](reference/EXPORTERS.md)** | every exporter: versions, required configuration, per-exporter traps |
+| **[AUDIT.md](reference/AUDIT.md)** | how closely the fixtures and rules match the estate they were written against |
 | **[docs/](docs/)** | browsable metric and alert reference, built from this repo |
 
 ### Exporter sample files
@@ -54,13 +54,13 @@ These rules have been tested with specific exporters version/ some custom parame
 
 ```bash
 # Syntax + lint (promtool check rules), all files in one invocation
-python3 validate_rules.py
+python3 scripts/validate_rules.py
 
 # Same, but treat lint issues such as duplicate rules as failures
-python3 validate_rules.py --strict
+python3 scripts/validate_rules.py --strict
 
 # Behavioural unit tests (promtool test rules) from tests/
-python3 run_tests.py
+python3 scripts/run_tests.py
 ```
 
 Both run automatically via pre-commit. They cover different failure modes, and
@@ -79,7 +79,7 @@ does and does not fire, so silence becomes a test failure. When you fix or add
 a rule, add a case — ideally one that fires and one that must stay quiet.
 
 Rule files are bare lists, so both scripts wrap them under a `groups:` key in a
-temp directory first (shared logic in `ruleslib.py`). Tests reference their
+temp directory first (shared logic in `scripts/ruleslib.py`). Tests reference their
 rules by plain basename: `rule_files: [basis.rules.yml]`. promtool does not
 report which file a failing test came from, so give every test a descriptive
 `name:`.
@@ -91,14 +91,14 @@ it was captured from. `check_versions.py` reads those headers and compares them 
 what we deploy and against upstream:
 
 ```bash
-python3 check_versions.py             # both comparisons
-python3 check_versions.py --offline   # skip the network
-python3 check_versions.py --markdown  # regenerate the version table in EXPORTERS.md
+python3 scripts/check_versions.py             # both comparisons
+python3 scripts/check_versions.py --offline   # skip the network
+python3 scripts/check_versions.py --markdown  # regenerate the version table in reference/EXPORTERS.md
 ```
 
 It fails only when a fixture was captured from a version nobody runs, because that is the
 comparison that decides whether a rule works. Upstream moving ahead is news, not a defect.
 
-The version table in EXPORTERS.md is generated from those headers — do not hand-edit it.
+The version table in reference/EXPORTERS.md is generated from those headers — do not hand-edit it.
 It exists because the versions used to live in this README as a second, manual copy, and
 that copy had drifted on five exporters, including one changed an hour earlier.

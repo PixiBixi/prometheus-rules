@@ -106,9 +106,9 @@ DEPLOYED = {
 # Matches "1.2.3", "v1.2.3", "0.24.0" in a provenance header.
 RE_VERSION = re.compile(r"\bv?(\d+\.\d+(?:\.\d+)?(?:-[\w.]+)?)\b")
 
-MARK_BEGIN = "<!-- BEGIN GENERATED: python3 check_versions.py --markdown -->"
+MARK_BEGIN = "<!-- BEGIN GENERATED: python3 scripts/check_versions.py --markdown -->"
 MARK_END = "<!-- END GENERATED -->"
-EXPORTERS_MD = os.path.join(ROOT, "EXPORTERS.md")
+EXPORTERS_MD = os.path.join(ROOT, "reference", "EXPORTERS.md")
 
 
 def fixture_version(path):

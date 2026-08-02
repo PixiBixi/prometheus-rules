@@ -4,26 +4,26 @@ repos:
       - id: validate-rules
         name: Validate PromQL rules with promtool
         language: system
-        entry: python3 validate_rules.py
+        entry: python3 scripts/validate_rules.py
         pass_filenames: false
-        files: ^(rules/.*\.yml|validate_rules\.py|ruleslib\.py)$
+        files: ^(rules/.*\.yml|scripts/(validate_rules|ruleslib)\.py)$
         stages: [pre-commit]
 
       - id: test-rules
         name: Run promtool rule unit tests
         language: system
-        entry: python3 run_tests.py
+        entry: python3 scripts/run_tests.py
         pass_filenames: false
-        files: ^(rules/.*\.yml|tests/.*\.test\.yml|run_tests\.py|ruleslib\.py)$
+        files: ^(rules/.*\.yml|tests/.*\.test\.yml|scripts/(run_tests|ruleslib)\.py)$
         stages: [pre-commit]
 
       - id: build-docs
         name: Build docs/data.json
         language: system
-        entry: python3 build.py
+        entry: python3 scripts/build.py
         pass_filenames: false
         always_run: false
-        files: ^(exporters/|rules/|build\.py)
+        files: ^(exporters/|rules/|scripts/build\.py)
         stages: [pre-commit]
 
       # Offline by design: reads fixture headers and the DEPLOYED map only, so it
@@ -31,7 +31,7 @@ repos:
       - id: exporter-versions
         name: Regenerate the version table in EXPORTERS.md
         language: system
-        entry: bash -c 'python3 check_versions.py --markdown && git add EXPORTERS.md'
+        entry: bash -c 'python3 scripts/check_versions.py --markdown && git add reference/EXPORTERS.md'
         pass_filenames: false
-        files: ^(exporters/|check_versions\.py|EXPORTERS\.md)$
+        files: ^(exporters/|scripts/check_versions\.py|reference/EXPORTERS\.md)$
         stages: [pre-commit]
