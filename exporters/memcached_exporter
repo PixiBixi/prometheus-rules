@@ -1,3 +1,6 @@
+# Captured 2026-08-01 from prometheus/memcached_exporter 0.16.0 against
+# memcached 1.6.45, with traffic generated so the counters are populated.
+# Both are the latest release as of that date.
 # HELP go_gc_duration_seconds A summary of the wall-time pause (stop-the-world) duration in garbage collection cycles.
 # TYPE go_gc_duration_seconds summary
 go_gc_duration_seconds{quantile="0"} 0
