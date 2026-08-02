@@ -1,3 +1,6 @@
+# Captured 2026-08-01 from RabbitMQ 4.3.4's built-in rabbitmq_prometheus plugin
+# on :15692 -- there is no third-party exporter for modern RabbitMQ.
+# 4.3.4 is the latest release as of that date.
 # HELP telemetry_scrape_duration_seconds_count 
 telemetry_scrape_duration_seconds_count{registry="default",content_type="text/plain; version=0.0.4"} 1
 # HELP telemetry_scrape_duration_seconds_sum 
