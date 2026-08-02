@@ -241,6 +241,12 @@
     - alert: PrometheusRemoteWriteDroppedSamples
       # reason="dropped_series" is intentional filtering via write_relabel_configs,
       # not an incident -- excluding it keeps this alert about genuine sample loss.
+      #
+      # Do not be alarmed if this metric is missing from a healthy instance. It
+      # is a CounterVec labelled by `reason` with no child series pre-initialised,
+      # so it does not exist until a sample is actually dropped -- which is
+      # exactly when this alert should start evaluating. Absence is the healthy
+      # state, not a broken rule. Works identically on 2.x and 3.x.
       expr: rate(prometheus_remote_storage_samples_dropped_total{reason!="dropped_series"}[5m]) > 0
       labels:
         severity: critical
