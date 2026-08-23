@@ -87,7 +87,7 @@
       labels:
         severity: critical
       annotations:
-        description: "Unclean leader election detected on {{ $labels.instance }} — potential data loss. Inspect consumer lag immediately."
+        description: "Unclean leader election detected on {{ $labels.instance }} - potential data loss. Inspect consumer lag immediately."
         summary: "Unclean leader election on {{ $labels.instance }}"
     - alert: KafkaOfflineReplicas
       expr: kafka_server_replicamanager_offlinereplicacount > 0
@@ -111,7 +111,7 @@
       labels:
         severity: warning
       annotations:
-        description: "{{ $value }} partition(s) are exactly at min ISR on {{ $labels.instance }} — one more failure risks under-min-ISR."
+        description: "{{ $value }} partition(s) are exactly at min ISR on {{ $labels.instance }} - one more failure risks under-min-ISR."
         summary: "{{ $value }} partition(s) at min ISR on {{ $labels.instance }}"
     - alert: KafkaOfflineLogDirectory
       expr: kafka_log_logmanager_offlinelogdirectorycount > 0

@@ -64,7 +64,7 @@
         severity: warning
       annotations:
         summary: "ZooKeeper outstanding requests (instance {{ $labels.instance }})"
-        description: "ZooKeeper has {{ $value }} outstanding requests on {{ $labels.instance }} — node may be overloaded."
+        description: "ZooKeeper has {{ $value }} outstanding requests on {{ $labels.instance }} - node may be overloaded."
 
     - alert: ZookeeperJVMDeadlock
       expr: jvm_threads_deadlocked_monitor > 0

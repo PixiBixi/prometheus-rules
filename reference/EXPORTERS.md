@@ -13,7 +13,7 @@ what we actually run, recorded by hand in the `DEPLOYED` map in `check_versions.
 the observation that established it.
 
 The second column is the one that decides whether a rule works. A fixture captured from a
-version nobody runs describes metrics that may not exist on the fleet — which is how
+version nobody runs describes metrics that may not exist on the fleet - which is how
 `PostgresChecksumFailures` came to depend on an exporter version half the estate had
 already moved off.
 
@@ -35,34 +35,34 @@ of staleness the script exists to catch. Ask for it when you need it.
 | Fixture | Captured from | Deployed here | How the deployed version is known |
 |---|---|---|---|
 | `aerospike` | _not recorded_ | 1.9.0 | unverified: carried over from the README |
-| `apache_exporter` | 1.1.1 | — | — |
-| `blackbox_exporter` | 0.24.0 | — | — |
+| `apache_exporter` | 1.1.1 | - | - |
+| `blackbox_exporter` | 0.24.0 | - | - |
 | `cert-manager` | 1.21.1 | 1.21.1 | confirmed with the cluster operators |
 | `haproxy_exporter_2x` | 2.7.11 | 2.7.11 | promex is built into HAProxy; version is HAProxy's own |
 | `haproxy_exporter_3x` | 3.2.21 | 3.2.21 | promex is built into HAProxy; version is HAProxy's own |
 | `ipsec_exporter` | _not recorded_ | 0.4.0 | unverified: carried over from the README |
-| `kafka_exporter` | 0.17.2 | — | — |
-| `keepalived_exporter` | 1.3.2 | — | — |
+| `kafka_exporter` | 0.17.2 | - | - |
+| `keepalived_exporter` | 1.3.2 | - | - |
 | `keydb_exporter` | 1.52.0 | 1.52.0 and 1.58.0 | redis_exporter_build_info: 210 instances on 1.52.0, 11 on 1.58.0 |
-| `memcached_exporter` | 0.16.0 | — | — |
-| `mongodb_exporter` | 0.52.0 | — | — |
-| `mysqld_exporter` | 0.15.0 | — | — |
+| `memcached_exporter` | 0.16.0 | - | - |
+| `mongodb_exporter` | 0.52.0 | - | - |
+| `mysqld_exporter` | 0.15.0 | - | - |
 | `node_exporter` | 1.7.0 | 1.7.0, rolling to 1.12.1 | role pinned to 1.12.1; fleet rollout not yet run |
-| `nvme_exporter` | _not recorded_ | — | — |
+| `nvme_exporter` | _not recorded_ | - | - |
 | `phpfpm_exporter` | _not recorded_ | 2.2.0 | unverified: carried over from the README |
-| `ping_exporter` | _not recorded_ | — | — |
+| `ping_exporter` | _not recorded_ | - | - |
 | `postgres_exporter` | 0.15.0 | 0.12.0 and 0.15.0 | counted across the fleet: 16 instances on 0.12.0, 21 on 0.15.0 |
 | `prometheus` | 3.13.1 | 2.55.0 and 3.13.1 | prometheus_build_info: 2.55.0 on the main estate, 3.13.1 on dynfactory |
-| `promtail_exporter` | 2.8.2 | — | — |
-| `rabbitmq_exporter` | 4.3.4 | — | — |
-| `rds_enhanced` | _not recorded_ | — | — |
-| `stackdriver_exporter` | 0.18.0 | — | — |
-| `varnish_exporter` | 1.6.1 | — | — |
-| `zookeeper_exporter` | 0.17.2 | — | — |
+| `promtail_exporter` | 2.8.2 | - | - |
+| `rabbitmq_exporter` | 4.3.4 | - | - |
+| `rds_enhanced` | _not recorded_ | - | - |
+| `stackdriver_exporter` | 0.18.0 | - | - |
+| `varnish_exporter` | 1.6.1 | - | - |
+| `zookeeper_exporter` | 0.17.2 | - | - |
 
 <!-- END GENERATED -->
 
-An exporter reading "not recorded" is not a problem with the fixture — it means nobody has
+An exporter reading "not recorded" is not a problem with the fixture - it means nobody has
 checked `*_build_info` for it yet. Several exporters here expose no version metric at all
 (`nvme`, `phpfpm`, `ping`, `ipsec`, aerospike), so for those the fixture header is the only
 record there will ever be.
@@ -80,7 +80,7 @@ I do use [Maven JMX Exporter](https://github.com/prometheus/jmx_exporter/)
 [node_exporter](https://github.com/prometheus/node_exporter)
 
 > The collector list below includes `openvpn-client@.*`, but the node_exporter Ansible
-> role does not — verified against the live Prometheus, zero hosts collect an openvpn
+> role does not - verified against the live Prometheus, zero hosts collect an openvpn
 > unit. `DownSystemdOpenVPN` therefore has no series to match. Either add the pattern to
 > the role's `--collector.systemd.unit-include`, or drop the alert.
 
@@ -111,7 +111,7 @@ Also, some collector have been disabled because I don't use them
 
 ### apache_exporter
 
-[apache_exporter](https://github.com/Lusitaniae/apache_exporter) — fixture tested against Apache 2.4.68.
+[apache_exporter](https://github.com/Lusitaniae/apache_exporter) - fixture tested against Apache 2.4.68.
 
 Requires `mod_status` with extended status, and the exporter pointed at it:
 
@@ -129,17 +129,17 @@ apache_exporter --scrape_uri=http://localhost/server-status?auto
 
 Without `ExtendedStatus On` the exporter still reports worker and scoreboard state, but
 `apache_accesses_total`, `apache_duration_ms_total` and `apache_sent_kilobytes_total` stay
-at zero — which silently disables `ApacheSlowRequests`.
+at zero - which silently disables `ApacheSlowRequests`.
 
 ### memcached_exporter
 
-[memcached_exporter](https://github.com/prometheus/memcached_exporter) — fixture tested against memcached 1.6.45.
+[memcached_exporter](https://github.com/prometheus/memcached_exporter) - fixture tested against memcached 1.6.45.
 
 No configuration needed on memcached's side; the exporter speaks the text protocol and only needs `--memcached.address`.
 
 ### varnish_exporter
 
-[prometheus_varnish_exporter](https://github.com/jonnenauha/prometheus_varnish_exporter) — fixture tested against Varnish 9.0.3.
+[prometheus_varnish_exporter](https://github.com/jonnenauha/prometheus_varnish_exporter) - fixture tested against Varnish 9.0.3.
 
 The exporter shells out to `varnishstat`, so it must run on the same host as Varnish with access to the shared memory in `/var/lib/varnish`. It cannot be run as a remote scraper.
 
@@ -147,7 +147,7 @@ Only amd64 binaries are published upstream.
 
 ### rabbitmq_exporter
 
-[RabbitMQ Prometheus plugin](https://www.rabbitmq.com/docs/prometheus) — fixture tested against RabbitMQ 4.3.4.
+[RabbitMQ Prometheus plugin](https://www.rabbitmq.com/docs/prometheus) - fixture tested against RabbitMQ 4.3.4.
 
 RabbitMQ 3.8+ ships the `rabbitmq_prometheus` plugin, enabled by default, serving metrics on :15692. **There is no third-party exporter to deploy.**
 
@@ -155,7 +155,7 @@ Note the metric names differ from the old kbudde/rabbitmq_exporter that most com
 
 ### mongodb_exporter
 
-[mongodb_exporter](https://github.com/percona/mongodb_exporter) — fixture tested against MongoDB 8.
+[mongodb_exporter](https://github.com/percona/mongodb_exporter) - fixture tested against MongoDB 8.
 
 This exporter names serverStatus metrics `mongodb_ss_*` and carries dimensions as labels. Connections are `mongodb_ss_connections{conn_type="current"}`, **not** `mongodb_connections_current` as most community alert sets assume.
 
@@ -193,7 +193,7 @@ frontend prometheus
 
 [haproxy](https://github.com/haproxy/haproxy)
 
-Two sample files cover both major versions — `diff exporters/haproxy_exporter_2x exporters/haproxy_exporter_3x` shows what changed between them. promex ships inside HAProxy itself, so the version in the table is HAProxy's own; there is no separate release to track.
+Two sample files cover both major versions - `diff exporters/haproxy_exporter_2x exporters/haproxy_exporter_3x` shows what changed between them. promex ships inside HAProxy itself, so the version in the table is HAProxy's own; there is no separate release to track.
 
 ### ipsec_exporter
 
@@ -247,8 +247,8 @@ Redis exporter is also used for KeyDB exporter as KeyDB is a fork of Redis
 > **Metric names move between versions of this exporter.** v1.52 exposes
 > `redis_config_maxclients`; current releases renamed it to `redis_max_clients`.
 > The rules in this repo target the former. `exporters/keydb_exporter` is a real
-> v1.52.0 scrape against KeyDB, merged from three roles — primary (with AOF and
-> maxmemory configured), replica, and a cluster-enabled node — so that
+> v1.52.0 scrape against KeyDB, merged from three roles - primary (with AOF and
+> maxmemory configured), replica, and a cluster-enabled node - so that
 > replication, AOF and `redis_cluster_*` metrics are all represented.
 > Regenerate it against the version you actually run, not `:latest`.
 
@@ -270,7 +270,7 @@ Please don't forget there's no sense to monitor Prometheus uptime from Prom itse
 
 > `prometheus_remote_storage_samples_dropped_total` is a `CounterVec` labelled by `reason`
 > with no child series pre-initialised, so a healthy instance emits nothing for it. Its
-> absence from a scrape is the healthy state, **not** a removal — the declaration is
+> absence from a scrape is the healthy state, **not** a removal - the declaration is
 > identical in 2.55.0 and 3.13.1. The fixture carries real series for it from the earlier
 > 2.55.0 capture so the family stays documented.
 
@@ -281,7 +281,7 @@ Please don't forget there's no sense to monitor Prometheus uptime from Prom itse
 If you want running the exporter as a non-super user, please follow [these steps](https://github.com/prometheus-community/postgres_exporter?tab=readme-ov-file#running-as-non-superuser)
 
 > **0.15 changed two things the rules depend on.** `pg_replication_lag` became
-> `pg_replication_lag_seconds` — both names are live across the estate, so both lag alerts
+> `pg_replication_lag_seconds` - both names are live across the estate, so both lag alerts
 > match either. And 0.15 dropped the legacy auto-discovery query mode that emitted
 > `pg_stat_database_checksum_failures`: only the instances still on 0.12 expose it, so
 > upgrading the rest of the fleet would silently kill `PostgresChecksumFailures`.
@@ -302,7 +302,7 @@ nvme metrics are collected through a custom exporter; there is no upstream relea
 
 We're using the internal metrics endpoint exposed by Promtail (Loki agent).
 
-[promtail](https://grafana.com/docs/loki/latest/send-data/promtail/) — versioned with Loki, so the table's version is a Loki release. Note promtail is deprecated upstream in favour of Grafana Alloy.
+[promtail](https://grafana.com/docs/loki/latest/send-data/promtail/) - versioned with Loki, so the table's version is a Loki release. Note promtail is deprecated upstream in favour of Grafana Alloy.
 
 ### rds_enhanced
 
@@ -330,4 +330,4 @@ real ACME activity. All three are confirmed present on our production Prometheus
 read by the rules, so dropping them would make working alerts look uncovered.
 
 `certmanager_issuer_ready_status` and `certmanager_clusterissuer_ready_status` are
-separate metrics — a cluster with only ClusterIssuers emits just the second.
+separate metrics - a cluster with only ClusterIssuers emits just the second.

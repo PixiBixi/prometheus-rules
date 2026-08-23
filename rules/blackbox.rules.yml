@@ -6,7 +6,7 @@
       labels:
         severity: critical
       annotations:
-        summary: "Blackbox probe failed — {{ $labels.job }} @ {{ $labels.instance }}"
+        summary: "Blackbox probe failed - {{ $labels.job }} @ {{ $labels.instance }}"
         description: "Probe {{ $labels.job }} failed on {{ $labels.instance }}"
 
     - alert: BlackboxProbeHttpFailure

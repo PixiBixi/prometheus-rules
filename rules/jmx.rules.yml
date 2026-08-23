@@ -16,7 +16,7 @@
         severity: critical
       annotations:
         summary: "JVM heap memory critical (instance {{ $labels.instance }})"
-        description: "JVM heap memory above 90% on {{ $labels.instance }} — raise -Xmx or investigate a leak\n  VALUE = {{ $value }}"
+        description: "JVM heap memory above 90% on {{ $labels.instance }} - raise -Xmx or investigate a leak\n  VALUE = {{ $value }}"
 
     - alert: JvmGcTimeTooHigh
       expr: sum by (instance)(rate(jvm_gc_collection_seconds_sum[5m])) > 0.05
@@ -54,7 +54,7 @@
         severity: warning
       annotations:
         summary: "JVM thread count high (instance {{ $labels.instance }})"
-        description: "JVM thread count is {{ $value }} (> 300) on {{ $labels.instance }} — potential thread leak"
+        description: "JVM thread count is {{ $value }} (> 300) on {{ $labels.instance }} - potential thread leak"
 
     - alert: JvmThreadsBlocked
       expr: |
@@ -70,7 +70,7 @@
         severity: warning
       annotations:
         summary: "JVM threads BLOCKED (instance {{ $labels.instance }})"
-        description: "More than 10% of JVM threads are BLOCKED on {{ $labels.instance }} ({{ $value | humanizePercentage }}) — lock contention suspected"
+        description: "More than 10% of JVM threads are BLOCKED on {{ $labels.instance }} ({{ $value | humanizePercentage }}) - lock contention suspected"
 
     - alert: JvmDirectBufferPoolFillingUp
       expr: (jvm_buffer_pool_used_bytes / jvm_buffer_pool_capacity_bytes) * 100 > 90 and jvm_buffer_pool_capacity_bytes > 0

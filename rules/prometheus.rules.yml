@@ -236,7 +236,7 @@
       labels:
         severity: warning
       annotations:
-        summary: "Prometheus timeseries cardinality — {{ $labels.name }}"
+        summary: "Prometheus timeseries cardinality - {{ $labels.name }}"
         description: "The \"{{ $labels.name }}\" metric accounts for {{ $value }} series, over 10% of the whole TSDB"
     - alert: PrometheusRemoteWriteDroppedSamples
       # reason="dropped_series" is intentional filtering via write_relabel_configs,

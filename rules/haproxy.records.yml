@@ -116,7 +116,7 @@
     - record: haproxy:backend_retries:rate5m
       expr: sum by (namespace, proxy, instance, job) (rate(haproxy_backend_retry_warnings_total[5m]))
 
-    # Downtime accumulation rate per backend — finer signal than binary status
+    # Downtime accumulation rate per backend - finer signal than binary status
     - record: haproxy:backend_downtime:rate5m
       expr: sum by (namespace, proxy, instance, job) (rate(haproxy_backend_downtime_seconds_total[5m]))
 

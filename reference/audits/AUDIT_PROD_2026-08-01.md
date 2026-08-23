@@ -1,4 +1,4 @@
-# Audit des règles contre le Prometheus de production — 1ᵉʳ août 2026
+# Audit des règles contre le Prometheus de production - 1ᵉʳ août 2026
 
 Journal d'investigation. Chaque constat est vérifié par requête contre
 `grafana.dynfactory.com` (datasource `0wjZprLnk`), pas déduit des fixtures.
@@ -17,7 +17,7 @@ quelqu'un d'autre.
 
 ---
 
-## A. Bugs de règles — nom de métrique ou de label faux
+## A. Bugs de règles - nom de métrique ou de label faux
 
 Ces alertes sont **mortes chez nous et ailleurs**. À corriger.
 
@@ -42,7 +42,7 @@ coredns_proxy_conn_cache_hits_total / _misses_total
 
 Les deux premières sont réparables par renommage. Les deux `ForwardErrors` n'ont aucun
 équivalent : ni `coredns_forward_responses_total` ni `coredns_proxy_responses_total`
-n'existent. À trancher — voir §D.
+n'existent. À trancher - voir §D.
 
 ### A2. `PromtailRequestErrors` rate tous les échecs réseau
 
@@ -59,23 +59,23 @@ réseau**, qui sont le cas le plus courant.
 
 ### A3. `PromtailRequestLatency` groupe sur un label inexistant
 
-`by (namespace, job, route, instance)` — le label `route` n'est pas exposé
+`by (namespace, job, route, instance)` - le label `route` n'est pas exposé
 (vérifié : `count by (route)` ne renvoie aucune valeur). Probablement copié depuis
 `loki_request_duration_seconds`, côté serveur Loki. L'annotation rend vide.
 
 ---
 
-## B. Logiciel non déployé ici — règles correctes, sans données
+## B. Logiciel non déployé ici - règles correctes, sans données
 
 À **ne pas supprimer** : elles servent à qui déploie ces exporters. À documenter.
 
 | Famille | Alertes concernées | Constat prod |
 |---|---|---|
-| `stackdriver_*` | les 5 de `stackdriver.rules.yml` | **0 famille de métrique** — exporter non scrapé |
-| `mysql_slave_status_*` | `MySQLReplicationDown` | **0 famille** — parc Galera pur, `--collect.slave_status` inactif |
-| `pg_bloat_*`, `pg_stat_user_tables_*`, `pg_general_index_info_*` | `PostgresqlBloatIndexHigh`, `PostgresqlBloatTableHigh`, `PostgresqlTooManyDeadTuples`, `PostgresqlTableNotAutoVacuumed` | absentes — issues d'un `queries.yaml` custom non déployé |
-| `kafka_consumer_consumer_fetch_manager_metrics_*` | `KafkaConsumerLagHigh` | absente — job `consumer` non scrapé |
-| `blackbox_exporter_config_*`, `blackbox_module_unknown_total` | alertes de rechargement de conf blackbox | absentes — seul l'endpoint de sonde est scrapé, pas le `/metrics` de l'exporter |
+| `stackdriver_*` | les 5 de `stackdriver.rules.yml` | **0 famille de métrique** - exporter non scrapé |
+| `mysql_slave_status_*` | `MySQLReplicationDown` | **0 famille** - parc Galera pur, `--collect.slave_status` inactif |
+| `pg_bloat_*`, `pg_stat_user_tables_*`, `pg_general_index_info_*` | `PostgresqlBloatIndexHigh`, `PostgresqlBloatTableHigh`, `PostgresqlTooManyDeadTuples`, `PostgresqlTableNotAutoVacuumed` | absentes - issues d'un `queries.yaml` custom non déployé |
+| `kafka_consumer_consumer_fetch_manager_metrics_*` | `KafkaConsumerLagHigh` | absente - job `consumer` non scrapé |
+| `blackbox_exporter_config_*`, `blackbox_module_unknown_total` | alertes de rechargement de conf blackbox | absentes - seul l'endpoint de sonde est scrapé, pas le `/metrics` de l'exporter |
 
 **Bonne nouvelle au passage** : `pg_replication_slots_active` **existe** en prod. Les
 alertes `PostgreSQLRepliDown` et `PostgresqlUnusedReplicationSlot`, marquées « à
@@ -101,12 +101,12 @@ Vérifiées présentes en prod, aucune action :
 
 ## D. Décisions à prendre
 
-1. **`CoreDNSForwardErrorsHigh` / `…Elevated`** — aucune métrique de réponses forward
+1. **`CoreDNSForwardErrorsHigh` / `…Elevated`** - aucune métrique de réponses forward
    n'existe. Supprimer, ou reconstruire sur `coredns_proxy_request_duration_seconds_count`
    (qui compte les requêtes mais ne distingue pas les erreurs) ?
-2. **Les 5 alertes stackdriver** — garder pour la réutilisabilité du dépôt, ou retirer
+2. **Les 5 alertes stackdriver** - garder pour la réutilisabilité du dépôt, ou retirer
    puisque l'exporter n'est pas déployé ?
-3. **`MySQLReplicationDown`** — le parc est Galera. Garder pour une future topologie
+3. **`MySQLReplicationDown`** - le parc est Galera. Garder pour une future topologie
    master/replica, ou retirer ?
 
 En l'absence d'arbitrage, l'option retenue est **garder et documenter** : la suppression
@@ -116,17 +116,17 @@ est destructive et le dépôt a vocation à être réutilisable.
 
 ## E. Livrables
 
-- [x] Complétude des fixtures — README, section « Fixture completeness versus production »
-- [x] A1, A2, A3 corrigés + tests joués contre la révision d'avant — PR #1
+- [x] Complétude des fixtures - README, section « Fixture completeness versus production »
+- [x] A1, A2, A3 corrigés + tests joués contre la révision d'avant - PR #1
 - [x] B documenté dans le README
-- [x] Apache — PR #2, fixture capturée d'un vrai apache_exporter 1.1.1
-- [x] Écarts de versions d'exporters relevés — ticket PE-1570
-- [x] Ticket Jira consolidé — PE-1570, avec la MR !184
+- [x] Apache - PR #2, fixture capturée d'un vrai apache_exporter 1.1.1
+- [x] Écarts de versions d'exporters relevés - ticket PE-1570
+- [x] Ticket Jira consolidé - PE-1570, avec la MR !184
 
 **Correction importante apportée en cours de route (§A1).** J'avais d'abord renommé les
 métriques CoreDNS en `coredns_proxy_*` après n'avoir consulté qu'un seul Prometheus.
 C'était une régression pour le cluster en 1.10, où seul `coredns_forward_*` existe. Les
-deux conventions coexistent — 1.11.4 d'un côté, 1.10.0/1.10.1 de l'autre — et les règles
+deux conventions coexistent (1.11.4 d'un côté, 1.10.0/1.10.1 de l'autre) et les règles
 matchent désormais les deux. Ma note « `coredns_forward_responses_total` n'existe nulle
 part » était fausse pour la même raison, et a été retirée du README.
 

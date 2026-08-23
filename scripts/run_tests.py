@@ -30,12 +30,12 @@ from ruleslib import TESTS_DIR, rule_files, wrap_into
 
 def main():
     if shutil.which("promtool") is None:
-        print("Warning: promtool not found — skipping rule unit tests.")
+        print("Warning: promtool not found - skipping rule unit tests.")
         print("Install: brew install prometheus  or  https://github.com/prometheus/prometheus/releases")
         sys.exit(0)
 
     if not os.path.isdir(TESTS_DIR):
-        print("No tests/ directory — nothing to run.")
+        print("No tests/ directory - nothing to run.")
         sys.exit(0)
 
     tests = sorted(
@@ -44,7 +44,7 @@ def main():
         if f.endswith(".test.yml")
     )
     if not tests:
-        print("No *.test.yml files in tests/ — nothing to run.")
+        print("No *.test.yml files in tests/ - nothing to run.")
         sys.exit(0)
 
     print(f"Running {len(tests)} rule test file(s) with promtool…")

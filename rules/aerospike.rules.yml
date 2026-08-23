@@ -72,7 +72,7 @@
         severity: critical
       annotations:
         summary: "AS - Stop Write Limit close for {{ $labels.ns }} @ {{ $labels.instance }} (< 15%)"
-        description: "AS stop write threshold (aerospike_namespace_stop_writes_pct) for ns={{ $labels.ns }} @ {{ $labels.instance }} is nearly reached — only 15% remaining before writes are blocked."
+        description: "AS stop write threshold (aerospike_namespace_stop_writes_pct) for ns={{ $labels.ns }} @ {{ $labels.instance }} is nearly reached - only 15% remaining before writes are blocked."
     - alert: ClockAreUnsync
       # This metric is node-level and carries no ns label; keeping it in the
       # aggregation produced an empty {{ $labels.ns }} in the annotation.
@@ -90,7 +90,7 @@
         severity: critical
       annotations:
         summary: "AS - Clock skew critical on {{ $labels.instance }} (> 40s)"
-        description: "Ensure clocks are synchronized across the cluster. {{ $labels.instance }} clock skew > 40s — writes may be stopped"
+        description: "Ensure clocks are synchronized across the cluster. {{ $labels.instance }} clock skew > 40s - writes may be stopped"
     - alert: LowHeapEfficiency
       expr: sum(aerospike_node_stats_heap_efficiency_pct) by (instance) < 50
       for: 1m

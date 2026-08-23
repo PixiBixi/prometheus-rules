@@ -16,7 +16,7 @@
       labels:
         severity: critical
       annotations:
-        summary: "RabbitMQ down — {{ $labels.job }} @ {{ $labels.instance }}"
+        summary: "RabbitMQ down - {{ $labels.job }} @ {{ $labels.instance }}"
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
 
     # ── Broker alarms ─────────────────────────────────────────────────────────
@@ -30,7 +30,7 @@
       labels:
         severity: critical
       annotations:
-        summary: "RabbitMQ memory alarm on {{ $labels.instance }} — publishers blocked"
+        summary: "RabbitMQ memory alarm on {{ $labels.instance }} - publishers blocked"
         description: "RabbitMQ on {{ $labels.instance }} has crossed its memory watermark and is blocking all publishing connections."
 
     - alert: RabbitmqDiskAlarm
@@ -39,7 +39,7 @@
       labels:
         severity: critical
       annotations:
-        summary: "RabbitMQ disk alarm on {{ $labels.instance }} — publishers blocked"
+        summary: "RabbitMQ disk alarm on {{ $labels.instance }} - publishers blocked"
         description: "Free disk space on {{ $labels.instance }} has crossed the watermark. RabbitMQ is blocking all publishing connections."
 
     # ── Resource saturation ───────────────────────────────────────────────────

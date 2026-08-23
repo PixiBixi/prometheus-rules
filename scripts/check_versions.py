@@ -154,7 +154,7 @@ def latest_release(repo):
         with urllib.request.urlopen(req, timeout=15) as resp:
             return json.load(resp).get("tag_name"), None
     except urllib.error.HTTPError as e:
-        hint = " (rate limited — install gh to authenticate)" if e.code == 403 else ""
+        hint = " (rate limited - install gh to authenticate)" if e.code == 403 else ""
         return None, f"HTTP {e.code}{hint}"
     except Exception as e:  # noqa: BLE001 - network shape varies, report and move on
         return None, str(e)[:60]
@@ -174,7 +174,7 @@ def deployed_status(captured, name):
     """
     entry = DEPLOYED.get(name)
     if entry is None:
-        return "—", "", "not recorded"
+        return "-", "", "not recorded"
     text, note = entry
     if captured is None:
         return text, note, "fixture has no version"
@@ -195,7 +195,7 @@ def write_markdown():
         text, note, status = deployed_status(captured, name)
         cap = captured or f"_{why}_"
         flag = " ⚠️" if status == "MISMATCH" else ""
-        rows.append(f"| `{name}` | {cap} | {text}{flag} | {note or '—'} |")
+        rows.append(f"| `{name}` | {cap} | {text}{flag} | {note or '-'} |")
 
     table = "\n".join([
         MARK_BEGIN,
@@ -249,7 +249,7 @@ def main():
 
         repo = UPSTREAM.get(name, "?")
         if repo is None:
-            up, ustatus = "—", "no upstream"
+            up, ustatus = "-", "no upstream"
         elif repo == "?":
             up, ustatus = "?", "not in UPSTREAM map"
         elif args.offline:
@@ -286,7 +286,7 @@ def main():
               "This is the one that breaks rules.")
     else:
         print("Every fixture with a recorded deployment matches it.")
-    print(f"{unrecorded} fixture(s) have no recorded deployed version — fill in DEPLOYED "
+    print(f"{unrecorded} fixture(s) have no recorded deployed version - fill in DEPLOYED "
           "in this script once you have checked *_build_info.")
     if not args.offline:
         print(f"{behind} behind upstream, which costs nothing until you upgrade.")

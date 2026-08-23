@@ -46,7 +46,7 @@
         severity: warning
       annotations:
         summary: "Keepalived VRRP flapping on {{ $labels.instance }}"
-        description: "{{ $labels.instance }} has transitioned to MASTER {{ $value }} times in 5 minutes for VRID {{ $labels.vrid }} — network or configuration instability."
+        description: "{{ $labels.instance }} has transitioned to MASTER {{ $value }} times in 5 minutes for VRID {{ $labels.vrid }} - network or configuration instability."
 
     - alert: KeepalivedAuthFailure
       expr: increase(keepalived_authentication_failure_total[5m]) > 0
@@ -55,7 +55,7 @@
         severity: warning
       annotations:
         summary: "Keepalived authentication failures on {{ $labels.instance }}"
-        description: "{{ $labels.instance }} is receiving VRRP packets with authentication failures — possible misconfiguration or unexpected peer on the network."
+        description: "{{ $labels.instance }} is receiving VRRP packets with authentication failures - possible misconfiguration or unexpected peer on the network."
 
     - alert: KeepalivedAdIntervalErrors
       expr: |
@@ -71,7 +71,7 @@
         severity: warning
       annotations:
         summary: "Keepalived advertisement interval errors on {{ $labels.instance }}"
-        description: "More than 5% of received VRRP advertisements have interval errors on {{ $labels.instance }} vrid={{ $labels.vrid }} ({{ $value | humanizePercentage }}) — risk of spurious master election."
+        description: "More than 5% of received VRRP advertisements have interval errors on {{ $labels.instance }} vrid={{ $labels.vrid }} ({{ $value | humanizePercentage }}) - risk of spurious master election."
 
     - alert: KeepalivedAuthenticationInvalid
       expr: increase(keepalived_authentication_invalid_total[5m]) > 0
@@ -80,7 +80,7 @@
         severity: warning
       annotations:
         summary: "Keepalived authentication invalid on {{ $labels.instance }}"
-        description: "VRRP authentication failures on {{ $labels.instance }} vrid={{ $labels.vrid }} — likely misconfiguration or rogue peer."
+        description: "VRRP authentication failures on {{ $labels.instance }} vrid={{ $labels.vrid }} - likely misconfiguration or rogue peer."
 
     - alert: KeepalivedTTLErrors
       expr: |
@@ -96,7 +96,7 @@
         severity: warning
       annotations:
         summary: "Keepalived TTL errors on {{ $labels.instance }}"
-        description: "More than 2% of received VRRP advertisements have TTL errors on {{ $labels.instance }} vrid={{ $labels.vrid }} ({{ $value | humanizePercentage }}) — possible routing misconfiguration or rogue peer."
+        description: "More than 2% of received VRRP advertisements have TTL errors on {{ $labels.instance }} vrid={{ $labels.vrid }} ({{ $value | humanizePercentage }}) - possible routing misconfiguration or rogue peer."
 
     - alert: KeepalivedPacketErrors
       expr: increase(keepalived_packet_length_errors_total[5m]) > 0
@@ -105,4 +105,4 @@
         severity: warning
       annotations:
         summary: "Keepalived packet length errors on {{ $labels.instance }}"
-        description: "VRRP packet length errors on {{ $labels.instance }} — possible network corruption or incompatible version."
+        description: "VRRP packet length errors on {{ $labels.instance }} - possible network corruption or incompatible version."

@@ -26,7 +26,7 @@ SKIP_EXPORTERS = set()
 SKIP_RULES     = {".yamllint.yml"}
 
 # Metric prefixes that belong to the exporter process itself (Go runtime,
-# Prometheus client, HTTP handler) — not relevant as "uncovered business metrics"
+# Prometheus client, HTTP handler) - not relevant as "uncovered business metrics"
 # when the exporter is a proxy (separate process scraping another system).
 EXPORTER_GENERIC_PREFIXES = (
     "go_",
@@ -35,7 +35,7 @@ EXPORTER_GENERIC_PREFIXES = (
     "net_conntrack_",
 )
 
-# Exporters where the software IS the thing being monitored — their go_*/process_*
+# Exporters where the software IS the thing being monitored - their go_*/process_*
 # metrics are legitimate business metrics (GC pressure, goroutine leaks, etc.)
 # and must NOT be filtered out.
 NATIVE_EXPORTERS = {
@@ -56,7 +56,7 @@ PROMQL_KEYWORDS = {
     "sort", "sort_desc", "inf", "nan",
 }
 
-# Precompiled once — these run on every line of every exporter fixture.
+# Precompiled once - these run on every line of every exporter fixture.
 RE_SAMPLE       = re.compile(r"^(\S+?)(\{[^}]*\})?\s+(.+)$")
 RE_LABEL        = re.compile(r'(\w+)="[^"]*"')
 RE_FIRST_LINE   = re.compile(r"^(# HELP|# TYPE|\w+[{ ])")

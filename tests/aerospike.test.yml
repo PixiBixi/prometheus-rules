@@ -28,7 +28,7 @@ tests:
               severity: critical
             exp_annotations:
               summary: "AS - Stop Write Limit close for mynamespace @ as1 (< 15%)"
-              description: "AS stop write threshold (aerospike_namespace_stop_writes_pct) for ns=mynamespace @ as1 is nearly reached — only 15% remaining before writes are blocked."
+              description: "AS stop write threshold (aerospike_namespace_stop_writes_pct) for ns=mynamespace @ as1 is nearly reached - only 15% remaining before writes are blocked."
 
   - interval: 1m
     name: stays silent well below the threshold

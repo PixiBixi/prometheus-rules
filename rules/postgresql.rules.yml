@@ -155,7 +155,7 @@
         severity: warning
       annotations:
         summary: "PostgreSQL too many dead tuples (instance {{ $labels.instance }})"
-        description: "Dead tuples ratio >= 10% on {{ $labels.instance }} table {{ $labels.relname }} — VACUUM may be needed"
+        description: "Dead tuples ratio >= 10% on {{ $labels.instance }} table {{ $labels.relname }} - VACUUM may be needed"
 
     - alert: PostgresqlTooManyLocksAcquired
       # All pg_* metrics carry `server`; aggregate to the same label set on both
@@ -169,7 +169,7 @@
         severity: critical
       annotations:
         summary: "PostgreSQL too many locks acquired (instance {{ $labels.instance }})"
-        description: "More than 20% of max_locks_per_transaction used on {{ $labels.instance }} — consider increasing max_locks_per_transaction"
+        description: "More than 20% of max_locks_per_transaction used on {{ $labels.instance }} - consider increasing max_locks_per_transaction"
 
     - alert: PostgresqlTableNotAutoVacuumed
       expr: |
@@ -189,7 +189,7 @@
         severity: warning
       annotations:
         summary: "PostgreSQL unused replication slot (instance {{ $labels.instance }})"
-        description: "Inactive replication slot on {{ $labels.instance }} — will prevent WAL cleanup and may fill disk"
+        description: "Inactive replication slot on {{ $labels.instance }} - will prevent WAL cleanup and may fill disk"
 
     - alert: PostgresqlBloatIndexHigh
       expr: pg_bloat_btree_bloat_pct > 80 and on (idxname) (pg_bloat_btree_real_size > 100000000)
@@ -198,7 +198,7 @@
         severity: warning
       annotations:
         summary: "PostgreSQL bloat index high (instance {{ $labels.instance }})"
-        description: "Index {{ $labels.idxname }} bloat > 80% on {{ $labels.instance }} — run: REINDEX INDEX CONCURRENTLY {{ $labels.idxname }}"
+        description: "Index {{ $labels.idxname }} bloat > 80% on {{ $labels.instance }} - run: REINDEX INDEX CONCURRENTLY {{ $labels.idxname }}"
 
     - alert: PostgresqlBloatTableHigh
       expr: pg_bloat_table_bloat_pct > 80 and on (relname) (pg_bloat_table_real_size > 200000000)
@@ -207,7 +207,7 @@
         severity: warning
       annotations:
         summary: "PostgreSQL bloat table high (instance {{ $labels.instance }})"
-        description: "Table {{ $labels.relname }} bloat > 80% on {{ $labels.instance }} — run: VACUUM {{ $labels.relname }}"
+        description: "Table {{ $labels.relname }} bloat > 80% on {{ $labels.instance }} - run: VACUUM {{ $labels.relname }}"
 
     - alert: PostgresqlInvalidIndex
       expr: pg_general_index_info_pg_relation_size{indexrelname=~".*ccnew.*"}
@@ -216,7 +216,7 @@
         severity: warning
       annotations:
         summary: "PostgreSQL invalid index (instance {{ $labels.instance }})"
-        description: "Table {{ $labels.relname }} has invalid index {{ $labels.indexrelname }} on {{ $labels.instance }} — run: DROP INDEX {{ $labels.indexrelname }}"
+        description: "Table {{ $labels.relname }} has invalid index {{ $labels.indexrelname }} on {{ $labels.instance }} - run: DROP INDEX {{ $labels.indexrelname }}"
 
     - alert: PostgresExporterScrapeFailed
       expr: pg_exporter_last_scrape_error == 1
@@ -294,7 +294,7 @@
         severity: critical
       annotations:
         summary: "PostgreSQL checksum failures (database {{ $labels.datname }})"
-        description: "Data checksum failure detected on {{ $labels.datname }} — possible disk corruption."
+        description: "Data checksum failure detected on {{ $labels.datname }} - possible disk corruption."
 
     - alert: PostgresTempFilesHigh
       expr: |
@@ -307,7 +307,7 @@
         severity: warning
       annotations:
         summary: "PostgreSQL temp files high (database {{ $labels.datname }})"
-        description: "Database {{ $labels.datname }} projected to write more than 50% of its size in temp files per hour ({{ $value | humanizePercentage }}) — query memory pressure, check work_mem."
+        description: "Database {{ $labels.datname }} projected to write more than 50% of its size in temp files per hour ({{ $value | humanizePercentage }}) - query memory pressure, check work_mem."
 
     - alert: PostgresBackendFsyncHigh
       expr: rate(pg_stat_bgwriter_buffers_backend_fsync_total[5m]) > 0
@@ -316,7 +316,7 @@
         severity: warning
       annotations:
         summary: "PostgreSQL backend fsync high (instance {{ $labels.instance }})"
-        description: "Backend processes are performing fsync themselves on {{ $labels.instance }} — bgwriter cannot keep up."
+        description: "Backend processes are performing fsync themselves on {{ $labels.instance }} - bgwriter cannot keep up."
 
     - alert: PostgresDatabaseSizeGrowthHigh
       expr: |

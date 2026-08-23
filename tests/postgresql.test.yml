@@ -48,7 +48,7 @@ tests:
               severity: critical
             exp_annotations:
               summary: "PostgreSQL too many locks acquired (instance pg1)"
-              description: "More than 20% of max_locks_per_transaction used on pg1 — consider increasing max_locks_per_transaction"
+              description: "More than 20% of max_locks_per_transaction used on pg1 - consider increasing max_locks_per_transaction"
 
   - interval: 1m
     name: a lightly loaded server triggers neither alert
