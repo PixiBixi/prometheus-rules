@@ -26,7 +26,7 @@ tests:
               severity: critical
             exp_annotations:
               summary: "MySQL connection errors (max_connections) on db1"
-              description: "db1 of job mysql is rejecting connections (max_connections) — clients are being refused"
+              description: "db1 of job mysql is rejecting connections (max_connections) - clients are being refused"
       - alertname: MysqlConnectionErrors
         eval_time: 10m
         exp_alerts: []

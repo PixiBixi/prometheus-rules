@@ -34,7 +34,7 @@ tests:
               instance: "https://example.com"
               severity: critical
             exp_annotations:
-              summary: "Blackbox probe failed — blackbox-http @ https://example.com"
+              summary: "Blackbox probe failed - blackbox-http @ https://example.com"
               description: "Probe blackbox-http failed on https://example.com"
 
   # PostgresDeadlockHigh was merged into PostgresqlDeadLocks.

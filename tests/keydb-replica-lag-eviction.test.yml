@@ -73,7 +73,7 @@ tests:
               severity: warning
             exp_annotations:
               summary: "Redis is evicting keys on keydb-1"
-              description: "200 keys evicted in 5m on keydb-1. maxmemory is being enforced and data is being discarded — not a cache-by-design fleet, so this is loss rather than housekeeping."
+              description: "200 keys evicted in 5m on keydb-1. maxmemory is being enforced and data is being discarded - not a cache-by-design fleet, so this is loss rather than housekeeping."
 
   # The state of all 221 production instances: a counter that has never moved.
   - interval: 1m

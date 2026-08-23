@@ -43,4 +43,4 @@
         severity: warning
       annotations:
         summary: "Stackdriver exporter high API calls (project {{ $labels.project_id }})"
-        description: "{{ $value }} API calls/min for project {{ $labels.project_id }} — may hit GCP quota"
+        description: "{{ $value }} API calls/min for project {{ $labels.project_id }} - may hit GCP quota"

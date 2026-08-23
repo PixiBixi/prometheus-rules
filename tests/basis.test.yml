@@ -103,7 +103,7 @@ tests:
           - exp_labels: {alertname: CPUwaitIO, instance: h1, job: node-exporter, severity: critical}
             exp_annotations:
               summary: "High IOWait (20%) on h1"
-              description: "CPU time spent waiting on I/O is above 10% on h1 — check disk latency and saturation"
+              description: "CPU time spent waiting on I/O is above 10% on h1 - check disk latency and saturation"
 
   # NodeSystemdNotRunning is opt-in: 45% of the live fleet reports systemd
   # degraded while no failed unit is visible through node_systemd_unit_state,

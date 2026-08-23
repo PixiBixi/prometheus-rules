@@ -49,7 +49,7 @@
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} is rejecting connections ({{ $labels.error }}) — clients are being refused"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} is rejecting connections ({{ $labels.error }}) - clients are being refused"
         summary: "MySQL connection errors ({{ $labels.error }}) on {{ $labels.instance }}"
     - alert: MysqlConnectionErrors
       expr: |
@@ -122,7 +122,7 @@
         severity: warning
       annotations:
         summary: "MySQL InnoDB log writes stalling (instance {{ $labels.instance }})"
-        description: "More than 1% of InnoDB log write requests are waiting for disk on {{ $labels.instance }} ({{ $value | humanizePercentage }}) — consider increasing innodb_log_buffer_size"
+        description: "More than 1% of InnoDB log write requests are waiting for disk on {{ $labels.instance }} ({{ $value | humanizePercentage }}) - consider increasing innodb_log_buffer_size"
 
     - alert: MysqlTooManyConnections
       expr: max_over_time(mysql_global_status_threads_connected[1m]) / mysql_global_variables_max_connections * 100 > 80 and mysql_global_variables_max_connections > 0
@@ -176,7 +176,7 @@
         severity: warning
       annotations:
         summary: "MySQL InnoDB force recovery enabled (instance {{ $labels.instance }})"
-        description: "innodb_force_recovery is enabled on {{ $labels.instance }} — should only be set temporarily for crash recovery"
+        description: "innodb_force_recovery is enabled on {{ $labels.instance }} - should only be set temporarily for crash recovery"
 
     - alert: MysqlInnodbHistoryLenTooLong
       expr: mysql_info_schema_innodb_metrics_transaction_trx_rseg_history_len > 50000
@@ -185,5 +185,5 @@
         severity: warning
       annotations:
         summary: "MySQL InnoDB history_len too long (instance {{ $labels.instance }})"
-        description: "InnoDB undo log (history_len) is too long ({{ $value }}) on {{ $labels.instance }} — long-running transactions suspected"
+        description: "InnoDB undo log (history_len) is too long ({{ $value }}) on {{ $labels.instance }} - long-running transactions suspected"
 

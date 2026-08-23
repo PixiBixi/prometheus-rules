@@ -1,5 +1,5 @@
 - name: prometheus.records
-  # Expensive full-series scan; evaluate infrequently — cardinality moves slowly.
+  # Expensive full-series scan; evaluate infrequently - cardinality moves slowly.
   # `count by (__name__)` is index-only work, so the cost is bounded, but this is
   # still the most expensive query in the repo. Do not lower this interval.
   interval: 10m
@@ -9,7 +9,7 @@
     #
     # Both records below are excluded from the scan. name:tsdb_series:count
     # emits one series per distinct metric name, so counting itself reports the
-    # number of metric names in the TSDB, filed under its own name — a
+    # number of metric names in the TSDB, filed under its own name - a
     # monitoring artifact nobody can act on, and one that grows with every
     # metric added. tsdb_series:total is the same class of artifact.
     - record: name:tsdb_series:count

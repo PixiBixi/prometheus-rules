@@ -341,7 +341,7 @@
         severity: warning
       annotations:
         summary: "Kubernetes HPA metrics unavailable ({{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler }})"
-        description: "HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler }} cannot collect metrics — autoscaling is inactive"
+        description: "HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler }} cannot collect metrics - autoscaling is inactive"
 
     # ── API Server ────────────────────────────────────────────────────────────
 

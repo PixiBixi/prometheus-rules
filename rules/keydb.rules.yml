@@ -139,4 +139,4 @@
         severity: warning
       annotations:
         summary: "Redis is evicting keys on {{ $labels.instance }}"
-        description: "{{ $value | printf \"%.0f\" }} keys evicted in 5m on {{ $labels.instance }}. maxmemory is being enforced and data is being discarded — not a cache-by-design fleet, so this is loss rather than housekeeping."
+        description: "{{ $value | printf \"%.0f\" }} keys evicted in 5m on {{ $labels.instance }}. maxmemory is being enforced and data is being discarded - not a cache-by-design fleet, so this is loss rather than housekeeping."

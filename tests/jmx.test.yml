@@ -32,7 +32,7 @@ tests:
           - exp_labels: {alertname: JvmHeapMemoryCritical, instance: kafka1, severity: critical}
             exp_annotations:
               summary: "JVM heap memory critical (instance kafka1)"
-              description: "JVM heap memory above 90% on kafka1 — raise -Xmx or investigate a leak\n  VALUE = 95"
+              description: "JVM heap memory above 90% on kafka1 - raise -Xmx or investigate a leak\n  VALUE = 95"
       - alertname: JvmOldGenGcFrequency
         eval_time: 8m
         exp_alerts:

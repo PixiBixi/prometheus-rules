@@ -3,13 +3,13 @@
 
 Our rule files start with '- name:' (a bare list) rather than the canonical
 'groups:' wrapper. This script writes 'groups:'-wrapped copies into a temp
-directory — keeping each file's original basename so promtool's output stays
-readable — then validates them all in a single promtool invocation.
+directory - keeping each file's original basename so promtool's output stays
+readable - then validates them all in a single promtool invocation.
 
 Lint issues (e.g. duplicate rules) are always printed: promtool reports them on
 stdout but exits 0, so they used to pass unnoticed. They are non-blocking by
 default because promtool's duplicate-rules lint only compares record name and
-static labels — recording rules deliberately split over disjoint selectors trip
+static labels - recording rules deliberately split over disjoint selectors trip
 it as false positives. Pass --strict to make them fail the run.
 
 Exits 0 if all files are valid (or promtool is not installed).
@@ -33,7 +33,7 @@ def main():
     strict = "--strict" in sys.argv[1:]
 
     if not promtool_available():
-        print("Warning: promtool not found — skipping PromQL validation.")
+        print("Warning: promtool not found - skipping PromQL validation.")
         print("Install: brew install prometheus  or  https://github.com/prometheus/prometheus/releases")
         sys.exit(0)
 
@@ -55,7 +55,7 @@ def main():
             stderr=subprocess.STDOUT,  # keep FAILED blocks next to their file
             text=True,
         )
-        # promtool echoes the temp paths it was handed — point them back at the
+        # promtool echoes the temp paths it was handed - point them back at the
         # real sources so the output is actionable.
         output = result.stdout.replace(tmpdir + os.sep, "rules/")
 

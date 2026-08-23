@@ -18,7 +18,7 @@
       labels:
         severity: critical
       annotations:
-        summary: "MongoDB exporter down — {{ $labels.job }} @ {{ $labels.instance }}"
+        summary: "MongoDB exporter down - {{ $labels.job }} @ {{ $labels.instance }}"
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
 
     - alert: MongodbDown

@@ -37,7 +37,7 @@ tests:
               job: hap
               severity: warning
             exp_annotations:
-              summary: "HAProxy connection rate near limit — h1"
+              summary: "HAProxy connection rate near limit - h1"
               description: "HAProxy connection rate at 80% of limit on h1"
 
   # current_queue is a gauge: rate() returned 0 for a queue sitting steadily at
@@ -58,7 +58,7 @@ tests:
               job: hap
               severity: warning
             exp_annotations:
-              summary: "HAProxy pending requests — p @ h1"
+              summary: "HAProxy pending requests - p @ h1"
               description: "Some HAProxy requests are pending on p @ h1 - 5.00"
 
   # Both recording rules below divided raw metrics carrying instance+job with
@@ -141,7 +141,7 @@ tests:
               job: hap
               severity: critical
             exp_annotations:
-              summary: "HAProxy high HTTP 5xx error rate — api @ h1"
+              summary: "HAProxy high HTTP 5xx error rate - api @ h1"
               description: "Too many HTTP requests with status 5xx (> 5%) on api @ h1"
       - alertname: HAproxyHighHttp5xxErrorRateServer
         eval_time: 15m
@@ -155,7 +155,7 @@ tests:
               job: hap
               severity: critical
             exp_annotations:
-              summary: "HAProxy high HTTP 5xx error rate — api/srv001 @ h1"
+              summary: "HAProxy high HTTP 5xx error rate - api/srv001 @ h1"
               description: "Too many HTTP requests with status 5xx (> 5%) on api/srv001 @ h1"
 
   # Two backends reusing the same server slot name -- the case `by (server,
@@ -189,7 +189,7 @@ tests:
               job: hap
               severity: critical
             exp_annotations:
-              summary: "HAProxy high HTTP 5xx error rate — api/srv001 @ h1"
+              summary: "HAProxy high HTTP 5xx error rate - api/srv001 @ h1"
               description: "Too many HTTP requests with status 5xx (> 5%) on api/srv001 @ h1"
 
   # server-template slots that are not provisioned sit in MAINT, so
@@ -229,7 +229,7 @@ tests:
               job: hap
               severity: critical
             exp_annotations:
-              summary: "HAProxy server down — api/srv001 @ h1"
+              summary: "HAProxy server down - api/srv001 @ h1"
               description: "Server api/srv001 @ h1 is DOWN"
 
   # stopping=1 is the normal state of a draining worker during a seamless reload
@@ -275,7 +275,7 @@ tests:
               job: hap
               severity: critical
             exp_annotations:
-              summary: "HAProxy high HTTP 5xx error rate — busy @ h1"
+              summary: "HAProxy high HTTP 5xx error rate - busy @ h1"
               description: "Too many HTTP requests with status 5xx (> 5%) on busy @ h1"
 
   # haproxy_frontend_status only ever carries DOWN and UP -- verified against
@@ -300,7 +300,7 @@ tests:
               job: hap
               severity: critical
             exp_annotations:
-              summary: "HAProxy frontend down — myproxy @ h1"
+              summary: "HAProxy frontend down - myproxy @ h1"
               description: "Frontend myproxy @ h1 is DOWN and not accepting connections"
 
   - interval: 1m

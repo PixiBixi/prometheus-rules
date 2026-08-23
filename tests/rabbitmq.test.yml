@@ -1,7 +1,7 @@
 # Tests for rules/rabbitmq.rules.yml
 #
 # Fixture is a real scrape of RabbitMQ 4.3.4's built-in rabbitmq_prometheus
-# plugin on :15692 — there is no third-party exporter for modern RabbitMQ.
+# plugin on :15692 - there is no third-party exporter for modern RabbitMQ.
 # Memory metrics are rabbitmq_process_resident_memory_bytes and
 # rabbitmq_resident_memory_limit_bytes, not the node_mem_used/limit pair some
 # community alert sets use.
@@ -22,7 +22,7 @@ tests:
         exp_alerts:
           - exp_labels: {alertname: RabbitmqMemoryAlarm, instance: rmq1, job: rabbitmq, severity: critical}
             exp_annotations:
-              summary: "RabbitMQ memory alarm on rmq1 — publishers blocked"
+              summary: "RabbitMQ memory alarm on rmq1 - publishers blocked"
               description: "RabbitMQ on rmq1 has crossed its memory watermark and is blocking all publishing connections."
 
   - interval: 1m

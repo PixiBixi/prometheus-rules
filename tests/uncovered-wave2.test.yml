@@ -70,7 +70,7 @@ tests:
               severity: warning
             exp_annotations:
               summary: "HAProxy internal errors on be_node_bidder @ proxy-1"
-              description: "3 internal errors on backend be_node_bidder @ proxy-1 in the last hour. These are HAProxy's own failures — allocation, buffers, internal state — not backend problems, and they do not show up in the health or saturation alerts."
+              description: "3 internal errors on backend be_node_bidder @ proxy-1 in the last hour. These are HAProxy's own failures (allocation, buffers, internal state), not backend problems, and they do not show up in the health or saturation alerts."
 
   - interval: 1m
     name: a backend with no internal errors stays quiet
