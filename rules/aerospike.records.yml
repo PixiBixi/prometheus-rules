@@ -1,0 +1,19 @@
+- name: aerospike.records
+  rules:
+    # Client timeouts as a percentage of client transactions. An absolute rate
+    # is not scale-aware: a few timeouts/s during a rolling restart is noise on
+    # a busy node. The > 10 tx/s floor drops idle namespaces, where two
+    # timeouts would otherwise read as a 50% ratio.
+    - record: aerospike:namespace_client_timeout:ratio5m
+      expr: |
+        100 * (
+            rate(aerospike_namespace_client_read_timeout[5m])
+          + rate(aerospike_namespace_client_write_timeout[5m])
+        )
+        / (
+            rate(aerospike_namespace_client_read_success[5m])
+          + rate(aerospike_namespace_client_write_success[5m])
+          + rate(aerospike_namespace_client_read_timeout[5m])
+          + rate(aerospike_namespace_client_write_timeout[5m])
+          > 10
+        )
