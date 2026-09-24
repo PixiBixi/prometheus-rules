@@ -5,6 +5,7 @@
 # usual stop_writes_pct of 90 it would have needed used_pct > 105.
 rule_files:
   - aerospike.rules.yml
+  - aerospike.records.yml
 
 evaluation_interval: 1m
 
@@ -41,4 +42,105 @@ tests:
     alert_rule_test:
       - alertname: DeviceCloseToStopWrite
         eval_time: 3m
+        exp_alerts: []
+
+  # A planned restart keeps a node down for 10+ minutes; it must not page.
+  - interval: 1m
+    name: a single node restarting for 12 minutes stays quiet
+    input_series:
+      - series: 'aerospike_node_up{instance="as1",job="aerospike",cluster_name="c",service="s1"}'
+        values: '0x12 1x10'
+    alert_rule_test:
+      - alertname: AerospikeDown
+        eval_time: 12m
+        exp_alerts: []
+      - alertname: AerospikeMultipleNodesDown
+        eval_time: 12m
+        exp_alerts: []
+
+  - interval: 1m
+    name: two nodes down at once pages
+    input_series:
+      - series: 'aerospike_node_up{instance="as1",job="aerospike",cluster_name="c",service="s1"}'
+        values: '0x10'
+      - series: 'aerospike_node_up{instance="as2",job="aerospike",cluster_name="c",service="s2"}'
+        values: '0x10'
+      - series: 'aerospike_node_up{instance="as3",job="aerospike",cluster_name="c",service="s3"}'
+        values: '1x10'
+    alert_rule_test:
+      - alertname: AerospikeMultipleNodesDown
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeMultipleNodesDown
+              job: aerospike
+              cluster_name: c
+              severity: critical
+            exp_annotations:
+              summary: "AS - 2 nodes down on c"
+              description: "2 nodes of cluster c are down at the same time. With replication factor 2, some partitions have no copy left."
+
+  # The flag oscillates on a threshold: a raw == 1 resolved and re-paged on
+  # every blip. Evaluated here on a scrape where the flag reads 0.
+  - interval: 1m
+    name: an oscillating stop-writes flag stays one firing alert
+    input_series:
+      - series: 'aerospike_namespace_stop_writes{job="aerospike",ns="n1",cluster_name="c",service="s1"}'
+        values: '1 0 0 1 0 0 1 0 0 1 0 0 1 0 0'
+    alert_rule_test:
+      - alertname: NamespaceIsDownWrite
+        eval_time: 11m
+        exp_alerts:
+          - exp_labels:
+              alertname: NamespaceIsDownWrite
+              job: aerospike
+              ns: n1
+              cluster_name: c
+              severity: critical
+            exp_annotations:
+              summary: "AS - Down write for n1 @ c"
+              description: "AS can't write any bin on n1 @ c, please dig ASAP"
+
+  # 10 timeouts/s against 100 successes/s: 9.09% of transactions.
+  - interval: 1m
+    name: client timeouts above 5% of transactions page
+    input_series:
+      - series: 'aerospike_namespace_client_read_timeout{job="aerospike",ns="n1",cluster_name="c",service="s1"}'
+        values: '0+600x20'
+      - series: 'aerospike_namespace_client_read_success{job="aerospike",ns="n1",cluster_name="c",service="s1"}'
+        values: '0+6000x20'
+      - series: 'aerospike_namespace_client_write_timeout{job="aerospike",ns="n1",cluster_name="c",service="s1"}'
+        values: '0x20'
+      - series: 'aerospike_namespace_client_write_success{job="aerospike",ns="n1",cluster_name="c",service="s1"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: AerospikeNamespaceClientTimeoutsCritical
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeNamespaceClientTimeoutsCritical
+              job: aerospike
+              ns: n1
+              cluster_name: c
+              service: s1
+              severity: critical
+            exp_annotations:
+              summary: "AS - Client timeouts critical for n1 @ c"
+              description: "9.09% of client transactions on n1 @ c time out (> 5%)"
+
+  # 1 timeout/s against 1 success/s is 50%, but below the 10 tx/s floor.
+  - interval: 1m
+    name: client timeouts on an idle namespace stay quiet
+    input_series:
+      - series: 'aerospike_namespace_client_read_timeout{job="aerospike",ns="n2",cluster_name="c",service="s1"}'
+        values: '0+60x20'
+      - series: 'aerospike_namespace_client_read_success{job="aerospike",ns="n2",cluster_name="c",service="s1"}'
+        values: '0+60x20'
+      - series: 'aerospike_namespace_client_write_timeout{job="aerospike",ns="n2",cluster_name="c",service="s1"}'
+        values: '0x20'
+      - series: 'aerospike_namespace_client_write_success{job="aerospike",ns="n2",cluster_name="c",service="s1"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: AerospikeNamespaceClientTimeoutsHigh
+        eval_time: 15m
         exp_alerts: []
