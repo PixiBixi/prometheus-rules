@@ -61,6 +61,34 @@
         summary: "Kubernetes node scheduling disabled ({{ $labels.node }})"
         description: "Node {{ $labels.node }} has been unschedulable for more than 30 minutes"
 
+    - alert: KubernetesKubeletScrapeCoverageDegraded
+      # Nodes without a cAdvisor target lose every per-pod CPU and memory series,
+      # which blinds the alerts and records built on them without any target
+      # going down. Assumes the kube-prometheus job/metrics_path/node labels.
+      expr: |
+        count by (dc, k8s_cluster_name) (
+          kube_node_info
+          unless on (dc, k8s_cluster_name, node)
+          up{job="kubelet", metrics_path="/metrics/cadvisor"}
+        ) >= 2
+        and on (dc, k8s_cluster_name)
+        avg_over_time(
+          (
+            count by (dc, k8s_cluster_name) (
+              kube_node_info
+              unless on (dc, k8s_cluster_name, node)
+              up{job="kubelet", metrics_path="/metrics/cadvisor"}
+            )
+            / count by (dc, k8s_cluster_name) (kube_node_info)
+          )[30m:1m]
+        ) > 0.05
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kubernetes kubelet scrape coverage degraded"
+        description: "{{ $value }} nodes have no kubelet cAdvisor scrape target, so per-pod CPU and memory metrics are missing for them"
+
     # ── Pods & Containers ─────────────────────────────────────────────────────
 
     - alert: KubernetesPodNotHealthy
@@ -95,6 +123,43 @@
       annotations:
         summary: "Kubernetes container OOMKilled ({{ $labels.namespace }}/{{ $labels.pod }})"
         description: "Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes"
+
+    # ── Resource requests ─────────────────────────────────────────────────────
+    # FinOps signal, never a page: averaged per namespace over 6h, since request
+    # sizing is a workload-wide change. The absolute floor (500m CPU, 1Gi memory
+    # unused) keeps small controllers quiet, where the saving is not worth a change.
+
+    - alert: KubernetesNamespaceCpuRequestUnderused
+      expr: |
+        avg_over_time(kube_namespace_cpu5m_request_ratio[6h]) < 0.1
+        and on (dc, k8s_cluster_name, namespace)
+        (
+          sum by (dc, k8s_cluster_name, namespace) (kube_namespace_cpu_request)
+          - sum by (dc, k8s_cluster_name, namespace) (avg_over_time(kube_container_cpu_usage_5m[6h]))
+          > 0.5
+        )
+      for: 6h
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kubernetes namespace CPU request underused ({{ $labels.namespace }})"
+        description: "Namespace {{ $labels.namespace }} has averaged {{ $value | humanizePercentage }} of its CPU request over the last 6h - consider lowering requests"
+
+    - alert: KubernetesNamespaceMemoryRequestUnderused
+      expr: |
+        avg_over_time(kube_namespace_memory_request_ratio[6h]) < 0.1
+        and on (dc, k8s_cluster_name, namespace)
+        (
+          sum by (dc, k8s_cluster_name, namespace) (kube_namespace_memory_request)
+          - sum by (dc, k8s_cluster_name, namespace) (avg_over_time(kube_container_memory_usage[6h]))
+          > 1024 * 1024 * 1024
+        )
+      for: 6h
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kubernetes namespace memory request underused ({{ $labels.namespace }})"
+        description: "Namespace {{ $labels.namespace }} has averaged {{ $value | humanizePercentage }} of its memory request over the last 6h - consider lowering requests"
 
     # ── Deployments & StatefulSets ────────────────────────────────────────────
 

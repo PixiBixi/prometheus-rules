@@ -1,6 +1,7 @@
 # Regression tests for rules/kubernetes.rules.yml
 rule_files:
   - kubernetes.rules.yml
+  - k8s.records.yml
 
 evaluation_interval: 1m
 
@@ -205,3 +206,110 @@ tests:
             exp_annotations:
               summary: "Kubernetes job slow completion (batch/etl)"
               description: "Job batch/etl did not complete within 12 hours"
+
+  # 0.1 CPU used out of 2 requested: 5% of the request, 1.9 CPU idle.
+  - interval: 1m
+    name: a namespace far below its CPU request is flagged
+    input_series:
+      - series: 'kube_pod_container_resource_requests{resource="cpu",namespace="ns-idle",pod="p1",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '2x800'
+      - series: 'kube_pod_container_status_running{namespace="ns-idle",pod="p1",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1"}'
+        values: '1x800'
+      - series: 'container_cpu_usage_seconds_total{namespace="ns-idle",pod="p1",container="app",image="app:1",instance="n1",job="kubelet",dc="dc1",k8s_cluster_name="c1"}'
+        values: '0+6x800'
+    alert_rule_test:
+      - alertname: KubernetesNamespaceCpuRequestUnderused
+        eval_time: 7h
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesNamespaceCpuRequestUnderused
+              dc: dc1
+              k8s_cluster_name: c1
+              namespace: ns-idle
+              severity: warning
+            exp_annotations:
+              summary: "Kubernetes namespace CPU request underused (ns-idle)"
+              description: "Namespace ns-idle has averaged 5% of its CPU request over the last 6h - consider lowering requests"
+
+  # 1m used out of 50m: 2% of the request, but only 49m to reclaim.
+  - interval: 1m
+    name: a small controller below the absolute floor stays quiet
+    input_series:
+      - series: 'kube_pod_container_resource_requests{resource="cpu",namespace="ns-small",pod="p1",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '0.05x800'
+      - series: 'kube_pod_container_status_running{namespace="ns-small",pod="p1",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1"}'
+        values: '1x800'
+      - series: 'container_cpu_usage_seconds_total{namespace="ns-small",pod="p1",container="app",image="app:1",instance="n1",job="kubelet",dc="dc1",k8s_cluster_name="c1"}'
+        values: '0+0.06x800'
+    alert_rule_test:
+      - alertname: KubernetesNamespaceCpuRequestUnderused
+        eval_time: 7h
+        exp_alerts: []
+
+  # 100Mi working set out of a 4Gi request.
+  - interval: 1m
+    name: a namespace far below its memory request is flagged
+    input_series:
+      - series: 'kube_pod_container_resource_requests{resource="cpu",namespace="ns-fat",pod="p1",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '1x800'
+      - series: 'kube_pod_container_resource_requests{resource="memory",namespace="ns-fat",pod="p1",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '4294967296x800'
+      - series: 'kube_pod_container_status_running{namespace="ns-fat",pod="p1",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1"}'
+        values: '1x800'
+      - series: 'container_cpu_usage_seconds_total{namespace="ns-fat",pod="p1",container="app",image="app:1",instance="n1",job="kubelet",dc="dc1",k8s_cluster_name="c1"}'
+        values: '0+60x800'
+      - series: 'container_memory_working_set_bytes{namespace="ns-fat",pod="p1",container="app",image="app:1",instance="n1",job="kubelet",dc="dc1",k8s_cluster_name="c1"}'
+        values: '104857600x800'
+    alert_rule_test:
+      - alertname: KubernetesNamespaceMemoryRequestUnderused
+        eval_time: 7h
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesNamespaceMemoryRequestUnderused
+              dc: dc1
+              k8s_cluster_name: c1
+              namespace: ns-fat
+              severity: warning
+            exp_annotations:
+              summary: "Kubernetes namespace memory request underused (ns-fat)"
+              description: "Namespace ns-fat has averaged 2.441% of its memory request over the last 6h - consider lowering requests"
+
+  - interval: 1m
+    name: nodes without a cAdvisor target are detected
+    input_series:
+      - series: 'kube_node_info{node="n1",instance="ksm",job="ksm"}'
+        values: '1x30'
+      - series: 'kube_node_info{node="n2",instance="ksm",job="ksm"}'
+        values: '1x30'
+      - series: 'kube_node_info{node="n3",instance="ksm",job="ksm"}'
+        values: '1x30'
+      - series: 'kube_node_info{node="n4",instance="ksm",job="ksm"}'
+        values: '1x30'
+      - series: 'up{node="n1",instance="10.0.0.1:10250",job="kubelet",metrics_path="/metrics/cadvisor"}'
+        values: '1x30'
+      - series: 'up{node="n2",instance="10.0.0.2:10250",job="kubelet",metrics_path="/metrics/cadvisor"}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: KubernetesKubeletScrapeCoverageDegraded
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesKubeletScrapeCoverageDegraded
+              severity: warning
+            exp_annotations:
+              summary: "Kubernetes kubelet scrape coverage degraded"
+              description: "2 nodes have no kubelet cAdvisor scrape target, so per-pod CPU and memory metrics are missing for them"
+
+  - interval: 1m
+    name: a single node without a cAdvisor target stays quiet
+    input_series:
+      - series: 'kube_node_info{node="n1",instance="ksm",job="ksm"}'
+        values: '1x30'
+      - series: 'kube_node_info{node="n2",instance="ksm",job="ksm"}'
+        values: '1x30'
+      - series: 'up{node="n1",instance="10.0.0.1:10250",job="kubelet",metrics_path="/metrics/cadvisor"}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: KubernetesKubeletScrapeCoverageDegraded
+        eval_time: 20m
+        exp_alerts: []
