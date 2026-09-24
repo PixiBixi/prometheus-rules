@@ -20,16 +20,31 @@
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
         summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
     - alert: AerospikeDown
+      # A restart keeps a node down through cold start, index rebuild and
+      # migrations, 10+ minutes on a large dataset, so 2m paged on every planned
+      # rolling restart. Losing two nodes at once is AerospikeMultipleNodesDown.
       expr: sum(aerospike_node_up) by (job,instance,cluster_name) == 0
-      for: 2m
+      for: 30m
       labels:
         severity: critical
       annotations:
         description: "{{ $labels.instance }} of cluster {{ $labels.cluster_name }} has been down for more than 2 minutes."
         summary: "Node {{ $labels.instance }} having an issue on {{ $labels.cluster_name }}"
+    - alert: AerospikeMultipleNodesDown
+      # Replication factor 2 loses data at two nodes down. A rolling restart
+      # takes one node at a time, so this stays quiet during maintenance.
+      expr: count by (job, cluster_name) (aerospike_node_up == 0) >= 2
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - {{ $value }} nodes down on {{ $labels.cluster_name }}"
+        description: "{{ $value }} nodes of cluster {{ $labels.cluster_name }} are down at the same time. With replication factor 2, some partitions have no copy left."
     - alert: NamespaceIsDownWrite
-      expr: sum(aerospike_namespace_stop_writes) by (cluster_name,ns,job) > 0
-      for: 1m
+      # The flag oscillates while a node sits on a threshold, which paged once
+      # per blip. The 15m window coalesces one outage into a single alert.
+      expr: sum(max_over_time(aerospike_namespace_stop_writes[15m])) by (cluster_name,ns,job) > 0
+      for: 3m
       labels:
         severity: critical
       annotations:
@@ -91,6 +106,22 @@
       annotations:
         summary: "AS - Clock skew critical on {{ $labels.instance }} (> 40s)"
         description: "Ensure clocks are synchronized across the cluster. {{ $labels.instance }} clock skew > 40s - writes may be stopped"
+    - alert: AerospikeNamespaceClientTimeoutsHigh
+      expr: aerospike:namespace_client_timeout:ratio5m > 1
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - Client timeouts high for {{ $labels.ns }} @ {{ $labels.cluster_name }}"
+        description: "{{ $value | printf \"%.2f\" }}% of client transactions on {{ $labels.ns }} @ {{ $labels.cluster_name }} time out (> 1%)"
+    - alert: AerospikeNamespaceClientTimeoutsCritical
+      expr: aerospike:namespace_client_timeout:ratio5m > 5
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Client timeouts critical for {{ $labels.ns }} @ {{ $labels.cluster_name }}"
+        description: "{{ $value | printf \"%.2f\" }}% of client transactions on {{ $labels.ns }} @ {{ $labels.cluster_name }} time out (> 5%)"
     - alert: LowHeapEfficiency
       expr: sum(aerospike_node_stats_heap_efficiency_pct) by (instance) < 50
       for: 1m
