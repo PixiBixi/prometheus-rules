@@ -1,0 +1,35 @@
+# Regression tests for rules/external-dns.rules.yml
+rule_files:
+  - external-dns.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: sustained reconciliation failures page
+    input_series:
+      - series: 'external_dns_controller_consecutive_soft_errors{job="external-dns",namespace="external-dns",instance="10.0.0.1:7979",pod="external-dns-0"}'
+        values: '0 1+1x20'
+    alert_rule_test:
+      - alertname: ExternalDnsReconciliationFailing
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: ExternalDnsReconciliationFailing
+              job: external-dns
+              namespace: external-dns
+              severity: critical
+            exp_annotations:
+              summary: "external-dns failing to reconcile (external-dns)"
+              description: "external-dns in external-dns reports 15 consecutive failed reconciliations. DNS records are no longer created, updated or deleted. Check the DNS provider credentials and API quota."
+
+  # A provider API blip: a few failed loops, then a success resets the counter.
+  - interval: 1m
+    name: a short provider blip stays quiet
+    input_series:
+      - series: 'external_dns_controller_consecutive_soft_errors{job="external-dns",namespace="external-dns",instance="10.0.0.1:7979",pod="external-dns-0"}'
+        values: '0 1 2 3 0x20'
+    alert_rule_test:
+      - alertname: ExternalDnsReconciliationFailing
+        eval_time: 15m
+        exp_alerts: []

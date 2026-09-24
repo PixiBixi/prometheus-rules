@@ -1,0 +1,13 @@
+- name: external-dns.rules
+  rules:
+    # external-dns keeps its pods Running while every reconciliation fails, and
+    # existing records stay in place, so nothing breaks until a record must
+    # change. The counter sits at 0 in steady state: no ratio or floor needed.
+    - alert: ExternalDnsReconciliationFailing
+      expr: max by (job, namespace) (external_dns_controller_consecutive_soft_errors) > 0
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "external-dns failing to reconcile ({{ $labels.namespace }})"
+        description: "external-dns in {{ $labels.namespace }} reports {{ $value }} consecutive failed reconciliations. DNS records are no longer created, updated or deleted. Check the DNS provider credentials and API quota."
