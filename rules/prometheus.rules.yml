@@ -124,6 +124,16 @@
       annotations:
         summary: "Prometheus rule evaluation slow (instance {{ $labels.instance }})"
         description: "Prometheus rule evaluation took more time than the scheduled interval. It indicates a slower storage backend access or too complex query."
+    - alert: PrometheusRuleGroupIterationsMissed
+      # Complements PrometheusRuleEvaluationSlow: one slow cycle trips that one,
+      # whereas a missed iteration is a gap that ends up in the recorded series.
+      expr: sum by (job, instance, rule_group) (rate(prometheus_rule_group_iterations_missed_total[5m])) > 0
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus rule group missing iterations (instance {{ $labels.instance }})"
+        description: "Rule group {{ $labels.rule_group }} takes longer than its interval to evaluate and skips iterations, so its recording rules and alerts have gaps."
     - alert: PrometheusNotificationsBacklog
       expr: min_over_time(prometheus_notifications_queue_length[10m]) > 0
       labels:
@@ -216,6 +226,22 @@
       annotations:
         summary: "Prometheus TSDB WAL corruptions (instance {{ $labels.instance }})"
         description: "Prometheus encountered {{ $value }} TSDB WAL corruptions"
+    - alert: PrometheusTsdbMmapChunkCorruptions
+      # Same data loss as a WAL corruption, on the head chunks mmapped to disk.
+      expr: increase(prometheus_tsdb_mmap_chunk_corruptions_total[5m]) > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus TSDB mmap chunk corruptions (instance {{ $labels.instance }})"
+        description: "Prometheus encountered {{ $value }} corrupted mmapped head chunks, which is unrecoverable local data loss"
+    - alert: PrometheusTsdbWalWritesFailed
+      # Usually a full volume or a failing disk: every sample after this is lost.
+      expr: increase(prometheus_tsdb_wal_writes_failed_total[5m]) > 0
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus TSDB WAL writes failed (instance {{ $labels.instance }})"
+        description: "Prometheus failed {{ $value }} WAL writes in the last 5 minutes. Check the free space and health of its data volume."
     - alert: PrometheusTsdbWalTruncationsFailed
       expr: increase(prometheus_tsdb_wal_truncations_failed_total[5m]) > 0
       labels:
@@ -268,6 +294,21 @@
       annotations:
         summary: "Prometheus remote write shards at max (instance {{ $labels.instance }})"
         description: "Prometheus remote write queue for remote_name={{ $labels.remote_name }} is running at max shards ({{ $value }}). The queue is saturated and samples may be dropped."
+    - alert: PrometheusRemoteWriteBehind
+      # Measured against the newest ingested sample, not time(): the queue is
+      # behind the TSDB, whatever the scrape activity. From the upstream mixin.
+      expr: |
+        (
+          max_over_time(prometheus_remote_storage_highest_timestamp_in_seconds[5m])
+          - ignoring (remote_name, url) group_right
+          max_over_time(prometheus_remote_storage_queue_highest_sent_timestamp_seconds[5m])
+        ) > 300
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus remote write behind (instance {{ $labels.instance }})"
+        description: "Prometheus remote write to remote_name={{ $labels.remote_name }} is {{ $value | humanizeDuration }} behind the newest ingested sample. The remote storage is missing recent data."
     - alert: PrometheusQueryEngineBusy
       expr: prometheus_engine_queries >= prometheus_engine_queries_concurrent_max
       for: 1m
