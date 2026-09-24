@@ -60,3 +60,91 @@ tests:
             exp_annotations:
               summary: "Prometheus remote write dropping samples (instance p1)"
               description: "Prometheus is dropping samples for remote_name=thanos, reason=too_old (16.67 samples/s lost)"
+
+  # A slow cycle alone does not skip an iteration; only a real gap may fire.
+  - interval: 1m
+    name: missed rule group iterations are detected
+    input_series:
+      - series: 'prometheus_rule_group_iterations_missed_total{instance="p1",job="prom",rule_group="/etc/prometheus/rules.yml;heavy"}'
+        values: '0+1x30'
+      - series: 'prometheus_rule_group_iterations_missed_total{instance="p1",job="prom",rule_group="/etc/prometheus/rules.yml;light"}'
+        values: '0x30'
+    alert_rule_test:
+      - alertname: PrometheusRuleGroupIterationsMissed
+        eval_time: 25m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusRuleGroupIterationsMissed
+              instance: p1
+              job: prom
+              rule_group: "/etc/prometheus/rules.yml;heavy"
+              severity: warning
+            exp_annotations:
+              summary: "Prometheus rule group missing iterations (instance p1)"
+              description: "Rule group /etc/prometheus/rules.yml;heavy takes longer than its interval to evaluate and skips iterations, so its recording rules and alerts have gaps."
+
+  - interval: 1m
+    name: mmap chunk corruption and WAL write failures page
+    input_series:
+      - series: 'prometheus_tsdb_mmap_chunk_corruptions_total{instance="p1",job="prom"}'
+        values: '0 0 0 1 1 1'
+      - series: 'prometheus_tsdb_wal_writes_failed_total{instance="p1",job="prom"}'
+        values: '0 0 0 2 2 2'
+    alert_rule_test:
+      - alertname: PrometheusTsdbMmapChunkCorruptions
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusTsdbMmapChunkCorruptions
+              instance: p1
+              job: prom
+              severity: critical
+            exp_annotations:
+              summary: "Prometheus TSDB mmap chunk corruptions (instance p1)"
+              description: "Prometheus encountered 1 corrupted mmapped head chunks, which is unrecoverable local data loss"
+      - alertname: PrometheusTsdbWalWritesFailed
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusTsdbWalWritesFailed
+              instance: p1
+              job: prom
+              severity: critical
+            exp_annotations:
+              summary: "Prometheus TSDB WAL writes failed (instance p1)"
+              description: "Prometheus failed 2 WAL writes in the last 5 minutes. Check the free space and health of its data volume."
+
+  # Sent timestamp frozen while ingestion keeps moving: the queue is stuck.
+  - interval: 1m
+    name: a stuck remote write queue is detected
+    input_series:
+      - series: 'prometheus_remote_storage_highest_timestamp_in_seconds{instance="p1",job="prom"}'
+        values: '1000+60x30'
+      - series: 'prometheus_remote_storage_queue_highest_sent_timestamp_seconds{instance="p1",job="prom",remote_name="thanos",url="https://x"}'
+        values: '1000x30'
+    alert_rule_test:
+      - alertname: PrometheusRemoteWriteBehind
+        eval_time: 25m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusRemoteWriteBehind
+              instance: p1
+              job: prom
+              remote_name: thanos
+              url: "https://x"
+              severity: critical
+            exp_annotations:
+              summary: "Prometheus remote write behind (instance p1)"
+              description: "Prometheus remote write to remote_name=thanos is 25m 0s behind the newest ingested sample. The remote storage is missing recent data."
+
+  - interval: 1m
+    name: a remote write queue keeping up stays quiet
+    input_series:
+      - series: 'prometheus_remote_storage_highest_timestamp_in_seconds{instance="p1",job="prom"}'
+        values: '1000+60x30'
+      - series: 'prometheus_remote_storage_queue_highest_sent_timestamp_seconds{instance="p1",job="prom",remote_name="thanos",url="https://x"}'
+        values: '990+60x30'
+    alert_rule_test:
+      - alertname: PrometheusRemoteWriteBehind
+        eval_time: 25m
+        exp_alerts: []
