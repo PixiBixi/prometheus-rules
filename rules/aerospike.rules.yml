@@ -88,6 +88,42 @@
       annotations:
         summary: "AS - Stop Write Limit close for {{ $labels.ns }} @ {{ $labels.instance }} (< 15%)"
         description: "AS stop write threshold (aerospike_namespace_stop_writes_pct) for ns={{ $labels.ns }} @ {{ $labels.instance }} is nearly reached - only 15% remaining before writes are blocked."
+    # Aerospike 7+: memory_free_pct and stop_writes_pct above no longer exist.
+    # Alert on the margin to the threshold the server enforces, not on a fill
+    # level: the 1:1 subtraction covers every storage engine and follows a
+    # per-namespace override. A threshold of 0 means disabled, hence the > 0.
+    - alert: AerospikeAvailCloseToStopWrites
+      expr: aerospike_namespace_data_avail_pct - (aerospike_namespace_storage_engine_stop_writes_avail_pct > 0) <= 15
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - avail stop-writes margin low for {{ $labels.ns }} @ {{ $labels.instance }}"
+        description: "{{ $labels.ns }} @ {{ $labels.instance }} ({{ $labels.storage_engine }}) is {{ $value | printf \"%.1f\" }} points from its avail stop-writes threshold (<= 15)"
+    - alert: AerospikeAvailCloseToStopWritesCritical
+      expr: aerospike_namespace_data_avail_pct - (aerospike_namespace_storage_engine_stop_writes_avail_pct > 0) <= 8
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - avail stop-writes margin low for {{ $labels.ns }} @ {{ $labels.instance }}"
+        description: "{{ $labels.ns }} @ {{ $labels.instance }} ({{ $labels.storage_engine }}) is {{ $value | printf \"%.1f\" }} points from its avail stop-writes threshold (<= 8)"
+    - alert: AerospikeUsedCloseToStopWrites
+      expr: (aerospike_namespace_storage_engine_stop_writes_used_pct > 0) - aerospike_namespace_data_used_pct <= 15
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - used stop-writes margin low for {{ $labels.ns }} @ {{ $labels.instance }}"
+        description: "{{ $labels.ns }} @ {{ $labels.instance }} ({{ $labels.storage_engine }}) is {{ $value | printf \"%.1f\" }} points from its used stop-writes threshold (<= 15)"
+    - alert: AerospikeUsedCloseToStopWritesCritical
+      expr: (aerospike_namespace_storage_engine_stop_writes_used_pct > 0) - aerospike_namespace_data_used_pct <= 8
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - used stop-writes margin low for {{ $labels.ns }} @ {{ $labels.instance }}"
+        description: "{{ $labels.ns }} @ {{ $labels.instance }} ({{ $labels.storage_engine }}) is {{ $value | printf \"%.1f\" }} points from its used stop-writes threshold (<= 8)"
     - alert: ClockAreUnsync
       # This metric is node-level and carries no ns label; keeping it in the
       # aggregation produced an empty {{ $labels.ns }} in the annotation.
