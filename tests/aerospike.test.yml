@@ -144,3 +144,72 @@ tests:
       - alertname: AerospikeNamespaceClientTimeoutsHigh
         eval_time: 15m
         exp_alerts: []
+
+  # Aerospike 7+: 20% avail against a 10% threshold is a 10 point margin.
+  - interval: 1m
+    name: an avail margin of 10 points warns without paging
+    input_series:
+      - series: 'aerospike_namespace_data_avail_pct{instance="as1",job="aerospike",ns="n1",cluster_name="c",service="s1",storage_engine="device"}'
+        values: '20x20'
+      - series: 'aerospike_namespace_storage_engine_stop_writes_avail_pct{instance="as1",job="aerospike",ns="n1",cluster_name="c",service="s1",storage_engine="device"}'
+        values: '10x20'
+    alert_rule_test:
+      - alertname: AerospikeAvailCloseToStopWrites
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeAvailCloseToStopWrites
+              instance: as1
+              job: aerospike
+              ns: n1
+              cluster_name: c
+              service: s1
+              storage_engine: device
+              severity: warning
+            exp_annotations:
+              summary: "AS - avail stop-writes margin low for n1 @ as1"
+              description: "n1 @ as1 (device) is 10.0 points from its avail stop-writes threshold (<= 15)"
+      - alertname: AerospikeAvailCloseToStopWritesCritical
+        eval_time: 16m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a used margin of 5 points pages
+    input_series:
+      - series: 'aerospike_namespace_data_used_pct{instance="as1",job="aerospike",ns="n1",cluster_name="c",service="s1",storage_engine="memory"}'
+        values: '65x10'
+      - series: 'aerospike_namespace_storage_engine_stop_writes_used_pct{instance="as1",job="aerospike",ns="n1",cluster_name="c",service="s1",storage_engine="memory"}'
+        values: '70x10'
+    alert_rule_test:
+      - alertname: AerospikeUsedCloseToStopWritesCritical
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeUsedCloseToStopWritesCritical
+              instance: as1
+              job: aerospike
+              ns: n1
+              cluster_name: c
+              service: s1
+              storage_engine: memory
+              severity: critical
+            exp_annotations:
+              summary: "AS - used stop-writes margin low for n1 @ as1"
+              description: "n1 @ as1 (memory) is 5.0 points from its used stop-writes threshold (<= 8)"
+
+  # A threshold of 0 disables that stop-writes check: 0 - used would be a
+  # negative margin and fire forever.
+  - interval: 1m
+    name: a disabled used threshold stays quiet
+    input_series:
+      - series: 'aerospike_namespace_data_used_pct{instance="as1",job="aerospike",ns="n1",cluster_name="c",service="s1",storage_engine="device"}'
+        values: '40x20'
+      - series: 'aerospike_namespace_storage_engine_stop_writes_used_pct{instance="as1",job="aerospike",ns="n1",cluster_name="c",service="s1",storage_engine="device"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: AerospikeUsedCloseToStopWrites
+        eval_time: 16m
+        exp_alerts: []
+      - alertname: AerospikeUsedCloseToStopWritesCritical
+        eval_time: 16m
+        exp_alerts: []
