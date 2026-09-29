@@ -42,3 +42,33 @@ tests:
             value: 1024
           - labels: 'kube_namespace_memory_request{dc="dc1",k8s_cluster_name="c1",namespace="ns-b",pod="redis-0"}'
             value: 2048
+
+  # kube_pod_container_status_running is 0, not absent, on a restarting
+  # container. Multiplying by it zeroed the request, so the pod ratio became
+  # usage / 0 = +Inf and the namespace average went +Inf with it.
+  - interval: 1m
+    name: restarting container drops out instead of yielding +Inf
+    input_series:
+      - series: 'kube_pod_container_resource_requests{resource="cpu",namespace="ns-c",pod="ok-0",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '1x10'
+      - series: 'kube_pod_container_resource_requests{resource="cpu",namespace="ns-c",pod="crash-0",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1",node="n1"}'
+        values: '1x10'
+      - series: 'kube_pod_container_status_running{namespace="ns-c",pod="ok-0",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1"}'
+        values: '1x10'
+      - series: 'kube_pod_container_status_running{namespace="ns-c",pod="crash-0",container="app",instance="ksm",job="ksm",dc="dc1",k8s_cluster_name="c1"}'
+        values: '0x10'
+      - series: 'container_cpu_usage_seconds_total{namespace="ns-c",pod="ok-0",container="app",dc="dc1",k8s_cluster_name="c1"}'
+        values: '0+30x10'
+      - series: 'container_cpu_usage_seconds_total{namespace="ns-c",pod="crash-0",container="app",dc="dc1",k8s_cluster_name="c1"}'
+        values: '0+12x10'
+    promql_expr_test:
+      - expr: kube_pod_cpu5m_request_ratio
+        eval_time: 8m
+        exp_samples:
+          - labels: 'kube_pod_cpu5m_request_ratio{dc="dc1",k8s_cluster_name="c1",namespace="ns-c",pod="ok-0"}'
+            value: 0.5
+      - expr: kube_namespace_cpu5m_request_ratio
+        eval_time: 8m
+        exp_samples:
+          - labels: 'kube_namespace_cpu5m_request_ratio{dc="dc1",k8s_cluster_name="c1",namespace="ns-c"}'
+            value: 0.5
