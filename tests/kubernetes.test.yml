@@ -313,3 +313,74 @@ tests:
       - alertname: KubernetesKubeletScrapeCoverageDegraded
         eval_time: 20m
         exp_alerts: []
+
+  # The old rule counted restarts: > 3 in 15m. A pod that restarts 4 times in a
+  # rollout and then recovers fired it, and a pod stuck in back-off (restarts
+  # spaced by up to 5m) could stay under the count. The waiting reason is the
+  # kubelet's own verdict.
+  - interval: 15s
+    name: a container in CrashLoopBackOff for 10m alerts, with no restart counter needed
+    input_series:
+      - series: 'kube_pod_container_status_waiting_reason{namespace="app",pod="p1",container="c1",reason="CrashLoopBackOff"}'
+        values: '1x200'
+      - series: 'kube_pod_container_status_waiting_reason{namespace="app",pod="p1",container="c1",reason="ContainerCreating"}'
+        values: '1x200'
+    alert_rule_test:
+      - alertname: KubernetesPodCrashLooping
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: KubernetesPodCrashLooping
+        eval_time: 12m
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesPodCrashLooping
+              namespace: app
+              pod: p1
+              container: c1
+              reason: CrashLoopBackOff
+              severity: warning
+            exp_annotations:
+              summary: "Kubernetes pod crash looping (app/p1)"
+              description: "Pod app/p1 container c1 has been in CrashLoopBackOff for more than 10 minutes"
+
+  - interval: 15s
+    name: a brief CrashLoopBackOff that clears does not alert
+    input_series:
+      - series: 'kube_pod_container_status_waiting_reason{namespace="app",pod="p2",container="c1",reason="CrashLoopBackOff"}'
+        values: '1x20 0x200'
+      - series: 'kube_pod_container_status_restarts_total{namespace="app",pod="p2",container="c1"}'
+        values: '0+1x200'
+    alert_rule_test:
+      - alertname: KubernetesPodCrashLooping
+        eval_time: 15m
+        exp_alerts: []
+
+  - interval: 15s
+    name: volume usage above 85 percent warns after 5m, stays quiet at 80 percent
+    input_series:
+      - series: 'kubelet_volume_stats_available_bytes{namespace="app",persistentvolumeclaim="full"}'
+        values: '12x100'
+      - series: 'kubelet_volume_stats_capacity_bytes{namespace="app",persistentvolumeclaim="full"}'
+        values: '100x100'
+      - series: 'kubelet_volume_stats_available_bytes{namespace="app",persistentvolumeclaim="ok"}'
+        values: '20x100'
+      - series: 'kubelet_volume_stats_capacity_bytes{namespace="app",persistentvolumeclaim="ok"}'
+        values: '100x100'
+    alert_rule_test:
+      - alertname: KubernetesVolumeUsageHigh
+        eval_time: 2m
+        exp_alerts: []
+      - alertname: KubernetesVolumeUsageHigh
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              alertname: KubernetesVolumeUsageHigh
+              namespace: app
+              persistentvolumeclaim: full
+              severity: warning
+            exp_annotations:
+              summary: "Kubernetes volume 85% full (app/full)"
+              description: "Volume app/full is more than 85% used (12.0% free). Expand it before KubernetesVolumeOutOfDiskSpace fires."
+      - alertname: KubernetesVolumeOutOfDiskSpace
+        eval_time: 6m
+        exp_alerts: []
