@@ -1,0 +1,45 @@
+- name: kafka-consumer.rules
+  # Thresholds are generic defaults: tune the lag floor and skew ratio to your topics.
+  # Based on danielqsj/kafka_exporter, which has no lag-in-seconds metric.
+  rules:
+    # Lag is a per-partition gauge, the floor avoids paging on a quiet topic.
+    - alert: KafkaConsumerGroupLagHigh
+      expr: max by (consumergroup, topic) (kafka_consumergroup_lag_sum) > 100000
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Consumer group {{ $labels.consumergroup }} is {{ $value | humanize }} messages behind on {{ $labels.topic }}"
+        description: "Total lag above 100000 messages for 15 minutes. Tune the threshold to the topic throughput."
+
+    # High lag and no committed offset movement: a wedged partition.
+    - alert: KafkaConsumerGroupPartitionStalled
+      expr: |
+        max by (consumergroup, topic) (
+          (max by (consumergroup, topic, partition) (kafka_consumergroup_lag) > 1000)
+          and on (consumergroup, topic, partition)
+          (sum by (consumergroup, topic, partition) (rate(kafka_consumergroup_current_offset[15m])) == 0)
+        )
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Consumer group {{ $labels.consumergroup }} is stuck on {{ $labels.topic }}"
+        description: "At least one partition committed no offset for 15m, worst backlog {{ $value }} messages."
+
+    # The median is the baseline: one partition far behind its peers means a slow or stuck consumer.
+    - alert: KafkaConsumerGroupPartitionSkew
+      expr: |
+        (
+          max by (consumergroup, topic) (kafka_consumergroup_lag)
+          / on (consumergroup, topic)
+          (quantile by (consumergroup, topic) (0.5, max by (consumergroup, topic, partition) (kafka_consumergroup_lag)) > 0)
+        ) > 10
+        and on (consumergroup, topic)
+        (max by (consumergroup, topic) (kafka_consumergroup_lag) > 1000)
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Consumer group {{ $labels.consumergroup }} is uneven on {{ $labels.topic }}"
+        description: "The worst partition is {{ $value | humanize }}x further behind than the median partition."
