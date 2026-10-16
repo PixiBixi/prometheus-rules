@@ -60,3 +60,101 @@ tests:
             exp_annotations:
               summary: "Wrong active Kafka controller count on kafka"
               description: "Kafka cluster kafka has 2 active controllers instead of exactly 1. Cluster operations are impaired."
+
+  # A broker restart leaves partitions under-replicated for 1-4 minutes while
+  # followers catch up: this must not page. The old 1m threshold fired here.
+  - interval: 15s
+    name: under-replicated partitions for 3m (a restart) stay quiet
+    input_series:
+      - series: 'kafka_server_replicamanager_underreplicatedpartitions{job="kafka",instance="b1"}'
+        values: '2x12 0x60'
+    alert_rule_test:
+      - alertname: KafkaUnderReplicatedPartitions
+        eval_time: 3m
+        exp_alerts: []
+
+  - interval: 15s
+    name: under-replicated partitions persisting 6m alert as critical
+    input_series:
+      - series: 'kafka_server_replicamanager_underreplicatedpartitions{job="kafka",instance="b1"}'
+        values: '2x40'
+    alert_rule_test:
+      - alertname: KafkaUnderReplicatedPartitions
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              alertname: KafkaUnderReplicatedPartitions
+              job: kafka
+              instance: b1
+              severity: critical
+            exp_annotations:
+              description: "b1 of job kafka has some underreplicated partitions"
+              summary: "b1 of job kafka has some underreplicated partitions"
+
+  # 2 failed of 100 produce requests per minute = 2% for 20m. Per-topic series
+  # must be ignored (topic label present) or the ratio is double counted.
+  - interval: 15s
+    name: produce error rate above 1 percent fires, ignoring per-topic series
+    input_series:
+      - series: 'kafka_server_brokertopicmetrics_failedproducerequests_total{job="kafka",instance="b1"}'
+        values: '0+0.5x400'
+      - series: 'kafka_server_brokertopicmetrics_totalproducerequests_total{job="kafka",instance="b1"}'
+        values: '0+25x400'
+      - series: 'kafka_server_brokertopicmetrics_totalproducerequests_total{job="kafka",instance="b1",topic="t"}'
+        values: '0+25x400'
+      - series: 'kafka_server_brokertopicmetrics_failedproducerequests_total{job="kafka",instance="b1",topic="t"}'
+        values: '0+0.5x400'
+    alert_rule_test:
+      - alertname: KafkaProduceErrorRate
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: KafkaProduceErrorRate
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alertname: KafkaProduceErrorRate
+              job: kafka
+              severity: critical
+            exp_annotations:
+              description: "Over 1% of produce requests failed on job kafka for 10 minutes (2%)."
+              summary: "Kafka produce error rate at 2% on job kafka"
+
+  - interval: 15s
+    name: produce error rate below 1 percent stays quiet, idle cluster does not divide by zero
+    input_series:
+      - series: 'kafka_server_brokertopicmetrics_failedproducerequests_total{job="kafka",instance="ok"}'
+        values: '0+0.01x400'
+      - series: 'kafka_server_brokertopicmetrics_totalproducerequests_total{job="kafka",instance="ok"}'
+        values: '0+25x400'
+      - series: 'kafka_server_brokertopicmetrics_failedproducerequests_total{job="idle",instance="idle"}'
+        values: '0x400'
+      - series: 'kafka_server_brokertopicmetrics_totalproducerequests_total{job="idle",instance="idle"}'
+        values: '0x400'
+    alert_rule_test:
+      - alertname: KafkaProduceErrorRate
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 15s
+    name: produce p99 latency above 500ms for 15m fires on the worst broker only
+    input_series:
+      - series: 'kafka_network_requestmetrics_totaltimems{job="kafka",instance="b1",request="Produce",quantile="0.99"}'
+        values: '800x100'
+      - series: 'kafka_network_requestmetrics_totaltimems{job="kafka",instance="b2",request="Produce",quantile="0.99"}'
+        values: '50x100'
+      - series: 'kafka_network_requestmetrics_totaltimems{job="kafka",instance="b1",request="Fetch",quantile="0.99"}'
+        values: '5000x100'
+    alert_rule_test:
+      - alertname: KafkaProduceLatencyHigh
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: KafkaProduceLatencyHigh
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alertname: KafkaProduceLatencyHigh
+              job: kafka
+              severity: warning
+            exp_annotations:
+              description: "The worst broker p99 of Produce total time on job kafka stayed above 500 ms for 15 minutes."
+              summary: "Kafka produce p99 latency at 800 ms on job kafka"
