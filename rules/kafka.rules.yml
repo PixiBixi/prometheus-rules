@@ -20,8 +20,10 @@
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
         summary: "Job {{ $labels.job }} having an issue on {{ $labels.instance }}"
     - alert: KafkaUnderReplicatedPartitions
+      # A broker restart or leader election leaves partitions under-replicated
+      # for a few minutes while followers catch up.
       expr: kafka_server_replicamanager_underreplicatedpartitions > 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -161,3 +163,24 @@
       annotations:
         description: "JMX scrape failed on {{ $labels.instance }}. Kafka metrics are incomplete."
         summary: "JMX scrape failed on {{ $labels.instance }}"
+    - alert: KafkaProduceErrorRate
+      # Broker-wide counters only (topic label absent), so per-topic series are not double counted.
+      expr: |
+        sum by (job) (increase(kafka_server_brokertopicmetrics_failedproducerequests_total{topic=""}[5m]))
+        /
+        (sum by (job) (increase(kafka_server_brokertopicmetrics_totalproducerequests_total{topic=""}[5m])) > 0)
+        > 0.01
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        description: "Over 1% of produce requests failed on job {{ $labels.job }} for 10 minutes ({{ $value | humanizePercentage }})."
+        summary: "Kafka produce error rate at {{ $value | humanizePercentage }} on job {{ $labels.job }}"
+    - alert: KafkaProduceLatencyHigh
+      expr: max by (job) (kafka_network_requestmetrics_totaltimems{request="Produce", quantile="0.99"}) > 500
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        description: "The worst broker p99 of Produce total time on job {{ $labels.job }} stayed above 500 ms for 15 minutes."
+        summary: "Kafka produce p99 latency at {{ $value | humanize }} ms on job {{ $labels.job }}"
