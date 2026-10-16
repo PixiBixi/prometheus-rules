@@ -114,3 +114,31 @@ tests:
               summary: "Certificate teleport not ready"
               description: "Certificate teleport in namespace teleport is not ready (condition=False) for more than 10 minutes."
               runbook_url: "https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagercertnotready"
+
+  # Expiry is an absolute timestamp, promtool time() starts at 0. soon expires
+  # at 4d (345600s), so it is inside the 4d window as soon as time() > 0.
+  - interval: 1m
+    name: a certificate under 4 days from expiry alerts critical, a 5 day one and an unissued one do not
+    input_series:
+      - series: 'certmanager_certificate_expiration_timestamp_seconds{name="soon",namespace="app",job="cert-manager",instance="cm1"}'
+        values: '345600x200'
+      - series: 'certmanager_certificate_expiration_timestamp_seconds{name="later",namespace="app",job="cert-manager",instance="cm1"}'
+        values: '432000x200'
+      - series: 'certmanager_certificate_expiration_timestamp_seconds{name="unissued",namespace="app",job="cert-manager",instance="cm1"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: CertManagerCertExpiryCritical
+        eval_time: 30m
+        exp_alerts: []
+      - alertname: CertManagerCertExpiryCritical
+        eval_time: 2h
+        exp_alerts:
+          - exp_labels:
+              alertname: CertManagerCertExpiryCritical
+              name: soon
+              namespace: app
+              severity: critical
+            exp_annotations:
+              summary: "Certificate soon expires in 3d 22h 0m 0s"
+              description: "Certificate soon in namespace app expires in 3d 22h 0m 0s. TLS will break on every endpoint it serves. Issue it manually if the renewal cannot be unblocked in time."
+              runbook_url: "https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagercertexpirysoon"

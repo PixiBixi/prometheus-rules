@@ -41,6 +41,21 @@
         description: "Certificate {{ $labels.name }} in namespace {{ if $labels.exported_namespace }}{{ $labels.exported_namespace }}{{ else }}{{ $labels.namespace }}{{ end }} has not been renewed and is {{ $value | humanizeDuration }} from expiry."
         runbook_url: https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagercertexpirysoon
 
+    - alert: CertManagerCertExpiryCritical
+      # Absolute 4 days, independent of the renewal window: leaves a working day
+      # before the weekend that precedes expiry. The > 0 drops unissued certs.
+      expr: |
+        min by (exported_namespace, namespace, name) (
+          certmanager_certificate_expiration_timestamp_seconds > 0
+        ) - time() < 4 * 86400
+      for: 1h
+      labels:
+        severity: critical
+      annotations:
+        summary: "Certificate {{ $labels.name }} expires in {{ $value | humanizeDuration }}"
+        description: "Certificate {{ $labels.name }} in namespace {{ if $labels.exported_namespace }}{{ $labels.exported_namespace }}{{ else }}{{ $labels.namespace }}{{ end }} expires in {{ $value | humanizeDuration }}. TLS will break on every endpoint it serves. Issue it manually if the renewal cannot be unblocked in time."
+        runbook_url: https://github.com/imusmanmalik/cert-manager-mixin/blob/main/RUNBOOK.md#certmanagercertexpirysoon
+
     - alert: CertManagerCertNotReady
       expr: |
         max by (name, exported_namespace, namespace, condition) (
