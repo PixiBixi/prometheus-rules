@@ -1,0 +1,86 @@
+# Tests for rules/argo-rollouts.rules.yml
+rule_files:
+  - argo-rollouts.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: no controller target up raises ArgoRolloutsControllerDown
+    input_series:
+      - series: 'up{job="argo-rollouts-metrics",namespace="argo-rollouts"}'
+        values: '0x30'
+    alert_rule_test:
+      - alertname: ArgoRolloutsControllerDown
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              description: "Rollouts are no longer reconciled: canary and blue-green deployments are blocked."
+              summary: "No Argo Rollouts controller answers"
+
+  - interval: 1m
+    name: a controller that is up does not alert
+    input_series:
+      - series: 'up{job="argo-rollouts-metrics",namespace="argo-rollouts"}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: ArgoRolloutsControllerDown
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a rollout in Abort phase alerts
+    input_series:
+      - series: 'rollout_info{name="app",namespace="shop",phase="Abort",strategy="canary",traffic_router=""}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: ArgoRolloutsRolloutFailed
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              name: app
+              namespace: shop
+              phase: Abort
+            exp_annotations:
+              description: "The new version of the rollout is not being promoted."
+              summary: "Rollout shop/app is in phase Abort"
+
+  - interval: 1m
+    name: a healthy rollout does not alert
+    input_series:
+      - series: 'rollout_info{name="app",namespace="shop",phase="Completed",strategy="canary",traffic_router=""}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: ArgoRolloutsRolloutFailed
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a rollout that keeps failing to reconcile alerts
+    input_series:
+      - series: 'rollout_reconcile_error{name="app",namespace="shop"}'
+        values: '0+1x90'
+    alert_rule_test:
+      - alertname: ArgoRolloutsRolloutReconcileErrors
+        eval_time: 1h
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              name: app
+              namespace: shop
+            exp_annotations:
+              description: "The controller keeps failing to reconcile this rollout. Check the controller logs."
+              summary: "Argo Rollouts cannot reconcile shop/app (15 errors in 15m)"
+
+  - interval: 1m
+    name: a rollout with a flat error counter does not alert
+    input_series:
+      - series: 'rollout_reconcile_error{name="app",namespace="shop"}'
+        values: '4x90'
+    alert_rule_test:
+      - alertname: ArgoRolloutsRolloutReconcileErrors
+        eval_time: 1h
+        exp_alerts: []

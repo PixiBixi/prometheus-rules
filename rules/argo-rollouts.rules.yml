@@ -1,0 +1,32 @@
+- name: argo-rollouts.rules
+  # Both namespace labels are kept, see cert-manager: `namespace` is the rollout's
+  # unless the scrape renamed it to `exported_namespace`.
+  rules:
+    # Rollouts stop progressing while the controller is gone; running pods keep serving.
+    - alert: ArgoRolloutsControllerDown
+      expr: absent(up{job=~".*argo-rollouts.*"} == 1)
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "No Argo Rollouts controller answers"
+        description: "Rollouts are no longer reconciled: canary and blue-green deployments are blocked."
+
+    # rollout_info, not the deprecated rollout_phase which never reports InvalidSpec.
+    - alert: ArgoRolloutsRolloutFailed
+      expr: max by (exported_namespace, namespace, name, phase) (rollout_info{phase=~"Abort|Error|Timeout|InvalidSpec"}) == 1
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Rollout {{ if $labels.exported_namespace }}{{ $labels.exported_namespace }}{{ else }}{{ $labels.namespace }}{{ end }}/{{ $labels.name }} is in phase {{ $labels.phase }}"
+        description: "The new version of the rollout is not being promoted."
+
+    - alert: ArgoRolloutsRolloutReconcileErrors
+      expr: sum by (exported_namespace, namespace, name) (increase(rollout_reconcile_error[15m])) > 0
+      for: 30m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Argo Rollouts cannot reconcile {{ if $labels.exported_namespace }}{{ $labels.exported_namespace }}{{ else }}{{ $labels.namespace }}{{ end }}/{{ $labels.name }} ({{ $value | printf \"%.0f\" }} errors in 15m)"
+        description: "The controller keeps failing to reconcile this rollout. Check the controller logs."
