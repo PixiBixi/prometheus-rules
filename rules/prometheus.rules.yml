@@ -377,3 +377,38 @@
       annotations:
         summary: "Prometheus is dropping alert notifications (instance {{ $labels.instance }})"
         description: "{{ $value | humanize }} alerts/min are being dropped on the way to Alertmanager by {{ $labels.instance }}. Alerts are firing and nobody is being told."
+    - alert: Watchdog
+      # Heartbeat, meant to always fire: route it to a dead man's switch, and
+      # page when it stops arriving (the alerting pipeline itself is broken).
+      expr: vector(1)
+      labels:
+        severity: warning
+      annotations:
+        summary: "Watchdog heartbeat, this alert always fires"
+        description: "Always-firing heartbeat that proves the Prometheus to Alertmanager pipeline works. Route it to a dead man's switch; if it stops arriving, alerting is down."
+    - alert: PrometheusOperatorReconcileErrors
+      # When the operator cannot build the config, Prometheus is never asked to
+      # reload, so PrometheusConfigReloadFailed stays silent while every change is ignored.
+      expr: sum by (controller) (increase(prometheus_operator_reconcile_errors_total[1h])) > 0
+      for: 30m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus Operator {{ $labels.controller }} controller cannot reconcile"
+        description: "{{ $value | humanize }} reconcile errors in the last hour on the {{ $labels.controller }} controller: new monitors, rules and remote writes are not applied. The reason is in the status conditions of the resource."
+    - alert: PrometheusOperatorNotReady
+      expr: min by (controller) (max_over_time(prometheus_operator_ready[5m])) == 0
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus Operator {{ $labels.controller }} controller not ready"
+        description: "The {{ $labels.controller }} controller of the Prometheus Operator is not ready: changes to its resources are not applied."
+    - alert: PrometheusOperatorRejectedResources
+      expr: max by (controller, resource) (prometheus_operator_managed_resources{state="rejected"}) > 0
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus Operator rejects {{ $labels.resource }} objects"
+        description: "{{ $value }} {{ $labels.resource }} objects are rejected by the {{ $labels.controller }} controller and not loaded. The operator logs give the reason."
