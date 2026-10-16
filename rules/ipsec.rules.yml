@@ -18,7 +18,7 @@
         severity: critical
       annotations:
         summary: "IPSEC Exporter seems down for {{ $labels.instance }}"
-        description: "IPSEC Exporter seems down for {{ $labels.instance }}"
+        description: "The IPsec exporter on {{ $labels.instance }} is failing its scrape or has vanished from service discovery. Tunnel alerts for this host are blind until it is back."
     - alert: IPSECDown
       expr: ipsec_status != 0
       for: 1m
