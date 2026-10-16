@@ -26,6 +26,7 @@
       for: 2m
       annotations:
         summary: "PHPFPM Exporter is UP but PHPFPM seems down for {{ $labels.instance }}"
+        description: "Pool {{ $labels.pool }} reports phpfpm_up == 0 while the exporter scrapes fine: the FPM status page is unreachable or the pool is down. Requests to this pool fail."
       labels:
         severity: critical
 
@@ -34,6 +35,7 @@
       for: 0s
       annotations:
         summary: "High connection usage on PHPFPM for {{ $labels.instance }} for all pools"
+        description: "Pools on {{ $labels.instance }} hit pm.max_children: new requests wait in the listen backlog. Raise max_children if memory allows, or find the slow requests holding workers."
       labels:
         severity: critical
 
