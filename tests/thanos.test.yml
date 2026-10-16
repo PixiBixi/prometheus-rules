@@ -1,0 +1,855 @@
+# Tests for rules/thanos.rules.yml
+rule_files:
+  - thanos.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 15s
+    name: ThanosComponentDown fires
+    input_series:
+      - series: 'up{job="thanos-store",instance="s1"}'
+        values: '0x160'
+    alert_rule_test:
+      - alertname: ThanosComponentDown
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosComponentDown"
+              severity: "critical"
+              job: "thanos-store"
+              instance: "s1"
+            exp_annotations:
+              summary: "Thanos component thanos-store is down"
+              description: "Thanos target thanos-store (s1) has failed its scrape for 20 minutes. The process is down or unreachable."
+
+  - interval: 15s
+    name: ThanosComponentDown stays quiet when healthy
+    input_series:
+      - series: 'up{job="thanos-store",instance="s1"}'
+        values: '1x160'
+    alert_rule_test:
+      - alertname: ThanosComponentDown
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosStatusUnhealthy fires
+    input_series:
+      - series: 'thanos_status{check="healthy",component="store",job="thanos-store",instance="s1"}'
+        values: '0x160'
+      - series: 'thanos_status{check="ready",component="store",job="thanos-store",instance="s1"}'
+        values: '0x160'
+    alert_rule_test:
+      - alertname: ThanosStatusUnhealthy
+        eval_time: 40m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosStatusUnhealthy"
+              severity: "critical"
+              check: "healthy"
+              component: "store"
+              job: "thanos-store"
+              instance: "s1"
+            exp_annotations:
+              summary: "Thanos store reports unhealthy"
+              description: "Thanos store on s1 has been reporting an unhealthy status for 30 minutes. The process runs but flagged an internal error."
+
+  - interval: 15s
+    name: ThanosStatusUnhealthy ignores a component that is healthy but not ready
+    input_series:
+      - series: 'thanos_status{check="healthy",component="store",job="thanos-store",instance="s1"}'
+        values: '1x160'
+      - series: 'thanos_status{check="ready",component="store",job="thanos-store",instance="s1"}'
+        values: '0x160'
+    alert_rule_test:
+      - alertname: ThanosStatusUnhealthy
+        eval_time: 40m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosQueryIsDown fires
+    input_series:
+      - series: 'up{job="thanos-query",instance="q1"}'
+        values: '0x160'
+      - series: 'up{job="thanos-query",instance="q2"}'
+        values: '0x160'
+    alert_rule_test:
+      - alertname: ThanosQueryIsDown
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosQueryIsDown"
+              severity: "critical"
+              job: "thanos-query"
+            exp_annotations:
+              summary: "Thanos Query thanos-query has no healthy instance"
+              description: "Every instance of thanos-query has been down for 20 minutes. All queries fail until one returns."
+
+  - interval: 15s
+    name: ThanosQueryIsDown stays quiet while one replica is still up
+    input_series:
+      - series: 'up{job="thanos-query",instance="q1"}'
+        values: '0x160'
+      - series: 'up{job="thanos-query",instance="q2"}'
+        values: '1x160'
+    alert_rule_test:
+      - alertname: ThanosQueryIsDown
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosQueryNoStoreConnections fires
+    input_series:
+      - series: 'thanos_store_nodes_grpc_connections{job="thanos-query",instance="q1",store_type="store",external_labels="a"}'
+        values: '0x160'
+    alert_rule_test:
+      - alertname: ThanosQueryNoStoreConnections
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosQueryNoStoreConnections"
+              severity: "critical"
+              job: "thanos-query"
+              instance: "q1"
+            exp_annotations:
+              summary: "Thanos Query q1 has no store connection"
+              description: "Thanos Query q1 has no gRPC connection to any Store API. It returns no data until connections are restored."
+
+  - interval: 15s
+    name: ThanosQueryNoStoreConnections stays quiet when healthy
+    input_series:
+      - series: 'thanos_store_nodes_grpc_connections{job="thanos-query",instance="q1",store_type="store",external_labels="a"}'
+        values: '2x160'
+    alert_rule_test:
+      - alertname: ThanosQueryNoStoreConnections
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosQueryHttpErrorRateHigh fires on 10% 5xx for query
+    input_series:
+      - series: 'http_requests_total{job="thanos-query",instance="q1",handler="query",code="500"}'
+        values: '0+2x200'
+      - series: 'http_requests_total{job="thanos-query",instance="q1",handler="query",code="200"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosQueryHttpErrorRateHigh
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosQueryHttpErrorRateHigh"
+              severity: "critical"
+              job: "thanos-query"
+              handler: "query"
+            exp_annotations:
+              summary: "Thanos Query thanos-query: 5xx on query requests"
+              description: "10% of query requests handled by thanos-query return a 5xx."
+
+  - interval: 15s
+    name: ThanosQueryHttpErrorRateHigh stays quiet without 5xx on query
+    input_series:
+      - series: 'http_requests_total{job="thanos-query",instance="q1",handler="query",code="500"}'
+        values: '0x200'
+      - series: 'http_requests_total{job="thanos-query",instance="q1",handler="query",code="200"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosQueryHttpErrorRateHigh
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosQueryHttpErrorRateHigh fires on 10% 5xx for query_range
+    input_series:
+      - series: 'http_requests_total{job="thanos-query",instance="q1",handler="query_range",code="500"}'
+        values: '0+2x200'
+      - series: 'http_requests_total{job="thanos-query",instance="q1",handler="query_range",code="200"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosQueryHttpErrorRateHigh
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosQueryHttpErrorRateHigh"
+              severity: "critical"
+              job: "thanos-query"
+              handler: "query_range"
+            exp_annotations:
+              summary: "Thanos Query thanos-query: 5xx on query_range requests"
+              description: "10% of query_range requests handled by thanos-query return a 5xx."
+
+  - interval: 15s
+    name: ThanosQueryHttpErrorRateHigh stays quiet without 5xx on query_range
+    input_series:
+      - series: 'http_requests_total{job="thanos-query",instance="q1",handler="query_range",code="500"}'
+        values: '0x200'
+      - series: 'http_requests_total{job="thanos-query",instance="q1",handler="query_range",code="200"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosQueryHttpErrorRateHigh
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosQueryGrpcServerErrorRate fires
+    input_series:
+      - series: 'grpc_server_started_total{job="thanos-query",instance="q1",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+20x200'
+      - series: 'grpc_server_handled_total{job="thanos-query",instance="q1",grpc_code="Unavailable",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+2x200'
+      - series: 'grpc_server_handled_total{job="thanos-query",instance="q1",grpc_code="OK",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosQueryGrpcServerErrorRate
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosQueryGrpcServerErrorRate"
+              severity: "warning"
+              job: "thanos-query"
+            exp_annotations:
+              summary: "Thanos Query thanos-query: gRPC server errors"
+              description: "10% of the gRPC requests served by thanos-query fail."
+
+  - interval: 15s
+    name: ThanosQueryGrpcServerErrorRate ignores client-side Canceled codes
+    input_series:
+      - series: 'grpc_server_started_total{job="thanos-query",instance="q1",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+20x200'
+      - series: 'grpc_server_handled_total{job="thanos-query",instance="q1",grpc_code="Canceled",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+2x200'
+      - series: 'grpc_server_handled_total{job="thanos-query",instance="q1",grpc_code="OK",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosQueryGrpcServerErrorRate
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosQueryGrpcClientErrorRate fires
+    input_series:
+      - series: 'grpc_client_started_total{job="thanos-query",instance="q1",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+20x200'
+      - series: 'grpc_client_handled_total{job="thanos-query",instance="q1",grpc_code="Unavailable",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+4x200'
+      - series: 'grpc_client_handled_total{job="thanos-query",instance="q1",grpc_code="OK",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+16x200'
+    alert_rule_test:
+      - alertname: ThanosQueryGrpcClientErrorRate
+        eval_time: 40m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosQueryGrpcClientErrorRate"
+              severity: "warning"
+              job: "thanos-query"
+            exp_annotations:
+              summary: "Thanos Query thanos-query: gRPC client errors towards stores"
+              description: "20% of the gRPC requests sent by thanos-query to its store endpoints fail. Store gateways or receivers may be unhealthy."
+
+  - interval: 15s
+    name: ThanosQueryGrpcClientErrorRate stays quiet when healthy
+    input_series:
+      - series: 'grpc_client_started_total{job="thanos-query",instance="q1",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+20x200'
+      - series: 'grpc_client_handled_total{job="thanos-query",instance="q1",grpc_code="OK",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+20x200'
+    alert_rule_test:
+      - alertname: ThanosQueryGrpcClientErrorRate
+        eval_time: 40m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosQueryInstantLatencyHigh fires on p99 above threshold
+    input_series:
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query",code="200",le="1"}'
+        values: '0+0x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query",code="200",le="60"}'
+        values: '0+0x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query",code="200",le="120"}'
+        values: '0+10x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query",code="200",le="+Inf"}'
+        values: '0+10x200'
+    alert_rule_test:
+      - alertname: ThanosQueryInstantLatencyHigh
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosQueryInstantLatencyHigh"
+              severity: "warning"
+              job: "thanos-query"
+            exp_annotations:
+              summary: "Thanos Query thanos-query: slow instant queries"
+              description: "p99 latency of instant queries on thanos-query is 1m 59s."
+
+  - interval: 15s
+    name: ThanosQueryInstantLatencyHigh stays quiet on fast queries
+    input_series:
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query",code="200",le="1"}'
+        values: '0+10x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query",code="200",le="60"}'
+        values: '0+10x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query",code="200",le="120"}'
+        values: '0+10x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query",code="200",le="+Inf"}'
+        values: '0+10x200'
+    alert_rule_test:
+      - alertname: ThanosQueryInstantLatencyHigh
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosQueryRangeLatencyHigh fires on p99 above threshold
+    input_series:
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query_range",code="200",le="1"}'
+        values: '0+0x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query_range",code="200",le="60"}'
+        values: '0+0x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query_range",code="200",le="120"}'
+        values: '0+10x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query_range",code="200",le="+Inf"}'
+        values: '0+10x200'
+    alert_rule_test:
+      - alertname: ThanosQueryRangeLatencyHigh
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosQueryRangeLatencyHigh"
+              severity: "warning"
+              job: "thanos-query"
+            exp_annotations:
+              summary: "Thanos Query thanos-query: slow range queries"
+              description: "p99 latency of range queries on thanos-query is 1m 59s."
+
+  - interval: 15s
+    name: ThanosQueryRangeLatencyHigh stays quiet on fast queries
+    input_series:
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query_range",code="200",le="1"}'
+        values: '0+10x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query_range",code="200",le="60"}'
+        values: '0+10x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query_range",code="200",le="120"}'
+        values: '0+10x200'
+      - series: 'http_request_duration_seconds_bucket{job="thanos-query",instance="q1",handler="query_range",code="200",le="+Inf"}'
+        values: '0+10x200'
+    alert_rule_test:
+      - alertname: ThanosQueryRangeLatencyHigh
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosStoreGrpcErrorRate fires
+    input_series:
+      - series: 'grpc_server_started_total{job="thanos-store",instance="s1",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+20x200'
+      - series: 'grpc_server_handled_total{job="thanos-store",instance="s1",grpc_code="Internal",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+2x200'
+    alert_rule_test:
+      - alertname: ThanosStoreGrpcErrorRate
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosStoreGrpcErrorRate"
+              severity: "warning"
+              job: "thanos-store"
+            exp_annotations:
+              summary: "Thanos Store thanos-store: gRPC errors"
+              description: "10% of the gRPC requests served by thanos-store fail. Queriers get errors or partial results for historical ranges."
+
+  - interval: 15s
+    name: ThanosStoreGrpcErrorRate stays quiet when healthy
+    input_series:
+      - series: 'grpc_server_started_total{job="thanos-store",instance="s1",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+20x200'
+      - series: 'grpc_server_handled_total{job="thanos-store",instance="s1",grpc_code="OK",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"}'
+        values: '0+20x200'
+    alert_rule_test:
+      - alertname: ThanosStoreGrpcErrorRate
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosStoreBucketHighOperationFailures fires
+    input_series:
+      - series: 'thanos_objstore_bucket_operations_total{job="thanos-store",instance="s1",bucket="b1",operation="get"}'
+        values: '0+20x200'
+      - series: 'thanos_objstore_bucket_operation_failures_total{job="thanos-store",instance="s1",bucket="b1",operation="get"}'
+        values: '0+4x200'
+    alert_rule_test:
+      - alertname: ThanosStoreBucketHighOperationFailures
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosStoreBucketHighOperationFailures"
+              severity: "warning"
+              job: "thanos-store"
+              bucket: "b1"
+            exp_annotations:
+              summary: "Thanos Store thanos-store: object storage failures on b1"
+              description: "20% of the operations of thanos-store against bucket b1 fail. Check bucket availability, credentials and network."
+
+  - interval: 15s
+    name: ThanosStoreBucketHighOperationFailures stays quiet when healthy
+    input_series:
+      - series: 'thanos_objstore_bucket_operations_total{job="thanos-store",instance="s1",bucket="b1",operation="get"}'
+        values: '0+20x200'
+      - series: 'thanos_objstore_bucket_operation_failures_total{job="thanos-store",instance="s1",bucket="b1",operation="get"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ThanosStoreBucketHighOperationFailures
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosStoreBlockLoadFailures fires
+    input_series:
+      - series: 'thanos_bucket_store_block_load_failures_total{job="thanos-store",instance="s1"}'
+        values: '0+1x200'
+    alert_rule_test:
+      - alertname: ThanosStoreBlockLoadFailures
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosStoreBlockLoadFailures"
+              severity: "warning"
+              job: "thanos-store"
+            exp_annotations:
+              summary: "Thanos Store thanos-store: block load failures"
+              description: "thanos-store fails to load blocks from object storage. Some time ranges return incomplete results."
+
+  - interval: 15s
+    name: ThanosStoreBlockLoadFailures stays quiet when healthy
+    input_series:
+      - series: 'thanos_bucket_store_block_load_failures_total{job="thanos-store",instance="s1"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ThanosStoreBlockLoadFailures
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosReceiveHttpErrorRateHigh fires
+    input_series:
+      - series: 'http_requests_total{job="thanos-receive",instance="r1",handler="receive",code="503"}'
+        values: '0+2x200'
+      - series: 'http_requests_total{job="thanos-receive",instance="r1",handler="receive",code="200"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosReceiveHttpErrorRateHigh
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosReceiveHttpErrorRateHigh"
+              severity: "warning"
+              job: "thanos-receive"
+            exp_annotations:
+              summary: "Thanos Receive thanos-receive: 5xx on remote write"
+              description: "10% of the write requests received by thanos-receive return a 5xx. Remote write senders are losing or retrying data."
+
+  - interval: 15s
+    name: ThanosReceiveHttpErrorRateHigh stays quiet when healthy
+    input_series:
+      - series: 'http_requests_total{job="thanos-receive",instance="r1",handler="receive",code="503"}'
+        values: '0x200'
+      - series: 'http_requests_total{job="thanos-receive",instance="r1",handler="receive",code="200"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosReceiveHttpErrorRateHigh
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosReceiveHighForwardFailureRate fires
+    input_series:
+      - series: 'thanos_receive_forward_requests_total{job="thanos-receive",instance="r1",result="error"}'
+        values: '0+6x200'
+      - series: 'thanos_receive_forward_requests_total{job="thanos-receive",instance="r1",result="success"}'
+        values: '0+14x200'
+    alert_rule_test:
+      - alertname: ThanosReceiveHighForwardFailureRate
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosReceiveHighForwardFailureRate"
+              severity: "warning"
+              job: "thanos-receive"
+            exp_annotations:
+              summary: "Thanos Receive thanos-receive: forward failures"
+              description: "30% of the requests forwarded by thanos-receive to other receivers fail. Check connectivity between replicas."
+
+  - interval: 15s
+    name: ThanosReceiveHighForwardFailureRate stays quiet at 10% errors
+    input_series:
+      - series: 'thanos_receive_forward_requests_total{job="thanos-receive",instance="r1",result="error"}'
+        values: '0+2x200'
+      - series: 'thanos_receive_forward_requests_total{job="thanos-receive",instance="r1",result="success"}'
+        values: '0+18x200'
+    alert_rule_test:
+      - alertname: ThanosReceiveHighForwardFailureRate
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosReceiveConfigReloadFailure fires
+    input_series:
+      - series: 'thanos_receive_config_last_reload_successful{job="thanos-receive",instance="r1"}'
+        values: '0x160'
+    alert_rule_test:
+      - alertname: ThanosReceiveConfigReloadFailure
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosReceiveConfigReloadFailure"
+              severity: "warning"
+              job: "thanos-receive"
+              instance: "r1"
+            exp_annotations:
+              summary: "Thanos Receive r1: hashring reload failed"
+              description: "The last hashring configuration reload of r1 failed. Routing changes have not taken effect."
+
+  - interval: 15s
+    name: ThanosReceiveConfigReloadFailure stays quiet when healthy
+    input_series:
+      - series: 'thanos_receive_config_last_reload_successful{job="thanos-receive",instance="r1"}'
+        values: '1x160'
+    alert_rule_test:
+      - alertname: ThanosReceiveConfigReloadFailure
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 1m
+    name: ThanosReceiveHeadCompactionStalled fires when the head is older than 6h
+    input_series:
+      - series: 'prometheus_tsdb_head_min_time{job="thanos-receive",instance="r1"}'
+        values: '0x700'
+    alert_rule_test:
+      - alertname: ThanosReceiveHeadCompactionStalled
+        eval_time: 600m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosReceiveHeadCompactionStalled"
+              severity: "critical"
+              job: "thanos-receive"
+              instance: "r1"
+            exp_annotations:
+              summary: "Thanos Receive r1: head block not compacted"
+              description: "The head block of r1 spans 10h. Compaction has stalled and memory keeps growing until an OOM kill."
+
+  - interval: 1m
+    name: ThanosReceiveHeadCompactionStalled stays quiet on a head under 6h
+    input_series:
+      - series: 'prometheus_tsdb_head_min_time{job="thanos-receive",instance="r1"}'
+        values: '0x700'
+    alert_rule_test:
+      - alertname: ThanosReceiveHeadCompactionStalled
+        eval_time: 300m
+        exp_alerts: []
+
+  - interval: 1m
+    name: ThanosReceiveHeadCompactionStalled ignores the MaxInt64 sentinel of an empty head
+    input_series:
+      - series: 'prometheus_tsdb_head_min_time{job="thanos-receive",instance="r1"}'
+        values: '9223372036854775807x700'
+    alert_rule_test:
+      - alertname: ThanosReceiveHeadCompactionStalled
+        eval_time: 600m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosRuleQueueIsDroppingAlerts fires
+    input_series:
+      - series: 'thanos_alert_queue_alerts_dropped_total{job="thanos-ruler",instance="u1"}'
+        values: '0+1x200'
+    alert_rule_test:
+      - alertname: ThanosRuleQueueIsDroppingAlerts
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosRuleQueueIsDroppingAlerts"
+              severity: "critical"
+              job: "thanos-ruler"
+              instance: "u1"
+            exp_annotations:
+              summary: "Thanos Rule u1: alert queue dropping alerts"
+              description: "u1 drops alerts from its queue. Alertmanager may not receive every firing alert."
+
+  - interval: 15s
+    name: ThanosRuleQueueIsDroppingAlerts stays quiet when healthy
+    input_series:
+      - series: 'thanos_alert_queue_alerts_dropped_total{job="thanos-ruler",instance="u1"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ThanosRuleQueueIsDroppingAlerts
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosRuleSenderIsFailingAlerts fires
+    input_series:
+      - series: 'thanos_alert_sender_alerts_dropped_total{job="thanos-ruler",instance="u1"}'
+        values: '0+1x200'
+    alert_rule_test:
+      - alertname: ThanosRuleSenderIsFailingAlerts
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosRuleSenderIsFailingAlerts"
+              severity: "critical"
+              job: "thanos-ruler"
+              instance: "u1"
+            exp_annotations:
+              summary: "Thanos Rule u1: failing to send alerts"
+              description: "u1 cannot deliver alerts to any Alertmanager. Firing alerts are dropped."
+
+  - interval: 15s
+    name: ThanosRuleSenderIsFailingAlerts stays quiet when healthy
+    input_series:
+      - series: 'thanos_alert_sender_alerts_dropped_total{job="thanos-ruler",instance="u1"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ThanosRuleSenderIsFailingAlerts
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosRuleHighRuleEvaluationFailures fires
+    input_series:
+      - series: 'prometheus_rule_evaluations_total{job="thanos-ruler",instance="u1",rule_group="g"}'
+        values: '0+20x200'
+      - series: 'prometheus_rule_evaluation_failures_total{job="thanos-ruler",instance="u1",rule_group="g"}'
+        values: '0+4x200'
+    alert_rule_test:
+      - alertname: ThanosRuleHighRuleEvaluationFailures
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosRuleHighRuleEvaluationFailures"
+              severity: "critical"
+              job: "thanos-ruler"
+              instance: "u1"
+            exp_annotations:
+              summary: "Thanos Rule u1: rule evaluation failures"
+              description: "20% of the rule evaluations of u1 fail. Alerts and recording rules are stale or missing."
+
+  - interval: 15s
+    name: ThanosRuleHighRuleEvaluationFailures stays quiet when healthy
+    input_series:
+      - series: 'prometheus_rule_evaluations_total{job="thanos-ruler",instance="u1",rule_group="g"}'
+        values: '0+20x200'
+      - series: 'prometheus_rule_evaluation_failures_total{job="thanos-ruler",instance="u1",rule_group="g"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ThanosRuleHighRuleEvaluationFailures
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosNoRuleEvaluations fires
+    input_series:
+      - series: 'prometheus_rule_evaluations_total{job="thanos-ruler",instance="u1",rule_group="g"}'
+        values: '100x200'
+      - series: 'thanos_rule_loaded_rules{job="thanos-ruler",instance="u1",file="f",group="g",strategy="abort"}'
+        values: '5x200'
+    alert_rule_test:
+      - alertname: ThanosNoRuleEvaluations
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosNoRuleEvaluations"
+              severity: "critical"
+              job: "thanos-ruler"
+              instance: "u1"
+            exp_annotations:
+              summary: "Thanos Rule u1: no rule evaluations"
+              description: "u1 has rules loaded but evaluated none for 20 minutes. It is stuck or cannot reach its query endpoints."
+
+  - interval: 15s
+    name: ThanosNoRuleEvaluations stays quiet when healthy
+    input_series:
+      - series: 'prometheus_rule_evaluations_total{job="thanos-ruler",instance="u1",rule_group="g"}'
+        values: '0+10x200'
+      - series: 'thanos_rule_loaded_rules{job="thanos-ruler",instance="u1",file="f",group="g",strategy="abort"}'
+        values: '5x200'
+    alert_rule_test:
+      - alertname: ThanosNoRuleEvaluations
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosNoRuleEvaluations stays quiet when no rule is loaded
+    input_series:
+      - series: 'prometheus_rule_evaluations_total{job="thanos-ruler",instance="u1",rule_group="g"}'
+        values: '100x200'
+      - series: 'thanos_rule_loaded_rules{job="thanos-ruler",instance="u1",file="f",group="g",strategy="abort"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ThanosNoRuleEvaluations
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosRuleConfigReloadFailure fires
+    input_series:
+      - series: 'thanos_rule_config_last_reload_successful{job="thanos-ruler",instance="u1"}'
+        values: '0x160'
+    alert_rule_test:
+      - alertname: ThanosRuleConfigReloadFailure
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosRuleConfigReloadFailure"
+              severity: "warning"
+              job: "thanos-ruler"
+              instance: "u1"
+            exp_annotations:
+              summary: "Thanos Rule u1: config reload failed"
+              description: "u1 could not reload its rule files. New or changed rule groups do not take effect."
+
+  - interval: 15s
+    name: ThanosRuleConfigReloadFailure stays quiet when healthy
+    input_series:
+      - series: 'thanos_rule_config_last_reload_successful{job="thanos-ruler",instance="u1"}'
+        values: '1x160'
+    alert_rule_test:
+      - alertname: ThanosRuleConfigReloadFailure
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 1m
+    name: ThanosShipperNoUploads fires after 6h without upload
+    input_series:
+      - series: 'thanos_shipper_uploads_total{job="thanos-receive",instance="r1"}'
+        values: '0+1x60 59x600'
+    alert_rule_test:
+      - alertname: ThanosShipperNoUploads
+        eval_time: 600m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosShipperNoUploads"
+              severity: "warning"
+              job: "thanos-receive"
+              instance: "r1"
+            exp_annotations:
+              summary: "Thanos Shipper r1: no block uploaded in 6h"
+              description: "r1 has shipped no block to object storage for 6 hours. The bucket is unreachable or block cutting has stalled."
+
+  - interval: 1m
+    name: ThanosShipperNoUploads stays quiet with an upload every 2h
+    input_series:
+      - series: 'thanos_shipper_uploads_total{job="thanos-receive",instance="r1"}'
+        values: '0+1x1 _x119 1+1x1 _x119 2+1x1 _x119 3+1x1 _x119 4+1x1 _x119'
+    alert_rule_test:
+      - alertname: ThanosShipperNoUploads
+        eval_time: 600m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosShipperUploadFailures fires
+    input_series:
+      - series: 'thanos_shipper_upload_failures_total{job="thanos-receive",instance="r1"}'
+        values: '0+1x200'
+    alert_rule_test:
+      - alertname: ThanosShipperUploadFailures
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosShipperUploadFailures"
+              severity: "warning"
+              job: "thanos-receive"
+              instance: "r1"
+            exp_annotations:
+              summary: "Thanos Shipper r1: block upload failures"
+              description: "r1 fails to upload TSDB blocks to object storage. Check credentials, connectivity and logs."
+
+  - interval: 15s
+    name: ThanosShipperUploadFailures stays quiet when healthy
+    input_series:
+      - series: 'thanos_shipper_upload_failures_total{job="thanos-receive",instance="r1"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ThanosShipperUploadFailures
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 1m
+    name: ThanosShipperCorruptedBlocks fires on a new corrupted block
+    input_series:
+      - series: 'thanos_shipper_corrupted_blocks_total{job="thanos-receive",instance="r1"}'
+        values: '0x10 1x60'
+    alert_rule_test:
+      - alertname: ThanosShipperCorruptedBlocks
+        eval_time: 40m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosShipperCorruptedBlocks"
+              severity: "warning"
+              job: "thanos-receive"
+              instance: "r1"
+            exp_annotations:
+              summary: "Thanos Shipper r1: corrupted blocks"
+              description: "r1 detected corrupted TSDB blocks in the last hour. Data may be lost, check TSDB integrity."
+
+  - interval: 1m
+    name: ThanosShipperCorruptedBlocks stays quiet without corrupted blocks
+    input_series:
+      - series: 'thanos_shipper_corrupted_blocks_total{job="thanos-receive",instance="r1"}'
+        values: '0x60'
+    alert_rule_test:
+      - alertname: ThanosShipperCorruptedBlocks
+        eval_time: 40m
+        exp_alerts: []
+
+  - interval: 15s
+    name: ThanosBlockMetaSyncFailures fires
+    input_series:
+      - series: 'thanos_blocks_meta_sync_failures_total{job="thanos-store",instance="s1"}'
+        values: '0+1x200'
+    alert_rule_test:
+      - alertname: ThanosBlockMetaSyncFailures
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosBlockMetaSyncFailures"
+              severity: "warning"
+              job: "thanos-store"
+              instance: "s1"
+            exp_annotations:
+              summary: "Thanos thanos-store: block metadata sync failures"
+              description: "s1 fails to sync block metadata from object storage and works on a stale view of the available blocks."
+
+  - interval: 15s
+    name: ThanosBlockMetaSyncFailures stays quiet when healthy
+    input_series:
+      - series: 'thanos_blocks_meta_sync_failures_total{job="thanos-store",instance="s1"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ThanosBlockMetaSyncFailures
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 1m
+    name: ThanosCompactHalted fires when the compactor halted
+    input_series:
+      - series: 'thanos_compact_halted{job="thanos-compact",instance="c1"}'
+        values: '1x20'
+    alert_rule_test:
+      - alertname: ThanosCompactHalted
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: "ThanosCompactHalted"
+              severity: "critical"
+              job: "thanos-compact"
+              instance: "c1"
+            exp_annotations:
+              summary: "Thanos Compact c1 halted"
+              description: "c1 halted after an unexpected error and no longer compacts or downsamples. It needs manual investigation, usually a corrupted or overlapping block."
+
+  - interval: 1m
+    name: ThanosCompactHalted stays quiet on a running compactor
+    input_series:
+      - series: 'thanos_compact_halted{job="thanos-compact",instance="c1"}'
+        values: '0x20'
+    alert_rule_test:
+      - alertname: ThanosCompactHalted
+        eval_time: 10m
+        exp_alerts: []
