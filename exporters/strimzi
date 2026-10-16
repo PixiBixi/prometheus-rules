@@ -1,0 +1,38 @@
+# strimzi/strimzi-kafka-operator (cluster operator, Micrometer Prometheus registry)
+# Built from operator-common MetricsHolder.java and cluster-operator
+# KafkaAssemblyOperatorMetricsHolder.java: names, help and labels from source.
+# Native exporter: metrics come from the operator on :8080/metrics.
+# `namespace` is the namespace of the reconciled resource, `resource_namespace`
+# (tag `resource-namespace`) is the Kafka's namespace on the certificate gauge.
+# HELP strimzi_certificate_expiration_timestamp_ms Time in milliseconds when the certificate expires
+# TYPE strimzi_certificate_expiration_timestamp_ms gauge
+strimzi_certificate_expiration_timestamp_ms{cluster="example-kafka",kind="Kafka",namespace="example-kafka",resource_namespace="example-kafka",type="cluster-ca"} 1.8e+12
+strimzi_certificate_expiration_timestamp_ms{cluster="example-kafka",kind="Kafka",namespace="example-kafka",resource_namespace="example-kafka",type="client-ca"} 1.8e+12
+# HELP strimzi_reconciliations_total Number of reconciliations done by the operator for individual resources
+# TYPE strimzi_reconciliations_total counter
+strimzi_reconciliations_total{kind="Kafka",namespace="example-kafka"} 120
+# HELP strimzi_reconciliations_periodical_total Number of periodical reconciliations done by the operator
+# TYPE strimzi_reconciliations_periodical_total counter
+strimzi_reconciliations_periodical_total{kind="Kafka",namespace="example-kafka"} 118
+# HELP strimzi_reconciliations_failed_total Number of reconciliations done by the operator for individual resources which failed
+# TYPE strimzi_reconciliations_failed_total counter
+strimzi_reconciliations_failed_total{kind="Kafka",namespace="example-kafka"} 0
+# HELP strimzi_reconciliations_successful_total Number of reconciliations done by the operator for individual resources which were successful
+# TYPE strimzi_reconciliations_successful_total counter
+strimzi_reconciliations_successful_total{kind="Kafka",namespace="example-kafka"} 120
+# HELP strimzi_reconciliations_locked_total Number of reconciliations skipped because another reconciliation for the same resource was still running
+# TYPE strimzi_reconciliations_locked_total counter
+strimzi_reconciliations_locked_total{kind="Kafka",namespace="example-kafka"} 0
+# HELP strimzi_reconciliations_duration_seconds The time the reconciliation takes to complete
+# TYPE strimzi_reconciliations_duration_seconds summary
+strimzi_reconciliations_duration_seconds_count{kind="Kafka",namespace="example-kafka"} 120
+strimzi_reconciliations_duration_seconds_sum{kind="Kafka",namespace="example-kafka"} 310.5
+# HELP strimzi_reconciliations_duration_seconds_max The time the reconciliation takes to complete
+# TYPE strimzi_reconciliations_duration_seconds_max gauge
+strimzi_reconciliations_duration_seconds_max{kind="Kafka",namespace="example-kafka"} 4.2
+# HELP strimzi_resources Number of custom resources the operator sees
+# TYPE strimzi_resources gauge
+strimzi_resources{kind="Kafka",namespace="example-kafka"} 1
+# HELP strimzi_resources_paused Number of custom resources the operator sees but does not reconcile due to paused reconciliations
+# TYPE strimzi_resources_paused gauge
+strimzi_resources_paused{kind="Kafka",namespace="example-kafka"} 0

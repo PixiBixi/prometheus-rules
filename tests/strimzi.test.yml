@@ -1,0 +1,157 @@
+# Tests for rules/strimzi.rules.yml
+# Expiry values are epoch milliseconds: (eval time + time left) * 1000.
+rule_files:
+  - strimzi.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    name: a CA with 10 days left only raises the not-renewed warning
+    input_series:
+      - series: 'strimzi_certificate_expiration_timestamp_ms{cluster="k1",kind="Kafka",namespace="kafka",resource_namespace="kafka",type="cluster-ca"}'
+        values: '871200000x180'
+    alert_rule_test:
+      - alertname: StrimziCaCertificateNotRenewed
+        eval_time: 2h
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              cluster: k1
+              namespace: kafka
+              resource_namespace: kafka
+              type: cluster-ca
+            exp_annotations:
+              description: "The CA entered its renewal window and was not renewed. The cluster operator is most likely stuck on a failed reconciliation: check its logs. Once it expires, brokers and clients lose TLS."
+              summary: "Strimzi cluster-ca of Kafka k1 expires in 10d 0h 0m 0s"
+      - alertname: StrimziCaCertificateExpiringSoon
+        eval_time: 2h
+        exp_alerts: []
+      - alertname: StrimziCaCertificateExpiringImminently
+        eval_time: 2h
+        exp_alerts: []
+
+  - interval: 1m
+    name: a CA with 5 days left raises the expiring-soon warning
+    input_series:
+      - series: 'strimzi_certificate_expiration_timestamp_ms{cluster="k1",kind="Kafka",namespace="kafka",resource_namespace="kafka",type="client-ca"}'
+        values: '439200000x180'
+    alert_rule_test:
+      - alertname: StrimziCaCertificateExpiringSoon
+        eval_time: 2h
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              cluster: k1
+              namespace: kafka
+              resource_namespace: kafka
+              type: client-ca
+            exp_annotations:
+              description: "Less than 7 days before the CA expires. Unblock the cluster operator reconciliation, or renew the CA manually with the strimzi.io/force-renew annotation on its Secret."
+              summary: "Strimzi client-ca of Kafka k1 expires in 5d 0h 0m 0s"
+      - alertname: StrimziCaCertificateExpiringImminently
+        eval_time: 2h
+        exp_alerts: []
+
+  - interval: 1m
+    name: a CA with 12 hours left is critical
+    input_series:
+      - series: 'strimzi_certificate_expiration_timestamp_ms{cluster="k1",kind="Kafka",namespace="kafka",resource_namespace="kafka",type="cluster-ca"}'
+        values: '50400000x180'
+    alert_rule_test:
+      - alertname: StrimziCaCertificateExpiringImminently
+        eval_time: 2h
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              cluster: k1
+              namespace: kafka
+              resource_namespace: kafka
+              type: cluster-ca
+            exp_annotations:
+              description: "Less than 1 day before the CA expires. Unblock the cluster operator reconciliation, or renew the CA manually with the strimzi.io/force-renew annotation on its Secret."
+              summary: "Strimzi cluster-ca of Kafka k1 expires in 12h 0m 0s"
+
+  - interval: 1m
+    name: a freshly renewed CA with 300 days left alerts on nothing
+    input_series:
+      - series: 'strimzi_certificate_expiration_timestamp_ms{cluster="k1",kind="Kafka",namespace="kafka",resource_namespace="kafka",type="cluster-ca"}'
+        values: '25927200000x180'
+    alert_rule_test:
+      - alertname: StrimziCaCertificateNotRenewed
+        eval_time: 2h
+        exp_alerts: []
+      - alertname: StrimziCaCertificateExpiringSoon
+        eval_time: 2h
+        exp_alerts: []
+      - alertname: StrimziCaCertificateExpiringImminently
+        eval_time: 2h
+        exp_alerts: []
+
+  - interval: 1m
+    name: a Kafka with no successful reconciliation for hours is stuck
+    input_series:
+      - series: 'strimzi_reconciliations_successful_total{kind="Kafka",namespace="kafka"}'
+        values: '5x240'
+      - series: 'strimzi_resources{kind="Kafka",namespace="kafka"}'
+        values: '1x240'
+    alert_rule_test:
+      - alertname: StrimziKafkaReconciliationStuck
+        eval_time: 3h
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              namespace: kafka
+            exp_annotations:
+              description: "The cluster operator reconciles every 2 minutes and none succeeded for 2 hours. CA renewal and certificate regeneration are steps of that reconciliation: left stuck, the certificates expire."
+              summary: "No successful Strimzi reconciliation of the Kafka in kafka for 2 hours"
+
+  - interval: 1m
+    name: a Kafka that keeps reconciling is not stuck
+    input_series:
+      - series: 'strimzi_reconciliations_successful_total{kind="Kafka",namespace="kafka"}'
+        values: '0+1x240'
+      - series: 'strimzi_resources{kind="Kafka",namespace="kafka"}'
+        values: '1x240'
+    alert_rule_test:
+      - alertname: StrimziKafkaReconciliationStuck
+        eval_time: 3h
+        exp_alerts: []
+
+  - interval: 1m
+    name: a namespace whose Kafka was removed does not alert on its frozen counter
+    input_series:
+      - series: 'strimzi_reconciliations_successful_total{kind="Kafka",namespace="kafka"}'
+        values: '5x240'
+      - series: 'strimzi_resources{kind="Kafka",namespace="kafka"}'
+        values: '0x240'
+    alert_rule_test:
+      - alertname: StrimziKafkaReconciliationStuck
+        eval_time: 3h
+        exp_alerts: []
+
+  - interval: 1m
+    name: an operator with no available replica alerts
+    input_series:
+      - series: 'kube_deployment_status_replicas_available{deployment="strimzi-cluster-operator",namespace="strimzi"}'
+        values: '0x30'
+    alert_rule_test:
+      - alertname: StrimziOperatorDown
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              namespace: strimzi
+            exp_annotations:
+              description: "Kafka clusters keep serving but are no longer reconciled: no rolling updates, no certificate renewal."
+              summary: "Strimzi cluster operator has no available replica in strimzi"
+
+  - interval: 1m
+    name: a running operator does not alert
+    input_series:
+      - series: 'kube_deployment_status_replicas_available{deployment="strimzi-cluster-operator",namespace="strimzi"}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: StrimziOperatorDown
+        eval_time: 20m
+        exp_alerts: []
