@@ -26,8 +26,10 @@
         description: "Redis cluster is not ok"
 
     - alert: RedisMissingMaster
+      # A failover takes a few minutes to promote a replica: 0m paged on every
+      # one. 5m rides it out and still catches a promotion that never happens.
       expr: (count(redis_instance_info{role="master"}) or vector(0)) < 1
-      for: 0m
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -35,8 +37,9 @@
         description: "Redis cluster has no node marked as master"
 
     - alert: RedisTooManyMasters
+      # The old master and the promoted replica overlap while a failover settles.
       expr: count(redis_instance_info{role="master"}) > 1
-      for: 1m
+      for: 5m
       labels:
         severity: critical
       annotations:
