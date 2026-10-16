@@ -106,6 +106,32 @@
         summary: "HAProxy process connections near limit - {{ $labels.instance }}"
         description: "HAProxy current connections exceed 80% of max on {{ $labels.instance }} - risk of connection rejection"
 
+    - alert: HAproxyProcessConnectionsNearHardMax
+      # Hard max is the FD-derived ceiling, above the configured maxconn: being
+      # near it means the process is about to be unable to open sockets.
+      expr: |
+        haproxy_process_hard_max_connections > 0
+          and
+        haproxy_process_current_connections / haproxy_process_hard_max_connections > 0.7
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy connections near hard max - {{ $labels.instance }}"
+        description: "HAProxy current connections exceed 70% of the hard connection ceiling on {{ $labels.instance }}, already beyond the configured maxconn"
+
+    - alert: HAproxyProcessConnectionsNearHardMaxCritical
+      expr: |
+        haproxy_process_hard_max_connections > 0
+          and
+        haproxy_process_current_connections / haproxy_process_hard_max_connections > 0.9
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HAProxy connections critically near hard max - {{ $labels.instance }}"
+        description: "HAProxy current connections exceed 90% of the hard connection ceiling on {{ $labels.instance }} - the process is about to be unable to accept new sockets"
+
     - alert: HAproxyProcessSslConnectionsCritical
       expr: |
         haproxy_process_max_ssl_connections > 0
