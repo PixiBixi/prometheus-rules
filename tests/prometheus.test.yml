@@ -233,3 +233,34 @@ tests:
             exp_annotations:
               summary: "Prometheus Operator rejects ServiceMonitor objects"
               description: "3 ServiceMonitor objects are rejected by the prometheus controller and not loaded. The operator logs give the reason."
+
+  # absent() is true until the first scrape after a restart.
+  - interval: 1m
+    name: prometheus job missing for 2m stays silent
+    input_series:
+      - series: 'up{job="prometheus",instance="p1"}'
+        values: '_ _ 1 1'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: PrometheusJobMissing
+        exp_alerts: []
+
+  - interval: 15s
+    name: remote write failing for 1m stays silent
+    input_series:
+      - series: 'prometheus_remote_storage_samples_failed_total{instance="p1",job="prometheus"}'
+        values: '0 0 0 0 10 20 30 40 40 40 40 40'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: PrometheusRemoteWriteFailed
+        exp_alerts: []
+
+  - interval: 15s
+    name: alertmanager notification failures for 2m stay silent
+    input_series:
+      - series: 'alertmanager_notifications_failed_total{integration="slack",instance="a1",job="alertmanager"}'
+        values: '0+10x8 80x20'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: PrometheusAlertmanagerNotificationFailing
+        exp_alerts: []
