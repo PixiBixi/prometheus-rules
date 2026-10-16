@@ -82,3 +82,47 @@ tests:
             exp_annotations:
               summary: "Redis out of configured maxmemory (instance 10.0.0.1:9121)"
               description: "Redis is running out of configured maxmemory (> 90%) on 10.0.0.1:9121\n  VALUE = 97.65625"
+
+  # A failover leaves the cluster with no master (or two) for a few minutes.
+  # Both used to fire at 0m / 1m on every one.
+  - interval: 15s
+    name: a failover with no master for 2m stays quiet, a missing master for 6m alerts
+    input_series:
+      - series: 'redis_instance_info{instance="10.0.0.1:9121",job="keydb",role="master"}'
+        values: '1x8 stale'
+      - series: 'redis_instance_info{instance="10.0.0.2:9121",job="keydb",role="slave"}'
+        values: '1x400'
+    alert_rule_test:
+      - alertname: RedisMissingMaster
+        eval_time: 3m
+        exp_alerts: []
+      - alertname: RedisMissingMaster
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: RedisMissingMaster
+              severity: critical
+            exp_annotations:
+              summary: "Redis missing master (instance )"
+              description: "Redis cluster has no node marked as master"
+
+  - interval: 15s
+    name: two masters for 2m during a failover stay quiet, 6m alerts
+    input_series:
+      - series: 'redis_instance_info{instance="10.0.0.1:9121",job="keydb",role="master"}'
+        values: '1x400'
+      - series: 'redis_instance_info{instance="10.0.0.2:9121",job="keydb",role="master"}'
+        values: '_x8 1x400'
+    alert_rule_test:
+      - alertname: RedisTooManyMasters
+        eval_time: 3m
+        exp_alerts: []
+      - alertname: RedisTooManyMasters
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              alertname: RedisTooManyMasters
+              severity: critical
+            exp_annotations:
+              summary: "Redis too many masters (instance )"
+              description: "Redis cluster has more than one master node"
