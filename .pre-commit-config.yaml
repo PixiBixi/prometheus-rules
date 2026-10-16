@@ -18,7 +18,7 @@ repos:
         stages: [pre-commit]
 
       - id: build-docs
-        name: Build docs/data.json
+        name: Build docs/rules.json and docs/exporters.json
         language: system
         entry: python3 scripts/build.py
         pass_filenames: false

@@ -41,7 +41,7 @@ jobs:
       - name: Validate PromQL rules
         run: python3 scripts/validate_rules.py
 
-      - name: Build data.json
+      - name: Build rules.json and exporters.json
         run: python3 scripts/build.py
 
       - name: Upload Pages artifact
