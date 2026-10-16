@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build docs/data.json from exporters/ and rules/."""
+"""Build docs/rules.json and docs/exporters.json from exporters/ and rules/."""
 
 import json
 import os
@@ -17,7 +17,20 @@ except ImportError:  # pragma: no cover - depends on local PyYAML build
 ROOT      = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPORTERS_DIR = os.path.join(ROOT, "exporters")
 RULES_DIR     = os.path.join(ROOT, "rules")
-OUT           = os.path.join(ROOT, "docs", "data.json")
+
+OUT_RULES     = os.path.join(ROOT, "docs", "rules.json")
+OUT_EXPORTERS = os.path.join(ROOT, "docs", "exporters.json")
+
+# Rule group stem -> category shown in the UI. Unlisted groups fall under "Other".
+CATEGORIES = {
+    **dict.fromkeys(["aerospike", "memcached", "mongodb", "mysql", "postgresql", "redis"], "Databases"),
+    **dict.fromkeys(["jmx", "kafka", "ksql", "rabbitmq", "zookeeper"], "Messaging & streaming"),
+    **dict.fromkeys(["apache", "haproxy", "keepalived", "php", "varnish"], "Web & load balancing"),
+    **dict.fromkeys(["blackbox", "certs", "coredns", "external-dns", "ipsec", "ping"], "Network, DNS & TLS"),
+    **dict.fromkeys(["cert-manager", "external-secrets", "k8s", "kubernetes"], "Kubernetes"),
+    **dict.fromkeys(["basis", "nvme"], "Hosts & hardware"),
+    **dict.fromkeys(["prometheus", "promtail", "stackdriver"], "Observability"),
+}
 
 GITHUB_REPO = "https://github.com/PixiBixi/prometheus-rules"
 BRANCH      = "main"
@@ -161,6 +174,23 @@ def extract_metric_names(expr):
     }
 
 
+def rule_line_finder(text):
+    """Return a lookup giving the 1-based line of each `- alert:`/`- record:` key, in file order."""
+    lines = text.splitlines()
+    pos = 0
+
+    def find(kind, name):
+        nonlocal pos
+        pat = re.compile(rf"^\s*-?\s*{kind}:\s*['\"]?{re.escape(name)}['\"]?\s*(#.*)?$")
+        for i in range(pos, len(lines)):
+            if pat.match(lines[i]):
+                pos = i + 1
+                return i + 1
+        return 0
+
+    return find
+
+
 def load_rules():
     rule_groups = []
     for fname in sorted(os.listdir(RULES_DIR)):
@@ -168,9 +198,11 @@ def load_rules():
             continue
         fpath = os.path.join(RULES_DIR, fname)
         with open(fpath) as f:
-            raw = yaml.load(f, Loader=YamlLoader)
+            text = f.read()
+        raw = yaml.load(text, Loader=YamlLoader)
         if not raw or not isinstance(raw, list):
             continue
+        line_of = rule_line_finder(text)
 
         for group in raw:
             name = group.get("name", fname)
@@ -189,6 +221,7 @@ def load_rules():
                         "description": rule.get("annotations", {}).get("description", ""),
                         "runbook_url": rule.get("annotations", {}).get("runbook_url", ""),
                         "metric_refs": metric_refs,
+                        "line": line_of("alert", rule["alert"]),
                     })
                 elif "record" in rule:
                     rules.append({
@@ -196,12 +229,15 @@ def load_rules():
                         "record": rule["record"],
                         "expr": expr,
                         "metric_refs": metric_refs,
+                        "line": line_of("record", rule["record"]),
                     })
 
             if rules:
+                stem = re.sub(r"\.(rules|records)$", "", name)
                 rule_groups.append({
                     "file": fname,
                     "name": name,
+                    "category": CATEGORIES.get(stem, "Other"),
                     "rules": rules,
                     "github_url": f"{GITHUB_REPO}/blob/{BRANCH}/rules/{fname}",
                 })
@@ -262,21 +298,26 @@ if __name__ == "__main__":
     print("Building cross-references...")
     exporters, rule_groups = build_cross_refs(exporters, rule_groups)
 
-    data = {
-        "meta": {
-            "github_repo": GITHUB_REPO,
-            "branch": BRANCH,
-        },
-        "exporters": exporters,
-        "rules": rule_groups,
-    }
+    meta = {"github_repo": GITHUB_REPO, "branch": BRANCH}
+    os.makedirs(os.path.dirname(OUT_RULES), exist_ok=True)
 
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w") as f:
-        json.dump(data, f, separators=(",", ":"))
+    # rules.json is fetched on first paint and carries only the metrics rules
+    # reference; exporters.json (~1.5 MB) is fetched once the page is idle.
+    referenced = {ref for g in rule_groups for r in g["rules"] for ref in r["metric_refs"]}
+    metric_index = {}
+    for e in exporters:
+        for m in e["metrics"]:
+            for name in (m["name"], re.sub(r"_(bucket|sum|count)$", "", m["name"])):
+                if name in referenced and m["name"] not in metric_index:
+                    metric_index[m["name"]] = [m["type"], m["help"], e["name"]]
+    with open(OUT_RULES, "w") as f:
+        json.dump({"meta": meta, "rules": rule_groups, "metrics": metric_index}, f, separators=(",", ":"))
+    with open(OUT_EXPORTERS, "w") as f:
+        json.dump({"exporters": exporters}, f, separators=(",", ":"))
 
-    size_kb = os.path.getsize(OUT) / 1024
-    print(f"\nWrote {OUT} ({size_kb:.0f} KB)")
+    print()
+    for p in (OUT_RULES, OUT_EXPORTERS):
+        print(f"Wrote {p} ({os.path.getsize(p) / 1024:.0f} KB)")
     print(f"  {len(exporters)} exporters, {sum(len(e['metrics']) for e in exporters)} metrics")
     total_alerts  = sum(len([r for r in g["rules"] if r["kind"]=="alert"])  for g in rule_groups)
     total_records = sum(len([r for r in g["rules"] if r["kind"]=="record"]) for g in rule_groups)
