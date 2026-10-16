@@ -148,3 +148,88 @@ tests:
       - alertname: PrometheusRemoteWriteBehind
         eval_time: 25m
         exp_alerts: []
+
+  - interval: 15s
+    name: Watchdog always fires as a heartbeat
+    input_series:
+      - series: 'up{job="prometheus",instance="p1"}'
+        values: '1x100'
+    alert_rule_test:
+      - alertname: Watchdog
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              alertname: Watchdog
+              severity: warning
+            exp_annotations:
+              summary: "Watchdog heartbeat, this alert always fires"
+              description: "Always-firing heartbeat that proves the Prometheus to Alertmanager pipeline works. Route it to a dead man's switch; if it stops arriving, alerting is down."
+
+  - interval: 15s
+    name: operator reconcile errors for 30m alert per controller, quiet when counter is flat
+    input_series:
+      - series: 'prometheus_operator_reconcile_errors_total{controller="prometheus",job="op"}'
+        values: '0+1x400'
+      - series: 'prometheus_operator_reconcile_errors_total{controller="alertmanager",job="op"}'
+        values: '5x400'
+    alert_rule_test:
+      - alertname: PrometheusOperatorReconcileErrors
+        eval_time: 20m
+        exp_alerts: []
+      - alertname: PrometheusOperatorReconcileErrors
+        eval_time: 60m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusOperatorReconcileErrors
+              controller: prometheus
+              severity: warning
+            exp_annotations:
+              summary: "Prometheus Operator prometheus controller cannot reconcile"
+              description: "240 reconcile errors in the last hour on the prometheus controller: new monitors, rules and remote writes are not applied. The reason is in the status conditions of the resource."
+
+  - interval: 15s
+    name: operator controller not ready for 10m alerts, a ready one does not
+    input_series:
+      - series: 'prometheus_operator_ready{controller="prometheus",job="op"}'
+        values: '0x200'
+      - series: 'prometheus_operator_ready{controller="alertmanager",job="op"}'
+        values: '1x200'
+    alert_rule_test:
+      - alertname: PrometheusOperatorNotReady
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: PrometheusOperatorNotReady
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusOperatorNotReady
+              controller: prometheus
+              severity: warning
+            exp_annotations:
+              summary: "Prometheus Operator prometheus controller not ready"
+              description: "The prometheus controller of the Prometheus Operator is not ready: changes to its resources are not applied."
+
+  - interval: 15s
+    name: operator rejected resources alert, zero rejected stays quiet
+    input_series:
+      - series: 'prometheus_operator_managed_resources{controller="prometheus",resource="ServiceMonitor",state="rejected",job="op"}'
+        values: '3x200'
+      - series: 'prometheus_operator_managed_resources{controller="prometheus",resource="PodMonitor",state="rejected",job="op"}'
+        values: '0x200'
+      - series: 'prometheus_operator_managed_resources{controller="prometheus",resource="ServiceMonitor",state="selected",job="op"}'
+        values: '9x200'
+    alert_rule_test:
+      - alertname: PrometheusOperatorRejectedResources
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: PrometheusOperatorRejectedResources
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              alertname: PrometheusOperatorRejectedResources
+              controller: prometheus
+              resource: ServiceMonitor
+              severity: warning
+            exp_annotations:
+              summary: "Prometheus Operator rejects ServiceMonitor objects"
+              description: "3 ServiceMonitor objects are rejected by the prometheus controller and not loaded. The operator logs give the reason."
