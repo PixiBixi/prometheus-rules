@@ -1,0 +1,126 @@
+# Tests for rules/controller-runtime.rules.yml
+rule_files:
+  - controller-runtime.rules.yml
+
+evaluation_interval: 15s
+
+tests:
+  - interval: 15s
+    name: a controller erroring at 0.067/s for 15m alerts
+    input_series:
+      - series: 'controller_runtime_reconcile_errors_total{job="op",controller="widget",instance="a"}'
+        values: '0+1x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeReconcileErrors
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: op
+              controller: widget
+            exp_annotations:
+              summary: "Controller widget (op) is failing to reconcile"
+              description: "Controller widget of op has been erroring at 66.67m/s for 15 minutes. Objects it owns are not converging. Check the operator logs."
+
+  - interval: 15s
+    name: a rare reconcile error (0.01/s) does not alert
+    input_series:
+      - series: 'controller_runtime_reconcile_errors_total{job="op",controller="widget",instance="a"}'
+        values: '0+0.15x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeReconcileErrors
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: a flat error counter does not alert
+    input_series:
+      - series: 'controller_runtime_reconcile_errors_total{job="op",controller="widget",instance="a"}'
+        values: '7x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeReconcileErrors
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: a reconcile panic alerts
+    input_series:
+      - series: 'controller_runtime_reconcile_panics_total{job="op",controller="widget",instance="a"}'
+        values: '0x40 1x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeReconcilePanics
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: op
+              controller: widget
+            exp_annotations:
+              summary: "Controller widget (op) panicked during reconcile"
+              description: "Controller widget of op recovered from 1 reconcile panics in the last 15 minutes. The offending object is retried and will keep panicking."
+
+  - interval: 15s
+    name: a panic counter that never moved does not alert
+    input_series:
+      - series: 'controller_runtime_reconcile_panics_total{job="op",controller="widget",instance="a"}'
+        values: '0x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeReconcilePanics
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 15s
+    name: a webhook answering 500 for 10m alerts critical
+    input_series:
+      - series: 'controller_runtime_webhook_requests_total{job="op",webhook="/validate-widget",code="500",instance="a"}'
+        values: '0+1x200'
+      - series: 'controller_runtime_webhook_requests_total{job="op",webhook="/validate-widget",code="200",instance="a"}'
+        values: '0+10x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeWebhookErrors
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: op
+              webhook: /validate-widget
+            exp_annotations:
+              summary: "Admission webhook /validate-widget (op) is returning errors"
+              description: "Webhook /validate-widget of op has been returning non-200 at 66.67m/s for 10 minutes. With a failurePolicy of Fail the API server rejects the matching objects."
+
+  - interval: 15s
+    name: a webhook answering only 200 does not alert
+    input_series:
+      - series: 'controller_runtime_webhook_requests_total{job="op",webhook="/validate-widget",code="200",instance="a"}'
+        values: '0+10x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeWebhookErrors
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: a workqueue with 10 minutes of unfinished work alerts
+    input_series:
+      - series: 'workqueue_unfinished_work_seconds{job="op",name="widget",controller="widget",instance="a"}'
+        values: '600x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeWorkqueueStuck
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: op
+              name: widget
+            exp_annotations:
+              summary: "Workqueue widget (op) is not draining"
+              description: "Workqueue widget of op has had unfinished work for 10m 0s. A reconcile is wedged rather than failing, so nothing errors but nothing progresses."
+
+  - interval: 15s
+    name: a workqueue below 300s of unfinished work does not alert
+    input_series:
+      - series: 'workqueue_unfinished_work_seconds{job="op",name="widget",controller="widget",instance="a"}'
+        values: '10x200'
+    alert_rule_test:
+      - alertname: ControllerRuntimeWorkqueueStuck
+        eval_time: 15m
+        exp_alerts: []
