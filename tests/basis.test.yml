@@ -136,3 +136,14 @@ tests:
             exp_annotations:
               summary: "systemd not fully operational on h2"
               description: "systemd reports system is not fully operational on h2."
+
+  # A unit caught in "failed" on a single scrape must not page.
+  - interval: 30s
+    name: systemd unit failed for one scrape stays silent
+    input_series:
+      - series: 'node_systemd_unit_state{state="failed",name="nginx.service",instance="h1",job="node"}'
+        values: '1 0 0 0'
+    alert_rule_test:
+      - eval_time: 30s
+        alertname: DownSystemdNginx
+        exp_alerts: []
