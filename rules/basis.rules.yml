@@ -154,6 +154,7 @@
         description: "Node memory is filling up (< 10% left)\n VALUE = {{ $value }}"
     - alert: HostOomKillDetected
       expr: increase(node_vmstat_oom_kill{ignoreOOM=""}[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -163,6 +164,7 @@
     # Misc
     - alert: Segfault
       expr: server_metrics{dimension="segfault"} > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -200,6 +202,7 @@
     # Systemd rules
     - alert: DownSystemdNginx
       expr: node_systemd_unit_state{state="failed",name="nginx.service",ignoreNginxDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -207,6 +210,7 @@
         description: "Systemd failed for nginx, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdDocker
       expr: node_systemd_unit_state{state="failed",name="docker.service",ignoreDockerDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -214,6 +218,7 @@
         description: "Systemd failed for docker, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdMySQL
       expr: node_systemd_unit_state{state="failed",name="mysql.service",ignoreMysqlDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -221,6 +226,7 @@
         description: "Systemd failed for MySQL, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdAerospike
       expr: node_systemd_unit_state{state="failed",name="aerospike.service",ignoreAerospikeDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -228,6 +234,7 @@
         description: "Systemd failed for aerospike, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdASGateway
       expr: node_systemd_unit_state{state="failed",name="as-rest-gateway.service",ignoreASRestDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -235,6 +242,7 @@
         description: "Systemd failed for as-rest-gateway, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdPromtail
       expr: node_systemd_unit_state{state="failed",name="promtail.service",ignorePromtailDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -242,6 +250,7 @@
         description: "Systemd failed for promtail, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdCron
       expr: node_systemd_unit_state{state="failed",name=~"crond?\\.service",ignoreCronDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -249,6 +258,7 @@
         description: "Systemd failed for cron, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdSSH
       expr: node_systemd_unit_state{state="failed",name=~"sshd?\\.service",ignoreSSHDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -256,6 +266,7 @@
         description: "Systemd failed for SSH, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdHAproxy
       expr: node_systemd_unit_state{state="failed",name="haproxy.service",ignoreHAproxyDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -263,6 +274,7 @@
         description: "Systemd failed for HAproxy, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdKeyDB
       expr: node_systemd_unit_state{state="failed",name="keydb.service",ignoreKeydbDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -270,6 +282,7 @@
         description: "Systemd failed for KeyDB, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdRedis
       expr: node_systemd_unit_state{state="failed",name=~"redis_.*.service",ignoreRedisDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -277,6 +290,7 @@
         description: "Systemd failed for Redis, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdBidRequest
       expr: node_systemd_unit_state{state="failed",name=~"bid_request_.*.service"} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -284,6 +298,7 @@
         description: "Systemd failed for Bid Request Logger, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdPHPFPM
       expr: node_systemd_unit_state{state="failed",name=~"php.*-fpm.service",ignorePHPDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -291,6 +306,7 @@
         description: "Systemd failed for PHPFPM, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdNTP
       expr: node_systemd_unit_state{state="failed",name=~"(chrony|systemd-timesyncd).*",ignoreNTPDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -298,6 +314,7 @@
         description: "Systemd failed for NTP, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdTeleport
       expr: node_systemd_unit_state{state="failed",name=~"teleport.service",ignoreTeleportDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -305,6 +322,7 @@
         description: "Systemd failed for Teleport, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdKafkaConnect
       expr: node_systemd_unit_state{state="failed",name="confluent-kafka-connect.service",ignoreKafkaConnectDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -312,6 +330,7 @@
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdSchemaRegistry
       expr: node_systemd_unit_state{state="failed",name="confluent-schema-registry.service",ignoreSchemaRegistryDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -319,6 +338,7 @@
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdKsqlDB
       expr: node_systemd_unit_state{state="failed",name="confluent-ksqldb.service",ignoreKsqlDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -326,6 +346,7 @@
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdZookeeper
       expr: node_systemd_unit_state{state="failed",name="confluent-zookeeper.service",ignoreZookeeperDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -333,6 +354,7 @@
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdKafka
       expr: node_systemd_unit_state{state="failed",name="confluent-kafka.service",ignoreKafkaDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -340,6 +362,7 @@
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdKafkaRest
       expr: node_systemd_unit_state{state="failed",name="confluent-kafka-rest.service",ignoreKafkaRestDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -347,6 +370,7 @@
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdSupervisor
       expr: node_systemd_unit_state{state="failed",name="supervisor.service",ignoreSupervisorDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -354,6 +378,7 @@
         description: "Systemd failed for supervisor, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdSquid
       expr: node_systemd_unit_state{state="failed",name="squid.service",ignoreSquidDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -365,6 +390,7 @@
       # node_exporter Ansible role, so this alert has no series to match and
       # cannot fire. Add openvpn-client@.* to that allowlist to enable it.
       expr: node_systemd_unit_state{state="failed",name=~"openvpn-client@.*",ignoreOpenVPNDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -372,6 +398,7 @@
         description: "Systemd failed for {{ $labels.name }}, please take a look with `systemctl status {{ $labels.name }}`"
     - alert: DownSystemdKeepalived
       expr: node_systemd_unit_state{state="failed",name="keepalived.service",ignoreKeepalivedDown=""} > 0
+      for: 1m
       labels:
         severity: critical
       annotations:
