@@ -172,7 +172,7 @@
       labels:
         severity: warning
       annotations:
-        description: "Backup for {{ $labels.instance }}/{{ $labels.namespace }} has failed"
+        description: "The last backup run of {{ $labels.namespace }} reported a failure. A restore would use the previous successful backup: check the backup job logs on {{ $labels.instance }}."
         summary: "Backup for {{ $labels.instance }}/{{ $labels.namespace }} has failed"
     - alert: AerospikePopBackupFail
       expr: sum(backup_aerospike_state) by (pop) == 0
@@ -180,7 +180,7 @@
       labels:
         severity: critical
       annotations:
-        description: "All Aerospike backups for pop {{ $labels.pop }} have failed"
+        description: "No Aerospike backup succeeded in pop {{ $labels.pop }}. A shared cause (storage target, credentials, network) is more likely than a single node."
         summary: "All Aerospike backups for pop {{ $labels.pop }} have failed"
     - alert: AerospikeDeadPartitions
       expr: sum(aerospike_namespace_dead_partitions) by (ns,cluster_name,job) > 0
