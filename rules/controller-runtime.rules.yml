@@ -1,0 +1,49 @@
+- name: controller-runtime.rules
+  rules:
+    - alert: ControllerRuntimeReconcileErrors
+      expr: |
+        sum by (job, controller) (
+          rate(controller_runtime_reconcile_errors_total[10m])
+        ) > 0.05
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Controller {{ $labels.controller }} ({{ $labels.job }}) is failing to reconcile"
+        description: "Controller {{ $labels.controller }} of {{ $labels.job }} has been erroring at {{ $value | humanize }}/s for 15 minutes. Objects it owns are not converging. Check the operator logs."
+
+    - alert: ControllerRuntimeReconcilePanics
+      expr: |
+        sum by (job, controller) (
+          increase(controller_runtime_reconcile_panics_total[15m])
+        ) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Controller {{ $labels.controller }} ({{ $labels.job }}) panicked during reconcile"
+        description: "Controller {{ $labels.controller }} of {{ $labels.job }} recovered from {{ $value | humanize }} reconcile panics in the last 15 minutes. The offending object is retried and will keep panicking."
+
+    - alert: ControllerRuntimeWebhookErrors
+      expr: |
+        sum by (job, webhook) (
+          rate(controller_runtime_webhook_requests_total{code!="200"}[10m])
+        ) > 0.05
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Admission webhook {{ $labels.webhook }} ({{ $labels.job }}) is returning errors"
+        description: "Webhook {{ $labels.webhook }} of {{ $labels.job }} has been returning non-200 at {{ $value | humanize }}/s for 10 minutes. With a failurePolicy of Fail the API server rejects the matching objects."
+
+    - alert: ControllerRuntimeWorkqueueStuck
+      expr: |
+        max by (job, name) (
+          workqueue_unfinished_work_seconds
+        ) > 300
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Workqueue {{ $labels.name }} ({{ $labels.job }}) is not draining"
+        description: "Workqueue {{ $labels.name }} of {{ $labels.job }} has had unfinished work for {{ $value | humanizeDuration }}. A reconcile is wedged rather than failing, so nothing errors but nothing progresses."
