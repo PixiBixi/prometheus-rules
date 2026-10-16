@@ -213,3 +213,205 @@ tests:
       - alertname: AerospikeUsedCloseToStopWritesCritical
         eval_time: 16m
         exp_alerts: []
+
+  - interval: 1m
+    name: dead partitions alert after 3m, quiet at zero
+    input_series:
+      - series: 'aerospike_namespace_dead_partitions{job="aerospike",instance="as1",cluster_name="c",ns="n1",service="s1"}'
+        values: '2x10'
+      - series: 'aerospike_namespace_dead_partitions{job="aerospike",instance="as2",cluster_name="c",ns="n2",service="s2"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: AerospikeDeadPartitions
+        eval_time: 2m
+        exp_alerts: []
+      - alertname: AerospikeDeadPartitions
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeDeadPartitions
+              job: aerospike
+              cluster_name: c
+              ns: n1
+              severity: critical
+            exp_annotations:
+              summary: "AS - Dead partitions for n1 @ c"
+              description: "n1 @ c has 2 dead partition(s): potential data loss, writes to them are refused until they are revived."
+
+  - interval: 1m
+    name: namespace clock skew stop-writes fires only when the flag is 1
+    input_series:
+      - series: 'aerospike_namespace_clock_skew_stop_writes{cluster_name="c",ns="n1",service="s1"}'
+        values: '1x10'
+      - series: 'aerospike_namespace_clock_skew_stop_writes{cluster_name="c",ns="n2",service="s1"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: AerospikeNamespaceClockSkewStopWrites
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeNamespaceClockSkewStopWrites
+              cluster_name: c
+              ns: n1
+              service: s1
+              severity: critical
+            exp_annotations:
+              summary: "AS - Stop-writes due to clock skew for n1 @ c"
+              description: "n1 @ c rejects writes because of cluster clock skew, check NTP on every node."
+
+  - interval: 1m
+    name: node clock skew warning above 2s and critical above 20s
+    input_series:
+      - series: 'aerospike_node_stats_cluster_clock_skew_ms{cluster_name="warn",instance="a",service="s1"}'
+        values: '3000x10'
+      - series: 'aerospike_node_stats_cluster_clock_skew_ms{cluster_name="crit",instance="b",service="s2"}'
+        values: '25000x10'
+      - series: 'aerospike_node_stats_cluster_clock_skew_ms{cluster_name="ok",instance="c",service="s3"}'
+        values: '1x10'
+    alert_rule_test:
+      - alertname: AerospikeNodeClockSkew
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeNodeClockSkew
+              cluster_name: warn
+              instance: a
+              service: s1
+              severity: warning
+            exp_annotations:
+              summary: "AS - Clock skew above 2s on cluster warn"
+              description: "Cluster warn clock skew is 3000ms (> 2s) as seen from a. Ensure clocks are synchronized."
+          - exp_labels:
+              alertname: AerospikeNodeClockSkew
+              cluster_name: crit
+              instance: b
+              service: s2
+              severity: warning
+            exp_annotations:
+              summary: "AS - Clock skew above 2s on cluster crit"
+              description: "Cluster crit clock skew is 25000ms (> 2s) as seen from b. Ensure clocks are synchronized."
+      - alertname: AerospikeNodeClockSkewCritical
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeNodeClockSkewCritical
+              cluster_name: crit
+              instance: b
+              service: s2
+              severity: critical
+            exp_annotations:
+              summary: "AS - Clock skew above 20s on cluster crit"
+              description: "Cluster crit clock skew is 25000ms (> 20s) as seen from b, writes may be stopped."
+
+  - interval: 1m
+    name: low system memory critical below 12 percent, quiet at 13
+    input_series:
+      - series: 'aerospike_node_stats_system_free_mem_pct{cluster_name="c",service="s1"}'
+        values: '11x10'
+      - series: 'aerospike_node_stats_system_free_mem_pct{cluster_name="c",service="s2"}'
+        values: '13x10'
+    alert_rule_test:
+      - alertname: AerospikeLowSystemMemoryCritical
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeLowSystemMemoryCritical
+              cluster_name: c
+              service: s1
+              severity: critical
+            exp_annotations:
+              summary: "AS - Low system memory on s1 @ c (< 12%)"
+              description: "System free memory of s1 @ c is 11.0%, close to the 10% stop-writes threshold."
+
+  # Dips to 14 for 5m (fires), recovers to 16 (still inside hysteresis, stays
+  # firing), then holds at 18 (keep_firing_for 15m, then resolves).
+  - interval: 1m
+    name: low system memory warning has hysteresis between 15 and 17 percent
+    input_series:
+      - series: 'aerospike_node_stats_system_free_mem_pct{cluster_name="c",service="s1"}'
+        values: '14x5 16x20 18x40'
+    alert_rule_test:
+      - alertname: AerospikeLowSystemMemory
+        eval_time: 2m
+        exp_alerts: []
+      - alertname: AerospikeLowSystemMemory
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeLowSystemMemory
+              cluster_name: c
+              service: s1
+              severity: warning
+            exp_annotations:
+              summary: "AS - Low system memory on s1 @ c (< 15%)"
+              description: "System free memory of s1 @ c is 14.0%. Stop-writes triggers at 10% free."
+      - alertname: AerospikeLowSystemMemory
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeLowSystemMemory
+              cluster_name: c
+              service: s1
+              severity: warning
+            exp_annotations:
+              summary: "AS - Low system memory on s1 @ c (< 15%)"
+              description: "System free memory of s1 @ c is 16.0%. Stop-writes triggers at 10% free."
+      - alertname: AerospikeLowSystemMemory
+        eval_time: 60m
+        exp_alerts: []
+
+  - interval: 1m
+    name: migrations stuck fires when remaining partitions never decrease for 1h, not when they drain
+    input_series:
+      # stuck: constant 10 (tx 6 + rx 4)
+      - series: 'aerospike_namespace_migrate_tx_partitions_remaining{cluster_name="stuck",ns="n1",service="s1"}'
+        values: '6x120'
+      - series: 'aerospike_namespace_migrate_rx_partitions_remaining{cluster_name="stuck",ns="n1",service="s1"}'
+        values: '4x120'
+      # draining: 120 down to 1
+      - series: 'aerospike_namespace_migrate_tx_partitions_remaining{cluster_name="drain",ns="n1",service="s1"}'
+        values: '120-1x119'
+      - series: 'aerospike_namespace_migrate_rx_partitions_remaining{cluster_name="drain",ns="n1",service="s1"}'
+        values: '0x120'
+      # idle: nothing to migrate
+      - series: 'aerospike_namespace_migrate_tx_partitions_remaining{cluster_name="idle",ns="n1",service="s1"}'
+        values: '0x120'
+      - series: 'aerospike_namespace_migrate_rx_partitions_remaining{cluster_name="idle",ns="n1",service="s1"}'
+        values: '0x120'
+    alert_rule_test:
+      - alertname: AerospikeMigrationsStuck
+        eval_time: 100m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeMigrationsStuck
+              cluster_name: stuck
+              ns: n1
+              severity: warning
+            exp_annotations:
+              summary: "AS - Migrations stuck for n1 @ stuck"
+              description: "10 partitions of n1 @ stuck are migrating with no progress for 1h. Migrations delay rolling restarts: check node size and the migrate settings."
+
+  - interval: 1m
+    name: XDR lag above 600s for 15m fires, below stays quiet
+    input_series:
+      - series: 'aerospike_xdr_lag{cluster_name="c",dc="dc1",service="s1"}'
+        values: '700x30'
+      - series: 'aerospike_xdr_lag{cluster_name="c",dc="dc1",service="s2"}'
+        values: '100x30'
+      - series: 'aerospike_xdr_lag{cluster_name="c",dc="dc2",service="s1"}'
+        values: '5x30'
+    alert_rule_test:
+      - alertname: AerospikeXdrLag
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: AerospikeXdrLag
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alertname: AerospikeXdrLag
+              cluster_name: c
+              dc: dc1
+              severity: warning
+            exp_annotations:
+              summary: "AS - XDR lag to dc1 from c"
+              description: "XDR lag from c to dc1 is 11m 40s (> 10m). The remote datacenter is the fallback for losing a cluster."
