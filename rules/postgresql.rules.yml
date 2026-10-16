@@ -104,7 +104,7 @@
       labels:
         severity: critical
       annotations:
-        description: "PostgreSQL replication down for {{ $labels.instance }} / {{ $labels.slot_name}} "
+        description: "Replication slot {{ $labels.slot_name }} is inactive: its consumer is disconnected. The primary retains WAL for the slot, so disk usage grows until it reconnects or the slot is dropped."
         summary: "PostgreSQL replication down for {{ $labels.instance }} / {{ $labels.slot_name}} "
     # Replication lag is covered by PostgresReplicationLagHigh / ...Critical below.
     # The former PostgreSQLRepliLag / ...Critical pair queried `replication_lag`,
