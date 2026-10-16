@@ -1,0 +1,158 @@
+# Tests for rules/argocd.rules.yml
+rule_files:
+  - argocd.rules.yml
+
+evaluation_interval: 15s
+
+tests:
+  - interval: 1m
+    name: an auto-synced app OutOfSync for over 1h alerts
+    input_series:
+      - series: 'argocd_app_info{job="argocd",name="web",project="default",autosync_enabled="true",sync_status="OutOfSync",health_status="Healthy",instance="a"}'
+        values: '1x90'
+    alert_rule_test:
+      - alertname: ArgoCDAppOutOfSync
+        eval_time: 80m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: argocd
+              name: web
+              project: default
+              sync_status: OutOfSync
+            exp_annotations:
+              summary: "ArgoCD application web cannot sync (OutOfSync)"
+              description: "Auto-sync has not converged for application web (project default) for over 1 hour, so merged changes do not reach the cluster. Read .status.operationState.message on the Application."
+
+  - interval: 1m
+    name: an OutOfSync app without auto-sync does not alert
+    input_series:
+      - series: 'argocd_app_info{job="argocd",name="web",project="default",autosync_enabled="false",sync_status="OutOfSync",health_status="Healthy",instance="a"}'
+        values: '1x90'
+    alert_rule_test:
+      - alertname: ArgoCDAppOutOfSync
+        eval_time: 80m
+        exp_alerts: []
+
+  - interval: 1m
+    name: an auto-synced app OutOfSync for only 30m does not alert
+    input_series:
+      - series: 'argocd_app_info{job="argocd",name="web",project="default",autosync_enabled="true",sync_status="OutOfSync",health_status="Healthy",instance="a"}'
+        values: '1x30 stale'
+    alert_rule_test:
+      - alertname: ArgoCDAppOutOfSync
+        eval_time: 80m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a Degraded app for 15m alerts
+    input_series:
+      - series: 'argocd_app_info{job="argocd",name="web",project="default",autosync_enabled="true",sync_status="Synced",health_status="Degraded",instance="a"}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: ArgoCDAppUnhealthy
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: argocd
+              name: web
+              project: default
+              health_status: Degraded
+            exp_annotations:
+              summary: "ArgoCD application web is Degraded"
+              description: "Application web (project default) has been Degraded for 15 minutes."
+
+  - interval: 1m
+    name: a Healthy or Progressing app does not alert
+    input_series:
+      - series: 'argocd_app_info{job="argocd",name="web",project="default",autosync_enabled="true",sync_status="Synced",health_status="Healthy",instance="a"}'
+        values: '1x30'
+      - series: 'argocd_app_info{job="argocd",name="api",project="default",autosync_enabled="true",sync_status="Synced",health_status="Progressing",instance="a"}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: ArgoCDAppUnhealthy
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a failed sync operation alerts
+    input_series:
+      - series: 'argocd_app_sync_total{job="argocd",name="web",project="default",phase="Error",dry_run="false",dest_server="x",instance="a"}'
+        values: '0x10 1x30'
+    alert_rule_test:
+      - alertname: ArgoCDAppSyncFailed
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: argocd
+              name: web
+              project: default
+            exp_annotations:
+              summary: "ArgoCD sync of web failed"
+              description: "Application web (project default) had 1 failed sync operations in the last 30 minutes."
+
+  - interval: 1m
+    name: successful syncs do not alert
+    input_series:
+      - series: 'argocd_app_sync_total{job="argocd",name="web",project="default",phase="Succeeded",dry_run="false",dest_server="x",instance="a"}'
+        values: '0+1x40'
+    alert_rule_test:
+      - alertname: ArgoCDAppSyncFailed
+        eval_time: 20m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a cluster with connection status 0 for 10m alerts critical
+    input_series:
+      - series: 'argocd_cluster_connection_status{job="argocd",server="https://c1",k8s_version="v1.31",instance="a"}'
+        values: '0x30'
+    alert_rule_test:
+      - alertname: ArgoCDClusterConnectionFailed
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: argocd
+              server: https://c1
+            exp_annotations:
+              summary: "ArgoCD cannot reach cluster https://c1"
+              description: "The application controller has had no working connection to cluster https://c1 for 10 minutes. Applications targeting it are not reconciled."
+
+  - interval: 1m
+    name: a connected cluster does not alert
+    input_series:
+      - series: 'argocd_cluster_connection_status{job="argocd",server="https://c1",k8s_version="v1.31",instance="a"}'
+        values: '1x30'
+    alert_rule_test:
+      - alertname: ArgoCDClusterConnectionFailed
+        eval_time: 15m
+        exp_alerts: []
+
+  - interval: 1m
+    name: a failing ls-remote on a repo alerts
+    input_series:
+      - series: 'argocd_git_lsremote_fail_total{job="argocd",repo="https://git/r.git",revision="HEAD",instance="a"}'
+        values: '0x5 1+1x40'
+    alert_rule_test:
+      - alertname: ArgoCDRepoUnreachable
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: argocd
+              repo: https://git/r.git
+            exp_annotations:
+              summary: "ArgoCD repo-server cannot reach https://git/r.git"
+              description: "git ls-remote against https://git/r.git keeps failing. Applications sourced from it stop seeing new commits."
+
+  - interval: 1m
+    name: a repo with no ls-remote failures does not alert
+    input_series:
+      - series: 'argocd_git_lsremote_fail_total{job="argocd",repo="https://git/r.git",revision="HEAD",instance="a"}'
+        values: '0x40'
+    alert_rule_test:
+      - alertname: ArgoCDRepoUnreachable
+        eval_time: 30m
+        exp_alerts: []

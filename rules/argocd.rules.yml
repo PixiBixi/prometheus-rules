@@ -1,0 +1,62 @@
+- name: argocd.rules
+  rules:
+    # Auto-sync converges in minutes: still not Synced after 1h means it is failing every attempt.
+    - alert: ArgoCDAppOutOfSync
+      expr: |
+        max by (job, project, name, sync_status) (
+          argocd_app_info{autosync_enabled="true", sync_status!="Synced"}
+        ) == 1
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "ArgoCD application {{ $labels.name }} cannot sync ({{ $labels.sync_status }})"
+        description: "Auto-sync has not converged for application {{ $labels.name }} (project {{ $labels.project }}) for over 1 hour, so merged changes do not reach the cluster. Read .status.operationState.message on the Application."
+
+    - alert: ArgoCDAppUnhealthy
+      expr: |
+        max by (job, project, name, health_status) (
+          argocd_app_info{health_status=~"Degraded|Missing"}
+        ) == 1
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "ArgoCD application {{ $labels.name }} is {{ $labels.health_status }}"
+        description: "Application {{ $labels.name }} (project {{ $labels.project }}) has been {{ $labels.health_status }} for 15 minutes."
+
+    - alert: ArgoCDAppSyncFailed
+      expr: |
+        sum by (job, project, name) (
+          increase(argocd_app_sync_total{phase=~"Error|Failed", dry_run="false"}[30m])
+        ) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "ArgoCD sync of {{ $labels.name }} failed"
+        description: "Application {{ $labels.name }} (project {{ $labels.project }}) had {{ $value | humanize }} failed sync operations in the last 30 minutes."
+
+    - alert: ArgoCDClusterConnectionFailed
+      expr: |
+        max by (job, server) (
+          argocd_cluster_connection_status
+        ) == 0
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "ArgoCD cannot reach cluster {{ $labels.server }}"
+        description: "The application controller has had no working connection to cluster {{ $labels.server }} for 10 minutes. Applications targeting it are not reconciled."
+
+    - alert: ArgoCDRepoUnreachable
+      expr: |
+        sum by (job, repo) (
+          increase(argocd_git_lsremote_fail_total[15m])
+        ) > 0
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "ArgoCD repo-server cannot reach {{ $labels.repo }}"
+        description: "git ls-remote against {{ $labels.repo }} keeps failing. Applications sourced from it stop seeing new commits."
