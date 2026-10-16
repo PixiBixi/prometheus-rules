@@ -1,0 +1,53 @@
+- name: strimzi.rules
+  # Strimzi renews a CA 30 days before expiry by default: under 14 days left
+  # means the renewal is stuck. Both namespace labels are kept, see cert-manager.
+  rules:
+    - alert: StrimziCaCertificateNotRenewed
+      expr: max by (exported_namespace, namespace, resource_namespace, cluster, type) (strimzi_certificate_expiration_timestamp_ms) / 1000 - time() < 14 * 86400
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "Strimzi {{ $labels.type }} of Kafka {{ $labels.cluster }} expires in {{ $value | humanizeDuration }}"
+        description: "The CA entered its renewal window and was not renewed. The cluster operator is most likely stuck on a failed reconciliation: check its logs. Once it expires, brokers and clients lose TLS."
+
+    - alert: StrimziCaCertificateExpiringSoon
+      expr: max by (exported_namespace, namespace, resource_namespace, cluster, type) (strimzi_certificate_expiration_timestamp_ms) / 1000 - time() < 7 * 86400
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Strimzi {{ $labels.type }} of Kafka {{ $labels.cluster }} expires in {{ $value | humanizeDuration }}"
+        description: "Less than 7 days before the CA expires. Unblock the cluster operator reconciliation, or renew the CA manually with the strimzi.io/force-renew annotation on its Secret."
+
+    - alert: StrimziCaCertificateExpiringImminently
+      expr: max by (exported_namespace, namespace, resource_namespace, cluster, type) (strimzi_certificate_expiration_timestamp_ms) / 1000 - time() < 1 * 86400
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Strimzi {{ $labels.type }} of Kafka {{ $labels.cluster }} expires in {{ $value | humanizeDuration }}"
+        description: "Less than 1 day before the CA expires. Unblock the cluster operator reconciliation, or renew the CA manually with the strimzi.io/force-renew annotation on its Secret."
+
+    # Summed per namespace: a per-pod series false-fires on an operator restart or a standby replica.
+    # The guard skips namespaces whose Kafka is gone, the operator keeps their counter.
+    - alert: StrimziKafkaReconciliationStuck
+      expr: |
+        sum by (exported_namespace, namespace) (increase(strimzi_reconciliations_successful_total{kind="Kafka"}[1h])) == 0
+        and on (exported_namespace, namespace)
+        sum by (exported_namespace, namespace) (strimzi_resources{kind="Kafka"}) > 0
+      for: 1h
+      labels:
+        severity: critical
+      annotations:
+        summary: "No successful Strimzi reconciliation of the Kafka in {{ if $labels.exported_namespace }}{{ $labels.exported_namespace }}{{ else }}{{ $labels.namespace }}{{ end }} for 2 hours"
+        description: "The cluster operator reconciles every 2 minutes and none succeeded for 2 hours. CA renewal and certificate regeneration are steps of that reconciliation: left stuck, the certificates expire."
+
+    - alert: StrimziOperatorDown
+      expr: max by (namespace) (kube_deployment_status_replicas_available{deployment="strimzi-cluster-operator"}) < 1
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Strimzi cluster operator has no available replica in {{ $labels.namespace }}"
+        description: "Kafka clusters keep serving but are no longer reconciled: no rolling updates, no certificate renewal."
