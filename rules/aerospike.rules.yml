@@ -182,3 +182,82 @@
       annotations:
         description: "All Aerospike backups for pop {{ $labels.pop }} have failed"
         summary: "All Aerospike backups for pop {{ $labels.pop }} have failed"
+    - alert: AerospikeDeadPartitions
+      expr: sum(aerospike_namespace_dead_partitions) by (ns,cluster_name,job) > 0
+      for: 3m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Dead partitions for {{ $labels.ns }} @ {{ $labels.cluster_name }}"
+        description: "{{ $labels.ns }} @ {{ $labels.cluster_name }} has {{ $value | printf \"%.0f\" }} dead partition(s): potential data loss, writes to them are refused until they are revived."
+    - alert: AerospikeNamespaceClockSkewStopWrites
+      # Distinct from ClockAreUnsync*: this is the namespace flag the server
+      # raises once it actually refuses writes because of clock skew.
+      expr: aerospike_namespace_clock_skew_stop_writes == 1
+      for: 3m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Stop-writes due to clock skew for {{ $labels.ns }} @ {{ $labels.cluster_name }}"
+        description: "{{ $labels.ns }} @ {{ $labels.cluster_name }} rejects writes because of cluster clock skew, check NTP on every node."
+    - alert: AerospikeNodeClockSkew
+      expr: aerospike_node_stats_cluster_clock_skew_ms > 2000
+      for: 3m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - Clock skew above 2s on cluster {{ $labels.cluster_name }}"
+        description: "Cluster {{ $labels.cluster_name }} clock skew is {{ $value | printf \"%.0f\" }}ms (> 2s) as seen from {{ $labels.instance }}. Ensure clocks are synchronized."
+    - alert: AerospikeNodeClockSkewCritical
+      expr: aerospike_node_stats_cluster_clock_skew_ms > 20000
+      for: 3m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Clock skew above 20s on cluster {{ $labels.cluster_name }}"
+        description: "Cluster {{ $labels.cluster_name }} clock skew is {{ $value | printf \"%.0f\" }}ms (> 20s) as seen from {{ $labels.instance }}, writes may be stopped."
+    - alert: AerospikeLowSystemMemory
+      # Hysteresis: once firing it only resolves above 17%, then keeps firing
+      # 15m. An integer gauge sitting on 15 flapped the alert every few minutes.
+      expr: |
+        aerospike_node_stats_system_free_mem_pct < 15
+        or
+        (aerospike_node_stats_system_free_mem_pct < 17 and on (cluster_name, service) ALERTS{alertname="AerospikeLowSystemMemory", alertstate="firing"})
+      for: 3m
+      keep_firing_for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - Low system memory on {{ $labels.service }} @ {{ $labels.cluster_name }} (< 15%)"
+        description: "System free memory of {{ $labels.service }} @ {{ $labels.cluster_name }} is {{ $value | printf \"%.1f\" }}%. Stop-writes triggers at 10% free."
+    - alert: AerospikeLowSystemMemoryCritical
+      # Stop-writes triggers at 10% free (stop-writes-sys-memory-pct 90): page
+      # at 12%, before it, not at it.
+      expr: aerospike_node_stats_system_free_mem_pct < 12
+      for: 3m
+      labels:
+        severity: critical
+      annotations:
+        summary: "AS - Low system memory on {{ $labels.service }} @ {{ $labels.cluster_name }} (< 12%)"
+        description: "System free memory of {{ $labels.service }} @ {{ $labels.cluster_name }} is {{ $value | printf \"%.1f\" }}%, close to the 10% stop-writes threshold."
+    - alert: AerospikeMigrationsStuck
+      # Subquery instead of a recording rule: delta >= 0 over 1h means the
+      # remaining partition count never went down.
+      expr: |
+        sum by (cluster_name, ns) (aerospike_namespace_migrate_tx_partitions_remaining + aerospike_namespace_migrate_rx_partitions_remaining) > 0
+        and
+        delta(sum by (cluster_name, ns) (aerospike_namespace_migrate_tx_partitions_remaining + aerospike_namespace_migrate_rx_partitions_remaining)[1h:1m]) >= 0
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - Migrations stuck for {{ $labels.ns }} @ {{ $labels.cluster_name }}"
+        description: "{{ $value | printf \"%.0f\" }} partitions of {{ $labels.ns }} @ {{ $labels.cluster_name }} are migrating with no progress for 1h. Migrations delay rolling restarts: check node size and the migrate settings."
+    - alert: AerospikeXdrLag
+      expr: max by (cluster_name, dc) (aerospike_xdr_lag) > 600
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "AS - XDR lag to {{ $labels.dc }} from {{ $labels.cluster_name }}"
+        description: "XDR lag from {{ $labels.cluster_name }} to {{ $labels.dc }} is {{ $value | humanizeDuration }} (> 10m). The remote datacenter is the fallback for losing a cluster."
