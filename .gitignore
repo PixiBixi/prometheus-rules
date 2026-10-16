@@ -1,5 +1,6 @@
 CLAUDE.md
 FIXTURE_CLEANUP.md
 NEW_ALERTS.md
-docs/data.json
 __pycache__/
+docs/rules.json
+docs/exporters.json
