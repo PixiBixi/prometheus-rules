@@ -1,921 +1,792 @@
-<!DOCTYPE html>
-<html lang="en" x-data="app()" x-init="init()" :class="{ dark: darkMode }">
+<!doctype html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prometheus Rules &amp; Metrics</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
-  <style>
-    [x-cloak] { display: none !important; }
-    pre { white-space: pre-wrap; overflow-wrap: anywhere; }
-    .sidebar-active { @apply bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold border-r-2 border-indigo-600; }
-    html { scroll-behavior: smooth; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prometheus Rules</title>
+<link rel="preload" href="rules.json" as="fetch" crossorigin>
+<style>
+:root{
+  --bg:#f8f7f4;--panel:#fff;--sunken:#f0eee9;--line:#e6e3dc;--text:#1c1b19;--muted:#5d5a54;--faint:#98948c;
+  --accent:#d9480f;--accent-soft:#fdeadf;
+  --crit:#c9302c;--crit-soft:#fbe3e1;--warn:#a96a12;--warn-soft:#fbefd6;--rec:#4f46e5;--rec-soft:#e8e7fd;
+  --code-bg:#f5f3ee;--t-fn:#7c3aed;--t-kw:#c2410c;--t-num:#0f766e;--t-str:#15803d;--t-metric:#1d4ed8;--t-label:#9a3412;--t-op:#8a867e;
+  --flash:#fff1c2;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#0e0f11;--panel:#15161a;--sunken:#1d1e23;--line:#2a2b31;--text:#ebe8e2;--muted:#aaa59c;--faint:#6f6c66;
+  --accent:#ff7a45;--accent-soft:#3a1f14;
+  --crit:#ff6b63;--crit-soft:#3b1715;--warn:#f2b84b;--warn-soft:#352812;--rec:#a5b4fc;--rec-soft:#1f2140;
+  --code-bg:#111216;--t-fn:#c4a7ff;--t-kw:#ff9e64;--t-num:#5eead4;--t-str:#86efac;--t-metric:#93c5fd;--t-label:#fdba74;--t-op:#7d7a73;
+  --flash:#3a3014;
+  color-scheme:dark;
+}}
+:root[data-theme=dark]{
+  --bg:#0e0f11;--panel:#15161a;--sunken:#1d1e23;--line:#2a2b31;--text:#ebe8e2;--muted:#aaa59c;--faint:#6f6c66;
+  --accent:#ff7a45;--accent-soft:#3a1f14;
+  --crit:#ff6b63;--crit-soft:#3b1715;--warn:#f2b84b;--warn-soft:#352812;--rec:#a5b4fc;--rec-soft:#1f2140;
+  --code-bg:#111216;--t-fn:#c4a7ff;--t-kw:#ff9e64;--t-num:#5eead4;--t-str:#86efac;--t-metric:#93c5fd;--t-label:#fdba74;--t-op:#7d7a73;
+  --flash:#3a3014;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:120px}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+code,pre,.mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+a{color:inherit}
+button{font:inherit;color:inherit}
+kbd{font:11px ui-monospace,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--muted);background:var(--panel)}
+[hidden]{display:none!important}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.row1{display:flex;align-items:center;gap:14px;padding:10px 24px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:-.01em;white-space:nowrap;text-decoration:none}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--accent);display:grid;place-items:center;color:#fff}
+.search{flex:1;max-width:640px;margin:0 auto;position:relative}
+.search input{width:100%;height:38px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:0 40px 0 36px;font:inherit;font-size:14.5px;color:var(--text);outline:none}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.search svg{position:absolute;left:12px;top:11px;color:var(--faint)}
+.search input{padding-right:118px}
+.palhint{position:absolute;right:5px;top:5px;height:28px;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:7px;background:var(--sunken);color:var(--muted);font-size:12.5px;padding:0 6px 0 9px;cursor:pointer}
+.palhint:hover{color:var(--accent)}
+.iconbtn{width:36px;height:36px;border:1px solid var(--line);background:var(--panel);border-radius:10px;display:grid;place-items:center;cursor:pointer;color:var(--muted);text-decoration:none;flex:none}
+.iconbtn:hover{color:var(--text)}
+.row2{display:flex;align-items:center;gap:10px;padding:0 24px 10px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--sunken);padding:3px;border-radius:9px;gap:2px}
+.seg button{border:0;background:none;padding:4px 11px;border-radius:7px;font-size:13px;font-weight:550;color:var(--muted);cursor:pointer;display:inline-flex;gap:6px;align-items:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed=true]{background:var(--panel);color:var(--text);box-shadow:0 1px 2px rgb(0 0 0/.08)}
+.seg .n{color:var(--faint);font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.dot.critical{background:var(--crit)}.dot.warning{background:var(--warn)}.dot.record{background:var(--rec);border-radius:2px}
+.count{margin-left:auto;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.link{font-size:13px;font-weight:550;color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:7px}
+.link:hover,.link.on{color:var(--accent)}
+.gsel{display:none;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);padding:0 8px;font:inherit;font-size:13px;max-width:180px}
+
+/* layout */
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);max-width:1440px;margin:0 auto}
+.toc{position:sticky;top:105px;align-self:start;height:calc(100vh - 105px);overflow:auto;padding:18px 10px 40px 18px;overscroll-behavior:contain}
+.toc a{display:flex;justify-content:space-between;gap:8px;padding:4px 10px;border-radius:7px;font-size:13.5px;color:var(--muted);text-decoration:none;border-left:2px solid transparent}
+.toc a:hover{color:var(--text);background:var(--sunken)}
+.toc a.on{color:var(--text);font-weight:600;border-left-color:var(--accent);border-radius:0 7px 7px 0;background:var(--sunken)}
+.toc .c{font-variant-numeric:tabular-nums;color:var(--faint);font-weight:500;display:inline-flex;gap:6px;align-items:center}
+.toch{display:flex;justify-content:space-between;align-items:center;gap:6px;margin:2px 0 8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:650}
+.toch em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:500}
+.toch button{border:0;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 7px;font-size:11.5px;text-transform:none;letter-spacing:0;cursor:pointer}
+.toc a.pick{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.tocc{display:block;width:100%;text-align:left;border:0;background:none;margin:16px 0 4px;padding:2px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:650;cursor:pointer}
+.tocc:hover,.tocc.pick{color:var(--accent)}
+.gcat{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:650}
+.badge.issue{background:transparent;border:1px dashed var(--line);color:var(--faint);font-weight:500;cursor:help}
+.toc a.pick .c{color:inherit}
+.doc{padding:8px 32px 120px;min-width:0}
+
+/* groups */
+.grp{margin-top:22px}
+.gh{position:sticky;top:105px;z-index:5;background:var(--bg);display:flex;align-items:baseline;gap:12px;padding:12px 2px 10px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.gh h2{margin:0;font-size:19px;letter-spacing:-.015em;font-weight:700}
+.gh .meta{font-size:12.5px;color:var(--faint);display:flex;gap:12px;align-items:center;font-variant-numeric:tabular-nums}
+.gh .meta a{text-decoration:none;color:var(--muted)}
+.gh .meta a:hover{color:var(--accent)}
+.gh .files{margin-left:auto}
+
+/* rules */
+.rule{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;position:relative;overflow:hidden;scroll-margin-top:170px}
+.rule::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.rule.critical::before{background:var(--crit)}.rule.warning::before{background:var(--warn)}.rule.record::before{background:var(--rec)}
+.rule.focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.rule.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,30%{background:var(--flash)}}
+.rh{display:flex;align-items:center;gap:10px;padding:12px 16px 0 19px;flex-wrap:wrap}
+.rn{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:14.5px;font-weight:650;text-decoration:none;word-break:break-word}
+.rn:hover{color:var(--accent)}
+.badge{font-size:11.5px;font-weight:600;border-radius:6px;padding:1px 7px;background:var(--sunken);color:var(--muted);white-space:nowrap;text-decoration:none;font-variant-numeric:tabular-nums}
+.badge.critical{background:var(--crit-soft);color:var(--crit)}.badge.warning{background:var(--warn-soft);color:var(--warn)}.badge.record{background:var(--rec-soft);color:var(--rec)}
+a.badge:hover{color:var(--accent)}
+.acts{margin-left:auto;display:flex;gap:4px;opacity:.55;transition:opacity .15s}
+.rule:hover .acts,.rule.focus .acts{opacity:1}
+.act{border:1px solid var(--line);background:var(--panel);border-radius:6px;font-size:11.5px;padding:2px 8px;color:var(--muted);cursor:pointer}
+.act:hover{color:var(--text)}.act.ok{color:var(--t-str);border-color:var(--t-str)}
+.rb{padding:6px 16px 14px 19px}
+.sum{margin:0;font-size:15px;font-weight:550;text-wrap:pretty}
+.desc{margin:2px 0 0;color:var(--muted);font-size:14px;text-wrap:pretty}
+.ph{font-family:ui-monospace,Menlo,monospace;font-size:.8em;background:var(--sunken);border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--t-label);white-space:nowrap}
+.ph.val{color:var(--t-num)}
+pre.expr{margin:10px 0 0;background:var(--code-bg);border:1px solid var(--line);border-radius:9px;padding:10px 14px;overflow:auto;font-size:12.8px;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-height:360px}
+.t-fn{color:var(--t-fn)}.t-kw{color:var(--t-kw);font-weight:600}.t-num{color:var(--t-num)}.t-str{color:var(--t-str)}.t-metric{color:var(--t-metric)}.t-label{color:var(--t-label)}.t-op{color:var(--t-op)}.t-com{color:var(--faint);font-style:italic}
+a.t-metric{text-decoration:none;border-bottom:1px dotted currentColor;cursor:pointer}
+a.t-metric:hover{border-bottom-style:solid}
+.used{margin-top:8px;font-size:12.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.used a{font-family:ui-monospace,Menlo,monospace;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:0 6px;display:inline-flex;gap:5px;align-items:center}
+.used a:hover{color:var(--text);border-color:var(--accent)}
+
+/* compact mode: one line per rule, expand on click */
+body.compact .rule{border-radius:0;margin:0;border-width:0 0 1px;background:transparent;cursor:pointer;overflow:visible}
+body.compact .grp .rule:first-of-type{border-top-width:0}
+body.compact .rh{padding:7px 12px 7px 16px;flex-wrap:nowrap}
+body.compact .rn{font-size:13.5px;flex:none;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.compact .csum{display:block}
+body.compact .rb{display:none}
+body.compact .rule.open{background:var(--panel);cursor:default}
+body.compact .rule.open .rb{display:block}
+body.compact .rule.open .csum{visibility:hidden}
+body.compact .rule:hover{background:var(--panel)}
+.csum{display:none;flex:1;min-width:0;font-size:13.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.compact .acts{display:none}
+body.compact .rule.open .acts{display:flex}
+
+.empty{padding:80px 20px;text-align:center;color:var(--faint)}
+.loading{padding:120px;text-align:center;color:var(--faint)}
+
+/* metric drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:var(--panel);border-left:1px solid var(--line);z-index:50;transform:translateX(100%);transition:transform .22s ease;overflow:auto;box-shadow:-20px 0 40px rgb(0 0 0/.12);visibility:hidden}
+.drawer.open{transform:none;visibility:visible}
+.dw{padding:22px 24px 48px}
+.dw h3{font-family:ui-monospace,Menlo,monospace;font-size:16px;margin:8px 0 6px;word-break:break-all}
+.dw .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:650;margin:22px 0 8px}
+.dw p{margin:0;color:var(--muted)}
+.dw pre{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:12px;white-space:pre-wrap;word-break:break-all}
+.lbls{display:flex;flex-wrap:wrap;gap:4px}
+.lbls code{font-size:12px;background:var(--sunken);border-radius:4px;padding:1px 6px;color:var(--t-label)}
+.rl a{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:5px;text-decoration:none;font-family:ui-monospace,Menlo,monospace;font-size:12.8px}
+.rl a:hover{border-color:var(--accent)}
+.rl a span.g{margin-left:auto;color:var(--faint);font-family:ui-sans-serif,system-ui;font-size:12px}
+.close{float:right}
+
+/* coverage */
+.cov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-top:22px}
+.cv{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.cv h4{margin:0;font-family:ui-monospace,Menlo,monospace;font-size:14px;display:flex;justify-content:space-between}
+.cv .pct{font-variant-numeric:tabular-nums;color:var(--muted)}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin:10px 0 8px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.cv .sub{font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.cv details{margin-top:8px}
+.cv summary{font-size:12.5px;color:var(--muted);cursor:pointer}
+.cv ul{list-style:none;margin:8px 0 0;padding:0;max-height:260px;overflow:auto}
+.cv li a{display:block;font-family:ui-monospace,Menlo,monospace;font-size:12px;padding:2px 0;color:var(--muted);text-decoration:none;word-break:break-all}
+.cv li a:hover{color:var(--accent)}
+.covh{display:flex;align-items:baseline;gap:12px;padding-top:18px}
+.covh h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.covh p{margin:0;color:var(--faint);font-size:13.5px}
+
+/* command palette */
+.kbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:3px 6px 3px 10px;font-size:13px;color:var(--muted);cursor:pointer}
+.kbtn:hover{color:var(--text);border-color:var(--accent)}
+.pal{position:fixed;inset:0;z-index:60;background:rgb(0 0 0/.35);display:flex;justify-content:center;align-items:flex-start;padding:12vh 16px 16px}
+.palbox{width:min(640px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px rgb(0 0 0/.3);overflow:hidden;display:flex;flex-direction:column;max-height:70vh}
+.palin{display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid var(--line)}
+.palin svg{color:var(--faint);flex:none}
+.palin input{flex:1;height:52px;border:0;background:none;font:inherit;font-size:16px;color:var(--text);outline:none}
+.palres{overflow:auto;padding:6px}
+.palsec{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:650;padding:10px 10px 4px}
+.palit{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;min-width:0}
+.palit.on{background:var(--sunken)}
+.palit .pl{font-weight:600;white-space:nowrap}
+.palit .pl.mono{font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.palit .ps{color:var(--faint);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.palit .pk{margin-left:auto;font-size:11.5px;color:var(--faint);white-space:nowrap}
+.palit.on .pk::after{content:" ↵"}
+.palit.picked .pl{color:var(--accent)}
+.palit b{color:var(--accent);font-weight:inherit}
+.ico{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;flex:none;font-size:11px;font-weight:700;background:var(--sunken);color:var(--muted)}
+.ico.p{background:var(--accent-soft);color:var(--accent)}
+.palfoot{border-top:1px solid var(--line);padding:8px 14px;font-size:12px;color:var(--faint);display:flex;gap:14px;flex-wrap:wrap}
+.palempty{padding:28px;text-align:center;color:var(--faint)}
+
+@media (max-width:1000px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .gh{flex-wrap:wrap}
+  .gh .files{display:none}
+  .toc{display:none}
+  .gsel{display:inline-block}
+  .doc{padding:8px 16px 100px}
+}
+@media (max-width:640px){
+  .row1{padding:10px 16px;gap:10px;flex-wrap:wrap}
+  .search{order:3;flex-basis:100%}
+  .palhint kbd{display:none}
+  .row2{padding:0 16px 10px;gap:6px}
+  .seg .n{display:none}
+  .count{display:none}
+  .gh{top:150px}
+  html{scroll-padding-top:200px}
+  .rule{scroll-margin-top:210px}
+  .acts{opacity:1}
+  body.compact .rn{max-width:60%}
+}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}.rule.flash{animation:none}}
+</style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans transition-colors" x-cloak
-  @keydown.j.window="navigateSidebar(1)"
-  @keydown.k.window="navigateSidebar(-1)">
-
-<!-- TOP NAV -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-14 flex items-center px-4 gap-3">
-  <a :href="meta.github_repo" target="_blank"
-    class="font-bold text-indigo-700 dark:text-indigo-400 text-base tracking-tight whitespace-nowrap flex items-center gap-1.5 hover:opacity-80">
-    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-    Prometheus Rules
-  </a>
-
-  <!-- Search -->
-  <div class="flex-1 max-w-lg relative">
-    <input type="text" x-model="search" @input="onSearchDebounced" @keydown.escape="search=''; onSearch()"
-      @keydown.slash.window="if(!['INPUT','TEXTAREA'].includes($event.target.tagName)){$event.preventDefault();$el.focus();}"
-      placeholder="Search metrics, alerts, expr… (press /)"
-      class="w-full pl-9 pr-8 py-1.5 text-sm border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-    <svg class="absolute left-2.5 top-2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg>
-    <button x-show="search" @click="search=''; onSearch()" class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
+<body>
+<header class="top">
+  <div class="row1">
+    <a class="brand" href="#/">
+      <span class="logo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>
+      Prometheus Rules
+    </a>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Filtrer : nom, summary, métrique, PromQL…" autocomplete="off" spellcheck="false">
+      <button class="palhint" id="palbtn" type="button" title="Aller à un produit, une alerte, une métrique">Aller à… <kbd id="palkbd">⌘K</kbd></button>
+    </div>
+    <button class="iconbtn" id="theme" title="Thème"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+    <a class="iconbtn" id="gh" title="GitHub" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.2-3.1-.1-.4-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.3 2.8.1 3.2.8.8 1.2 1.9 1.2 3.1 0 4.7-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg></a>
   </div>
-
-  <!-- Tabs -->
-  <div class="flex gap-0.5 text-sm">
-    <button @click="setTab('home')" :class="tab==='home' ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">Home</button>
-    <button @click="setTab('metrics')" :class="tab==='metrics' ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
-      Metrics <span class="text-xs opacity-70" x-text="'('+totalMetrics+')'"></span>
-    </button>
-    <button @click="setTab('alerts')" :class="tab==='alerts' ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
-      Alerts <span class="text-xs opacity-70" x-text="'('+totalAlerts+')'"></span>
-    </button>
-    <button @click="setTab('records')" :class="tab==='records' ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
-      Records <span class="text-xs opacity-70" x-text="'('+totalRecords+')'"></span>
-    </button>
-    <button @click="setTab('uncovered')" :class="tab==='uncovered' ? 'bg-amber-500 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'" class="px-3 py-1.5 rounded-md font-medium transition">
-      Uncovered <span class="text-xs opacity-70" x-text="'('+uncoveredMetrics+')'"></span>
-    </button>
+  <div class="row2">
+    <select class="gsel" id="gsel"></select>
+    <div class="seg" id="segKind"></div>
+    <div class="seg" id="segSev"></div>
+    <div class="seg" id="segDensity">
+      <button data-density="full" title="Tout déplié">Détaillé</button>
+      <button data-density="compact" title="Une ligne par règle">Compact</button>
+    </div>
+    <div class="seg"><button data-review title="Pas de for, description manquante ou identique au summary, recording rule sans consommateur">À revoir<span class="n"></span></button></div>
+    <a class="link" id="covLink" href="#/coverage">Couverture</a>
+    <span class="count" id="count"></span>
   </div>
+</header>
 
-  <!-- Grafana config -->
-  <div class="relative flex items-center gap-1.5 ml-auto">
-    <button @click="showGrafanaInput = !showGrafanaInput" title="Configure Grafana URL" aria-label="Configure Grafana URL"
-      :class="grafanaUrl ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'"
-      class="hover:opacity-80 transition flex items-center gap-1 text-xs">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-      <span x-show="!grafanaUrl" class="hidden lg:inline">Grafana</span>
-      <span x-show="grafanaUrl" class="hidden lg:inline">Grafana ✓</span>
-    </button>
-    <!-- Grafana URL dropdown -->
-    <div x-show="showGrafanaInput" @click.outside="showGrafanaInput=false" @keydown.escape.window="showGrafanaInput=false"
-      class="absolute top-8 right-0 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 z-50">
-      <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Grafana URL</p>
-      <input type="url" x-model="grafanaUrl" @input="saveGrafanaUrl" placeholder="https://grafana.example.com"
-        class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-      <p class="text-xs text-gray-400 dark:text-gray-500 mt-1.5">Saved in localStorage. Enables "Open in Explore" on each alert.</p>
-    </div>
-  </div>
-
-  <!-- Dark mode toggle -->
-  <button @click="toggleDarkMode" aria-label="Toggle dark mode" class="text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition shrink-0">
-    <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-    <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-  </button>
-</nav>
-
-<!-- LAYOUT -->
-<div class="flex pt-14 h-screen overflow-hidden">
-
-  <!-- SIDEBAR -->
-  <aside class="w-56 shrink-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-y-auto" x-show="tab !== 'home' && tab !== 'uncovered'">
-
-    <!-- Metrics sidebar -->
-    <div x-show="tab==='metrics'">
-      <div class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Exporters</div>
-      <template x-for="exp in filteredExporters" :key="exp.name">
-        <button @click="selectExporter(exp.name)"
-          :class="selectedExporter===exp.name ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold border-r-2 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-          class="w-full text-left px-4 py-2 text-sm flex justify-between items-center gap-1">
-          <span x-text="exp.name" class="truncate"></span>
-          <div class="flex items-center gap-1 shrink-0">
-            <span x-show="exp.related_alerts && exp.related_alerts.length > 0"
-              class="text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded-full font-medium"
-              x-text="exp.related_alerts.length + 'a'"></span>
-            <span class="text-xs text-gray-400 dark:text-gray-500" x-text="exp.metrics.length"></span>
-          </div>
-        </button>
-      </template>
-      <div x-show="filteredExporters.length===0" class="px-4 py-3 text-sm text-gray-400">No results</div>
-    </div>
-
-    <!-- Alerts sidebar -->
-    <div x-show="tab==='alerts'">
-      <div class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Severity</div>
-      <div class="px-3 pb-3 flex gap-1.5">
-        <button @click="severityFilter='all'" :class="severityFilter==='all' ? 'bg-gray-700 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'" class="flex-1 text-xs py-1 rounded font-medium transition">All</button>
-        <button @click="severityFilter='critical'" :class="severityFilter==='critical' ? 'bg-red-600 text-white' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'" class="flex-1 text-xs py-1 rounded font-medium transition">Crit</button>
-        <button @click="severityFilter='warning'" :class="severityFilter==='warning' ? 'bg-yellow-500 text-white' : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400'" class="flex-1 text-xs py-1 rounded font-medium transition">Warn</button>
-      </div>
-      <div class="px-4 pb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Alert files</div>
-      <template x-for="grp in filteredAlertGroups" :key="grp.file">
-        <button @click="selectRuleGroup(grp.file)"
-          :class="selectedRuleGroup===grp.file ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold border-r-2 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-          class="w-full text-left px-4 py-2 text-sm flex justify-between items-center gap-1">
-          <span x-text="grp.file.replace(/\.rules\.yml$|\.yml$/,'')" class="truncate"></span>
-          <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0" x-text="grp.rules.length"></span>
-        </button>
-      </template>
-      <div x-show="filteredAlertGroups.length===0" class="px-4 py-3 text-sm text-gray-400">No results</div>
-    </div>
-
-    <!-- Records sidebar -->
-    <div x-show="tab==='records'">
-      <div class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Record files</div>
-      <template x-for="grp in filteredRecordGroups" :key="grp.file">
-        <button @click="selectRuleGroup(grp.file)"
-          :class="selectedRuleGroup===grp.file ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold border-r-2 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-          class="w-full text-left px-4 py-2 text-sm flex justify-between items-center gap-1">
-          <span x-text="grp.file.replace(/\.records\.yml$|\.yml$/,'')" class="truncate"></span>
-          <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0" x-text="grp.rules.length"></span>
-        </button>
-      </template>
-      <div x-show="filteredRecordGroups.length===0" class="px-4 py-3 text-sm text-gray-400">No results</div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="flex-1 overflow-y-auto px-6 py-5">
-
-    <!-- ── HOME / STATS ── -->
-    <div x-show="tab==='home'">
-      <h1 class="text-2xl font-bold mb-6">Overview</h1>
-
-      <!-- Stat cards -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-          <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Exporters</p>
-          <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400" x-text="exporters.length"></p>
-        </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-          <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Metrics</p>
-          <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400" x-text="totalMetrics"></p>
-        </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-          <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Alerts</p>
-          <div class="flex items-end gap-2">
-            <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400" x-text="totalAlerts"></p>
-            <div class="flex gap-1 mb-1">
-              <span class="text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-1.5 py-0.5 rounded" x-text="stats.critical + ' crit'"></span>
-              <span class="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-1.5 py-0.5 rounded" x-text="stats.warning + ' warn'"></span>
-            </div>
-          </div>
-        </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-          <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Uncovered metrics</p>
-          <div class="flex items-end gap-2">
-            <p class="text-3xl font-bold text-amber-500" x-text="uncoveredMetrics"></p>
-            <p class="text-xs text-gray-400 mb-1" x-text="'/ ' + totalMetrics"></p>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <!-- Coverage -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-          <p class="text-sm font-semibold mb-4">Exporter coverage</p>
-          <div class="space-y-2.5">
-            <template x-for="exp in stats.exporterCoverage" :key="exp.name">
-              <div>
-                <div class="flex justify-between text-xs mb-1">
-                  <button @click="setTab('metrics'); selectExporter(exp.name)" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 truncate" x-text="exp.name"></button>
-                  <span class="text-gray-400 shrink-0 ml-2" x-text="exp.alerts + ' alerts'"></span>
-                </div>
-                <div class="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full transition-all"
-                    :class="exp.alerts > 0 ? 'bg-green-400' : 'bg-gray-300 dark:bg-gray-700'"
-                    :style="'width:' + (stats.exporterCoverage[0]?.alerts > 0 ? Math.round(exp.alerts / stats.exporterCoverage[0].alerts * 100) : exp.alerts > 0 ? 100 : 5) + '%'">
-                  </div>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-
-        <!-- Severity breakdown + top exporters -->
-        <div class="space-y-6">
-
-          <!-- Severity bars -->
-          <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-            <p class="text-sm font-semibold mb-4">Alerts by severity</p>
-            <div class="space-y-3">
-              <div>
-                <div class="flex justify-between text-xs mb-1">
-                  <span class="text-red-600 dark:text-red-400 font-medium">Critical</span>
-                  <span class="text-gray-400" x-text="stats.critical"></span>
-                </div>
-                <div class="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-red-500 rounded-full" :style="'width:' + (totalAlerts ? stats.critical/totalAlerts*100 : 0) + '%'"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-xs mb-1">
-                  <span class="text-yellow-600 dark:text-yellow-400 font-medium">Warning</span>
-                  <span class="text-gray-400" x-text="stats.warning"></span>
-                </div>
-                <div class="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-yellow-400 rounded-full" :style="'width:' + (totalAlerts ? stats.warning/totalAlerts*100 : 0) + '%'"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Top exporters by metric count -->
-          <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-            <p class="text-sm font-semibold mb-4">Top exporters by metric count</p>
-            <div class="space-y-2">
-              <template x-for="exp in stats.topExporters" :key="exp.name">
-                <div class="flex items-center gap-3">
-                  <button @click="setTab('metrics'); selectExporter(exp.name)"
-                    class="text-xs text-gray-700 dark:text-gray-300 hover:text-indigo-600 w-36 truncate text-left" x-text="exp.name"></button>
-                  <div class="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-indigo-400 rounded-full" :style="'width:' + (exp.count / stats.topExporters[0].count * 100) + '%'"></div>
-                  </div>
-                  <span class="text-xs text-gray-400 w-10 text-right" x-text="exp.count"></span>
-                </div>
-              </template>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Second row: top metrics + exporters without alerts -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-
-        <!-- Top metrics by alert references -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-          <p class="text-sm font-semibold mb-4">Most referenced metrics</p>
-          <div class="space-y-2">
-            <template x-for="m in stats.topMetrics" :key="m.name">
-              <div class="flex items-center gap-3">
-                <button @click="goToMetric(m.name)"
-                  class="text-xs font-mono text-indigo-700 dark:text-indigo-400 hover:underline w-52 truncate text-left" x-text="m.name"></button>
-                <div class="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-indigo-400 rounded-full" :style="'width:' + (m.count / stats.topMetrics[0].count * 100) + '%'"></div>
-                </div>
-                <span class="text-xs text-gray-400 w-12 text-right shrink-0" x-text="m.count + ' rules'"></span>
-              </div>
-            </template>
-            <div x-show="stats.topMetrics.length === 0" class="text-xs text-gray-400">No data</div>
-          </div>
-        </div>
-
-        <!-- Exporters without any alert -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-          <div class="flex items-center gap-2 mb-4">
-            <p class="text-sm font-semibold">Exporters without alerts</p>
-            <span class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full" x-text="stats.exportersWithoutAlerts.length"></span>
-          </div>
-          <div x-show="stats.exportersWithoutAlerts.length === 0" class="text-xs text-gray-400">All exporters have coverage 🎉</div>
-          <div class="flex flex-wrap gap-1.5">
-            <template x-for="name in stats.exportersWithoutAlerts" :key="name">
-              <button @click="setTab('metrics'); selectExporter(name)"
-                class="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-700 px-2 py-1 rounded font-mono hover:opacity-80 transition"
-                x-text="name">
-              </button>
-            </template>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── METRICS VIEW ── -->
-    <div x-show="tab==='metrics'">
-      <template x-if="activeExporter">
-        <div>
-          <div class="flex items-center gap-3 mb-2">
-            <h1 class="text-xl font-bold" x-text="activeExporter.name"></h1>
-            <span class="text-sm text-gray-400" x-text="visibleMetrics.length + ' metrics'"></span>
-            <a :href="activeExporter.github_url" target="_blank"
-              class="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-600 transition">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-              View raw
-            </a>
-          </div>
-
-          <!-- Related alerts banner -->
-          <div x-show="activeExporter.related_alerts && activeExporter.related_alerts.length > 0"
-            class="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
-            <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-2">
-              Related alerts (<span x-text="activeExporter.related_alerts.length"></span>)
-            </p>
-            <div class="flex flex-wrap gap-1.5">
-              <template x-for="a in activeExporter.related_alerts" :key="a.file+a.alert">
-                <button @click="goToAlert(a.file, a.alert)"
-                  :class="{'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-700': a.severity==='critical', 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700': a.severity==='warning', 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700': !['critical','warning'].includes(a.severity)}"
-                  class="text-xs px-2 py-0.5 rounded border font-medium hover:opacity-80 transition" x-text="a.alert">
-                </button>
-              </template>
-            </div>
-          </div>
-
-          <!-- Type filter -->
-          <div class="flex gap-1.5 mb-4">
-            <button @click="metricTypeFilter=''" :class="metricTypeFilter==='' ? 'bg-gray-700 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'" class="text-xs px-2.5 py-1 rounded font-medium transition">All</button>
-            <template x-for="t in ['gauge','counter','histogram','summary']" :key="t">
-              <button @click="metricTypeFilter = metricTypeFilter===t ? '' : t"
-                :class="{
-                  'bg-blue-600 text-white': metricTypeFilter===t && t==='gauge',
-                  'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': metricTypeFilter!==t && t==='gauge',
-                  'bg-green-600 text-white': metricTypeFilter===t && t==='counter',
-                  'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300': metricTypeFilter!==t && t==='counter',
-                  'bg-purple-600 text-white': metricTypeFilter===t && t==='histogram',
-                  'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300': metricTypeFilter!==t && t==='histogram',
-                  'bg-orange-600 text-white': metricTypeFilter===t && t==='summary',
-                  'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300': metricTypeFilter!==t && t==='summary',
-                }"
-                class="text-xs px-2.5 py-1 rounded font-medium capitalize transition" x-text="t">
-              </button>
-            </template>
-          </div>
-
-          <div class="space-y-3">
-            <template x-for="metric in visibleMetrics" :key="metric.name">
-              <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition"
-                :id="'m-' + metric.name">
-                <div class="flex items-start justify-between gap-4 mb-1.5">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <code class="text-sm font-mono font-semibold text-indigo-700 dark:text-indigo-400" x-text="metric.name"></code>
-                    <span :class="{
-                      'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': metric.type==='gauge',
-                      'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300': metric.type==='counter',
-                      'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300': metric.type==='histogram',
-                      'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300': metric.type==='summary',
-                      'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400': !['gauge','counter','histogram','summary'].includes(metric.type)
-                    }" class="text-xs px-2 py-0.5 rounded-full font-medium capitalize" x-text="metric.type"></span>
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <button @click="copyPermalink('metrics', activeExporter.name, metric.name)" title="Copy permalink"
-                      class="text-gray-300 dark:text-gray-600 hover:text-indigo-500 transition">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                    </button>
-                    <button @click="copyText(metric.name, 'Metric name copied')" title="Copy metric name" aria-label="Copy metric name"
-                      class="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    </button>
-                  </div>
-                </div>
-                <p x-show="metric.help" class="text-sm text-gray-600 dark:text-gray-400 mb-2" x-text="metric.help"></p>
-                <div x-show="metric.labels.length > 0" class="flex flex-wrap gap-1 mb-2">
-                  <template x-for="label in metric.labels" :key="label">
-                    <span class="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded font-mono" x-text="label"></span>
-                  </template>
-                </div>
-                <pre class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded px-3 py-2 font-mono" x-text="metric.example"></pre>
-              </div>
-            </template>
-          </div>
-          <div x-show="visibleMetrics.length===0" class="text-center py-16 text-gray-400">No metrics match your filters.</div>
-        </div>
-      </template>
-      <template x-if="!activeExporter">
-        <div class="text-center py-20 text-gray-400">
-          <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582 4 8 4"/></svg>
-          <p>Select an exporter</p>
-        </div>
-      </template>
-    </div>
-
-    <!-- ── ALERTS VIEW ── -->
-    <div x-show="tab==='alerts'">
-      <template x-if="activeRuleGroup">
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <h1 class="text-xl font-bold" x-text="activeRuleGroup.name"></h1>
-            <span class="text-sm text-gray-400" x-text="visibleRules.length + ' alerts'"></span>
-            <a :href="activeRuleGroup.github_url" target="_blank" class="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-600 transition">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-              View on GitHub
-            </a>
-          </div>
-          <div class="space-y-3">
-            <template x-for="rule in visibleRules" :key="rule.alert">
-              <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition"
-                :id="'r-' + rule.alert">
-                <div class="flex items-start justify-between gap-4 mb-2">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="font-semibold text-sm" x-text="rule.alert"></span>
-                    <span x-show="rule.severity"
-                      :class="{'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400': rule.severity==='critical', 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400': rule.severity==='warning', 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': !['critical','warning'].includes(rule.severity)}"
-                      class="text-xs px-2 py-0.5 rounded-full font-medium capitalize" x-text="rule.severity">
-                    </span>
-                    <span x-show="rule.for" class="text-xs text-gray-400" x-text="'for ' + rule.for"></span>
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <button @click="copyPermalink('alerts', activeRuleGroup.file, rule.alert)" title="Copy permalink"
-                      class="text-gray-300 dark:text-gray-600 hover:text-indigo-500 transition">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                    </button>
-                    <a x-show="grafanaUrl" :href="grafanaExploreUrl(rule.expr)" target="_blank"
-                      title="Open in Grafana Explore"
-                      class="text-orange-400 hover:text-orange-500 transition">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </a>
-                    <button @click="copyText(rule.expr, 'Expression copied')" aria-label="Copy expression" class="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center gap-1 text-xs whitespace-nowrap">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                      Copy
-                    </button>
-                  </div>
-                </div>
-                <p x-show="rule.summary" class="text-sm text-gray-600 dark:text-gray-400 mb-1" x-text="rule.summary"></p>
-                <p x-show="rule.description && rule.description !== rule.summary" class="text-xs text-gray-500 dark:text-gray-500 mb-2" x-text="rule.description"></p>
-                <a x-show="rule.runbook_url" :href="rule.runbook_url" target="_blank"
-                  class="inline-flex items-center gap-1 text-xs text-blue-500 hover:underline mb-2">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                  Runbook
-                </a>
-                <pre class="text-xs bg-gray-900 text-green-400 rounded px-3 py-2 font-mono overflow-x-auto" x-text="rule.expr"></pre>
-                <div x-show="rule.metric_refs && rule.metric_refs.length > 0" class="mt-2 flex flex-wrap gap-1">
-                  <template x-for="ref in rule.metric_refs" :key="ref">
-                    <button @click="goToMetric(ref)"
-                      class="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-700 px-1.5 py-0.5 rounded font-mono hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
-                      x-text="ref">
-                    </button>
-                  </template>
-                </div>
-              </div>
-            </template>
-          </div>
-          <div x-show="visibleRules.length===0" class="text-center py-16 text-gray-400">No alerts match your filters.</div>
-        </div>
-      </template>
-      <template x-if="!activeRuleGroup">
-        <div class="text-center py-20 text-gray-400">
-          <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-          <p>Select an alert file</p>
-        </div>
-      </template>
-    </div>
-
-    <!-- ── RECORDS VIEW ── -->
-    <div x-show="tab==='records'">
-      <template x-if="activeRuleGroup">
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <h1 class="text-xl font-bold" x-text="activeRuleGroup.name"></h1>
-            <span class="text-sm text-gray-400" x-text="visibleRules.length + ' records'"></span>
-            <a :href="activeRuleGroup.github_url" target="_blank" class="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-600 transition">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-              View on GitHub
-            </a>
-          </div>
-          <div class="space-y-3">
-            <template x-for="rule in visibleRules" :key="rule.record">
-              <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition">
-                <div class="flex items-start justify-between gap-4 mb-2">
-                  <div class="flex items-center gap-2">
-                    <code class="font-semibold text-sm font-mono text-indigo-700 dark:text-indigo-400" x-text="rule.record"></code>
-                    <span class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full">record</span>
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <a x-show="grafanaUrl" :href="grafanaExploreUrl(rule.expr)" target="_blank" title="Open in Grafana Explore" class="text-orange-400 hover:text-orange-500 transition">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </a>
-                    <button @click="copyText(rule.expr, 'Expression copied')" aria-label="Copy expression" class="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center gap-1 text-xs whitespace-nowrap">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                      Copy
-                    </button>
-                  </div>
-                </div>
-                <pre class="text-xs bg-gray-900 text-green-400 rounded px-3 py-2 font-mono overflow-x-auto" x-text="rule.expr"></pre>
-                <div x-show="rule.metric_refs && rule.metric_refs.length > 0" class="mt-2 flex flex-wrap gap-1">
-                  <template x-for="ref in rule.metric_refs" :key="ref">
-                    <button @click="goToMetric(ref)"
-                      class="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-700 px-1.5 py-0.5 rounded font-mono hover:bg-indigo-100 transition"
-                      x-text="ref">
-                    </button>
-                  </template>
-                </div>
-              </div>
-            </template>
-          </div>
-          <div x-show="visibleRules.length===0" class="text-center py-16 text-gray-400">No records match your search.</div>
-        </div>
-      </template>
-      <template x-if="!activeRuleGroup">
-        <div class="text-center py-20 text-gray-400">
-          <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          <p>Select a record file</p>
-        </div>
-      </template>
-    </div>
-
-    <!-- ── UNCOVERED METRICS ── -->
-    <div x-show="tab==='uncovered'" class="max-w-4xl">
-      <div class="flex items-center gap-3 mb-2">
-        <h1 class="text-xl font-bold">Uncovered metrics</h1>
-        <span class="text-sm text-gray-400" x-text="uncoveredMetrics + ' metrics not referenced in any alert'"></span>
-      </div>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">These metrics have no associated alerting rules - potential gaps in coverage.</p>
-
-      <div class="space-y-2">
-        <template x-for="group in filteredUncovered" :key="group.exporter">
-          <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
-            <!-- Exporter row -->
-            <button
-              @click="toggleUncoveredExporter(group.exporter)"
-              class="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition text-left">
-              <svg :class="expandedUncoveredExporters[group.exporter] ? 'rotate-90' : ''"
-                class="w-4 h-4 text-gray-400 transition-transform shrink-0"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-              <span class="font-mono font-semibold text-sm text-gray-800 dark:text-gray-100 flex-1" x-text="group.exporter"></span>
-              <span class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full font-medium"
-                x-text="group.metrics.length + ' uncovered'"></span>
-            </button>
-            <!-- Expanded metrics list -->
-            <div x-show="expandedUncoveredExporters[group.exporter]" x-transition class="border-t border-gray-100 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
-              <template x-for="m in group.metrics" :key="m.name">
-                <div class="flex items-start gap-3 px-5 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <button @click="goToMetric(m.name)"
-                        class="text-sm font-mono text-indigo-700 dark:text-indigo-400 hover:underline truncate"
-                        x-text="m.name">
-                      </button>
-                      <span :class="{
-                        'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300': m.type==='gauge',
-                        'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300': m.type==='counter',
-                        'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300': m.type==='histogram',
-                        'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300': m.type==='summary',
-                        'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400': !['gauge','counter','histogram','summary'].includes(m.type)
-                      }" class="text-xs px-2 py-0.5 rounded-full font-medium capitalize shrink-0" x-text="m.type"></span>
-                    </div>
-                    <p x-show="m.help" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" x-text="m.help"></p>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </div>
-        </template>
-      </div>
-      <div x-show="filteredUncovered.length===0" class="text-center py-16 text-gray-400">
-        <template x-if="search && uncoveredByExporter.length > 0">
-          <p>No uncovered metrics match "<span class="font-mono" x-text="search"></span>".</p>
-        </template>
-        <template x-if="!search || uncoveredByExporter.length === 0">
-          <p>🎉 All metrics are covered by at least one alert!</p>
-        </template>
-      </div>
-    </div>
-
-  </main>
+<div class="layout">
+  <nav class="toc" id="toc"></nav>
+  <main class="doc" id="doc"><div class="loading">Chargement…</div></main>
 </div>
-
-<!-- LOADING OVERLAY -->
-<div x-show="loading" class="fixed inset-0 z-[100] bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center gap-3">
-  <svg class="w-8 h-8 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
-    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-  </svg>
-  <p class="text-sm text-gray-500 dark:text-gray-400">Loading rules…</p>
+<aside class="drawer" id="drawer" aria-label="Métrique"></aside>
+<div class="pal" id="pal" hidden>
+  <div class="palbox" role="dialog" aria-label="Recherche rapide">
+    <div class="palin">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="palq" placeholder="Produit, alerte, recording rule, métrique…" autocomplete="off" spellcheck="false">
+      <kbd>esc</kbd>
+    </div>
+    <div class="palres" id="palres"></div>
+    <div class="palfoot"><span><kbd>↑</kbd> <kbd>↓</kbd> naviguer</span><span><kbd>↵</kbd> ouvrir</span><span><kbd id="palmod">⌘</kbd> <kbd>↵</kbd> ajouter au filtre</span><span><kbd>p:</kbd> <kbd>a:</kbd> <kbd>r:</kbd> <kbd>m:</kbd> produits, alertes, records, métriques</span></div>
+  </div>
 </div>
-
-<!-- COPY TOAST -->
-<div x-show="toastMsg" x-transition class="fixed bottom-4 right-4 bg-gray-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50" x-text="toastMsg"></div>
 
 <script>
-function app() {
-  return {
-    meta: { github_repo: '#', branch: 'main' },
-    exporters: [],
-    ruleGroups: [],
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const ESC = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ESC[c]);
+const enc = encodeURIComponent;
 
-    loading: true,
-    _searchTimer: null,
-    tab: 'home',
-    search: '',
-    selectedExporter: null,
-    selectedRuleGroup: null,
-    severityFilter: 'all',
-    metricTypeFilter: '',
-    darkMode: false,
-    grafanaUrl: '',
-    showGrafanaInput: false,
-    toastMsg: '',
-    expandedUncoveredExporters: {},
+const S = { q:'', sev:'all', kind:'alert', density:'full', view:'rules', products:new Set(), review:false };
+try { S.density = localStorage.getItem('density') || 'full'; } catch {}
+let RULES = [], GROUPS = [], EXP = [], REPO = '';
+const CAT_ORDER = ['Hosts & hardware', 'Kubernetes', 'Databases', 'Messaging & streaming', 'Web & load balancing', 'Network, DNS & TLS', 'Observability', 'Other'];
+const CATS = new Map();
+const METRIC = new Map(), USES = new Map(), RECNAME = new Map(), BYID = new Map();
 
-    filteredExporters: [],
-    filteredAlertGroups: [],
-    filteredRecordGroups: [],
+const lookup = m => METRIC.get(m) || METRIC.get(m.replace(/_(bucket|sum|count)$/, ''));
+const keyOf = m => lookup(m)?.name || m;
 
-    _fuseAllMetrics: null,
-    _fuseAllRules: null,
+/* ---------- data ---------- */
+async function boot() {
+  const d = await (await fetch('rules.json')).json();
+  REPO = d.meta?.github_repo || '';
+  $('#gh').href = REPO;
+  for (const [name, [type, help, exporter]] of Object.entries(d.metrics || {})) METRIC.set(name, { name, type, help, exporter });
+  METRIC.set('up', { name:'up', type:'gauge', help:'1 si la cible a répondu au dernier scrape, 0 sinon. Série synthétique produite par Prometheus.', labels:['instance','job'], exporter:null });
 
-    // ── computed ──────────────────────────────────────────
+  const gmap = new Map();
+  for (const f of d.rules) {
+    const g = f.name.replace(/\.(rules|records)$/, '');
+    if (!gmap.has(g)) gmap.set(g, { name: g, cat: f.category || 'Other', files: [], rules: [] });
+    const G = gmap.get(g);
+    G.files.push({ file: f.file, url: f.github_url });
+    for (const r of f.rules) {
+      const name = r.alert || r.record;
+      const o = { ...r, name, group: g, file: f.file, url: f.github_url, src: f.github_url + (r.line ? '#L' + r.line : ''), id: g + '/' + name, sevk: r.kind === 'alert' ? r.severity : 'record' };
+      // Same alert name can appear twice in a group (split selectors): suffix to keep DOM ids unique.
+      for (let n = 2; BYID.has(o.id); n++) o.id = g + '/' + name + '~' + n;
+      G.rules.push(o); RULES.push(o); BYID.set(o.id, o);
+    }
+  }
+  const ci = c => { const i = CAT_ORDER.indexOf(c); return i < 0 ? CAT_ORDER.length : i; };
+  GROUPS = [...gmap.values()].sort((a, b) => ci(a.cat) - ci(b.cat) || a.name.localeCompare(b.name));
+  for (const G of GROUPS) { if (!CATS.has(G.cat)) CATS.set(G.cat, []); CATS.get(G.cat).push(G); }
+  for (const G of GROUPS) G.rules.sort((a, b) => (a.kind === b.kind ? 0 : a.kind === 'alert' ? -1 : 1));
+  for (const r of RULES) if (r.kind === 'record') RECNAME.set(r.record, r);
+  for (const r of RULES) {
+    r.refs = [...new Set((r.metric_refs || []).filter(m => lookup(m) || RECNAME.has(m)))];
+    for (const m of r.refs) { const k = keyOf(m); if (!USES.has(k)) USES.set(k, []); USES.get(k).push(r); }
+    r.hay = [r.name, r.group, r.summary, r.description, r.expr, r.severity, r.for].join(' ').toLowerCase();
+  }
+  for (const r of RULES) {
+    const iss = r.issues = [];
+    if (r.kind === 'alert') {
+      if (!r.for) iss.push(['pas de for', 'Se déclenche dès la première évaluation : un seul scrape raté suffit.']);
+      if (!r.description) iss.push(['pas de description', 'Seul le summary arrive dans la notification.']);
+      else if (r.description === r.summary) iss.push(['description = summary', 'La description répète le summary au lieu de donner le contexte.']);
+    } else if (!(USES.get(r.record) || []).length) iss.push(['aucun consommateur', 'Aucune alerte ni recording rule ne lit cette série.']);
+  }
 
-    get totalMetrics() { return this.exporters.reduce((s,e) => s+e.metrics.length, 0); },
-    get totalAlerts()  { return this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='alert').length, 0); },
-    get totalRecords() { return this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='record').length, 0); },
-
-    get activeExporter() {
-      return this.filteredExporters.find(e => e.name === this.selectedExporter) || null;
-    },
-    get activeRuleGroup() {
-      const list = this.tab === 'alerts' ? this.filteredAlertGroups : this.filteredRecordGroups;
-      return list.find(g => g.file === this.selectedRuleGroup) || null;
-    },
-    get visibleMetrics() {
-      if (!this.activeExporter) return [];
-      let m = this.activeExporter.metrics;
-      if (this.metricTypeFilter) m = m.filter(x => x.type === this.metricTypeFilter);
-      return m;
-    },
-    get visibleRules() {
-      if (!this.activeRuleGroup) return [];
-      let r = this.activeRuleGroup.rules;
-      if (this.tab === 'alerts' && this.severityFilter !== 'all')
-        r = r.filter(x => x.severity === this.severityFilter);
-      return r;
-    },
-    get uncoveredByExporter() {
-      const allRefs = new Set(
-        this.ruleGroups.flatMap(g => g.rules.flatMap(r => r.metric_refs || []))
-      );
-      return this.exporters
-        .map(e => ({ exporter: e.name, metrics: e.metrics.filter(m => !allRefs.has(m.name) && !m.generic) }))
-        .filter(g => g.metrics.length > 0);
-    },
-    get uncoveredMetrics() {
-      return this.uncoveredByExporter.reduce((s, g) => s + g.metrics.length, 0);
-    },
-    get filteredUncovered() {
-      if (!this.search) return this.uncoveredByExporter;
-      const q = this.search.toLowerCase();
-      return this.uncoveredByExporter
-        .map(g => ({
-          exporter: g.exporter,
-          metrics: g.metrics.filter(m => m.name.includes(q) || m.help.toLowerCase().includes(q)),
-        }))
-        .filter(g => g.metrics.length > 0 || g.exporter.includes(q));
-    },
-    get stats() {
-      const critical = this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='alert'&&r.severity==='critical').length, 0);
-      const warning  = this.ruleGroups.reduce((s,g) => s+g.rules.filter(r=>r.kind==='alert'&&r.severity==='warning').length, 0);
-      const exporterCoverage = [...this.exporters]
-        .map(e => ({ name: e.name, alerts: (e.related_alerts||[]).length, metrics: e.metrics.length }))
-        .sort((a,b) => b.alerts - a.alerts);
-      const topExporters = [...this.exporters]
-        .map(e => ({ name: e.name, count: e.metrics.length }))
-        .sort((a,b) => b.count - a.count)
-        .slice(0, 8);
-      const refCounts = {};
-      this.ruleGroups.flatMap(g => g.rules.flatMap(r => r.metric_refs || []))
-        .forEach(m => { refCounts[m] = (refCounts[m] || 0) + 1; });
-      const topMetrics = Object.entries(refCounts)
-        .sort((a,b) => b[1]-a[1]).slice(0, 8)
-        .map(([name, count]) => ({ name, count }));
-      const exportersWithoutAlerts = this.exporters
-        .filter(e => !e.related_alerts || e.related_alerts.length === 0)
-        .map(e => e.name);
-      return { critical, warning, exporterCoverage, topExporters, topMetrics, exportersWithoutAlerts };
-    },
-
-    // ── init ─────────────────────────────────────────────
-
-    async init() {
-      this.darkMode   = localStorage.getItem('darkMode') === 'true';
-      this.grafanaUrl = localStorage.getItem('grafanaUrl') || '';
-
-      const res  = await fetch('data.json');
-      const data = await res.json();
-      this.meta       = data.meta;
-      this.exporters  = data.exporters;
-      this.ruleGroups = data.rules;
-      this.resetFilters();
-      this._buildIndexes();
-      this._parseHash();
-      window.addEventListener('hashchange', () => this._parseHash());
-      this.loading = false;
-    },
-
-    resetFilters() {
-      this.filteredExporters    = [...this.exporters];
-      this.filteredAlertGroups  = this.ruleGroups
-        .map(g => ({ ...g, rules: g.rules.filter(r=>r.kind==='alert') }))
-        .filter(g => g.rules.length > 0);
-      this.filteredRecordGroups = this.ruleGroups
-        .map(g => ({ ...g, rules: g.rules.filter(r=>r.kind==='record') }))
-        .filter(g => g.rules.length > 0);
-    },
-
-    _buildIndexes() {
-      this._fuseAllMetrics = new Fuse(
-        this.exporters.flatMap(e => e.metrics.map(m => ({ ...m, _exporter: e.name }))),
-        { keys: ['name','help'], threshold: 0.3 }
-      );
-      this._fuseAllRules = new Fuse(
-        this.ruleGroups.flatMap(g => g.rules.map(r => ({ ...r, _file: g.file }))),
-        { keys: ['alert','record','expr','summary'], threshold: 0.3 }
-      );
-    },
-
-    // ── hash-based permalinks ─────────────────────────────
-
-    _parseHash() {
-      const hash = decodeURIComponent(window.location.hash.slice(1));
-      if (!hash) return;
-      const [tab, a, b] = hash.split('/');
-      if (tab === 'home') { this.setTab('home'); return; }
-      if (tab === 'uncovered') { this.setTab('uncovered'); return; }
-      if (tab === 'metrics' && a) {
-        this.setTab('metrics');
-        this.selectExporter(a);
-        if (b) this.$nextTick(() => {
-          const el = document.getElementById('m-'+b);
-          if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
-        });
-        return;
-      }
-      if ((tab === 'alerts' || tab === 'records') && a) {
-        this.setTab(tab);
-        this.selectRuleGroup(a);
-        if (b) this.$nextTick(() => {
-          const el = document.getElementById('r-'+b);
-          if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
-        });
-      }
-    },
-
-    _setHash(parts) {
-      window.history.replaceState(null, '', '#' + parts.map(encodeURIComponent).join('/'));
-    },
-
-    copyPermalink(tab, a, b) {
-      const url = window.location.origin + window.location.pathname + '#' + [tab,a,b].map(encodeURIComponent).join('/');
-      navigator.clipboard.writeText(url);
-      this._toast('Link copied!');
-    },
-
-    // ── navigation ────────────────────────────────────────
-
-    setTab(t) {
-      this.tab = t;
-      this.search = '';
-      this.metricTypeFilter = '';
-      this.severityFilter = 'all';
-      this.resetFilters();
-      if (t === 'home' || t === 'uncovered') {
-        this.selectedRuleGroup = null;
-        this._setHash([t]);
-      } else if (t === 'metrics' && !this.selectedExporter && this.filteredExporters.length > 0) {
-        this.selectExporter(this.filteredExporters[0].name);
-      } else if ((t === 'alerts' || t === 'records') && !this.selectedRuleGroup) {
-        const list = t === 'alerts' ? this.filteredAlertGroups : this.filteredRecordGroups;
-        if (list.length > 0) this.selectRuleGroup(list[0].file);
-      }
-    },
-
-    onSearchDebounced() {
-      clearTimeout(this._searchTimer);
-      this._searchTimer = setTimeout(() => this.onSearch(), 150);
-    },
-
-    onSearch() {
-      const q = this.search.trim();
-      if (!q) { this.resetFilters(); return; }
-
-      if (this.tab === 'home' || this.tab === 'uncovered') {
-        this.tab = 'alerts';
-      }
-
-      if (this.tab === 'metrics') {
-        const hits = this._fuseAllMetrics.search(q);
-        const byExp = {};
-        hits.forEach(h => { const e=h.item._exporter; if(!byExp[e]) byExp[e]=[]; byExp[e].push(h.item); });
-        this.filteredExporters = this.exporters.filter(e=>byExp[e.name]).map(e=>({...e, metrics:byExp[e.name]}));
-        if (this.filteredExporters.length > 0 && !this.filteredExporters.find(e=>e.name===this.selectedExporter))
-          this.selectedExporter = this.filteredExporters[0].name;
-      } else if (this.tab === 'alerts' || this.tab === 'records') {
-        const kind = this.tab === 'alerts' ? 'alert' : 'record';
-        const hits = this._fuseAllRules.search(q).filter(h=>h.item.kind===kind);
-        const byFile = {};
-        hits.forEach(h => { const f=h.item._file; if(!byFile[f]) byFile[f]=[]; byFile[f].push(h.item); });
-        const filtered = this.ruleGroups.filter(g=>byFile[g.file]).map(g=>({...g, rules:byFile[g.file]}));
-        if (this.tab==='alerts') this.filteredAlertGroups=filtered; else this.filteredRecordGroups=filtered;
-        const list = this.tab==='alerts' ? this.filteredAlertGroups : this.filteredRecordGroups;
-        if (list.length>0 && !list.find(g=>g.file===this.selectedRuleGroup)) this.selectedRuleGroup=list[0].file;
-      }
-    },
-
-    selectExporter(name) {
-      this.selectedExporter = name;
-      this.metricTypeFilter = '';
-      this._setHash(['metrics', name]);
-    },
-
-    selectRuleGroup(file) {
-      this.selectedRuleGroup = file;
-      this._setHash([this.tab, file]);
-    },
-
-    goToAlert(file, alertName) {
-      this.tab = 'alerts';
-      this.search = '';
-      this.severityFilter = 'all';
-      this.resetFilters();
-      this.selectedRuleGroup = file;
-      this._setHash(['alerts', file, alertName]);
-      this.$nextTick(() => {
-        const el = document.getElementById('r-'+alertName);
-        if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
-      });
-    },
-
-    goToMetric(metricName) {
-      const exporter = this.exporters.find(e => e.metrics.some(m => m.name === metricName));
-      if (!exporter) return;
-      this.tab = 'metrics';
-      this.search = '';
-      this.metricTypeFilter = '';
-      this.resetFilters();
-      this.selectedExporter = exporter.name;
-      this._setHash(['metrics', exporter.name, metricName]);
-      this.$nextTick(() => {
-        const el = document.getElementById('m-'+metricName);
-        if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
-      });
-    },
-
-    // ── Grafana ───────────────────────────────────────────
-
-    saveGrafanaUrl() {
-      localStorage.setItem('grafanaUrl', this.grafanaUrl);
-    },
-
-    grafanaExploreUrl(expr) {
-      if (!this.grafanaUrl) return '#';
-      const left = JSON.stringify({
-        datasource: { type: 'prometheus' },
-        queries: [{ refId: 'A', expr: String(expr), range: true, instant: false }],
-        range: { from: 'now-1h', to: 'now' }
-      });
-      return `${this.grafanaUrl.replace(/\/$/, '')}/explore?orgId=1&left=${encodeURIComponent(left)}`;
-    },
-
-    // ── utils ─────────────────────────────────────────────
-
-    toggleDarkMode() {
-      this.darkMode = !this.darkMode;
-      localStorage.setItem('darkMode', this.darkMode);
-    },
-
-    async copyText(text, label = 'Copied!') {
-      await navigator.clipboard.writeText(text);
-      this._toast(label);
-    },
-
-    _toast(msg) {
-      this.toastMsg = msg;
-      setTimeout(() => this.toastMsg = '', 1500);
-    },
-
-    // ── j/k sidebar navigation ────────────────────────────
-
-    navigateSidebar(dir) {
-      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
-      if (['home', 'uncovered'].includes(this.tab)) return;
-      let items, current;
-      if (this.tab === 'metrics') {
-        items = this.filteredExporters.map(e => e.name);
-        current = this.selectedExporter;
-      } else {
-        const list = this.tab === 'alerts' ? this.filteredAlertGroups : this.filteredRecordGroups;
-        items = list.map(g => g.file);
-        current = this.selectedRuleGroup;
-      }
-      if (!items.length) return;
-      const idx = items.indexOf(current);
-      const next = Math.max(0, Math.min(items.length - 1, (idx === -1 ? 0 : idx) + dir));
-      if (this.tab === 'metrics') this.selectExporter(items[next]);
-      else this.selectRuleGroup(items[next]);
-      this.$nextTick(() => {
-        const sidebar = document.querySelector('aside');
-        const active = sidebar?.querySelector('.sidebar-active, [class*="border-indigo-600"]');
-        if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      });
-    },
-
-    toggleUncoveredExporter(name) {
-      this.expandedUncoveredExporters = {
-        ...this.expandedUncoveredExporters,
-        [name]: !this.expandedUncoveredExporters[name],
-      };
-    },
-  };
+  renderControls();
+  renderDoc();
+  route();
+  // exporters.json (~1.5 MB) only feeds the metric drawer and the coverage page: fetch it once idle.
+  if (window.requestIdleCallback) requestIdleCallback(() => loadExporters(), { timeout: 3000 });
+  else setTimeout(loadExporters, 1500);
 }
+let EXP_P = null;
+function loadExporters() {
+  return EXP_P ||= fetch('exporters.json').then(r => r.json()).then(d => {
+    for (const e of d.exporters) for (const m of e.metrics) {
+      const cur = METRIC.get(m.name);
+      if (!cur || (!cur.full && cur.exporter === e.name)) METRIC.set(m.name, { ...m, exporter: e.name, full: true });
+    }
+    EXP = d.exporters.map(e => {
+      const biz = e.metrics.filter(m => !m.generic);
+      const unc = biz.filter(m => !USES.has(m.name));
+      const al = new Set();
+      for (const m of e.metrics) for (const r of USES.get(m.name) || []) if (r.kind === 'alert') al.add(r.id);
+      return { name: e.name, url: e.github_url, biz: biz.length, unc, alerts: al.size };
+    }).sort((a, b) => (b.biz - b.unc.length) / (b.biz || 1) - (a.biz - a.unc.length) / (a.biz || 1));
+  });
+}
+
+/* ---------- formatting ---------- */
+function tpl(s) {
+  return esc(s).replace(/\{\{-?\s*(.*?)\s*-?\}\}/g, (_, x) => {
+    const m = x.match(/^\$labels\.(\w+)/);
+    if (m) return `<span class="ph">${m[1]}</span>`;
+    if (x.includes('$value')) { const f = x.split('|')[1]; return `<span class="ph val">valeur${f ? ' · ' + f.trim() : ''}</span>`; }
+    return `<span class="ph">${x}</span>`;
+  });
+}
+const plain = s => String(s ?? '').replace(/\{\{-?\s*\$labels\.(\w+)\s*-?\}\}/g, '$1').replace(/\{\{.*?\}\}/g, 'valeur');
+const FN = new Set('abs absent absent_over_time avg avg_over_time bottomk ceil changes clamp clamp_max clamp_min count count_over_time count_values day_of_month day_of_week days_in_month delta deriv exp floor group histogram_quantile holt_winters hour idelta increase irate label_join label_replace last_over_time ln log10 log2 max max_over_time min min_over_time minute month predict_linear quantile quantile_over_time rate resets round scalar sgn sort sort_desc sqrt stddev stddev_over_time stdvar stdvar_over_time sum sum_over_time time timestamp topk vector year present_over_time limitk'.split(' '));
+const KW = new Set('by without on ignoring group_left group_right and or unless offset bool'.split(' '));
+const LBLKW = new Set('by without on ignoring group_left group_right'.split(' '));
+function promql(src) {
+  const re = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`)|(#[^\n]*)|(\d+(?:\.\d+)?(?:ms|[smhdwy])(?:\d+(?:ms|[smhdwy]))*\b|\d+(?:\.\d+)?(?:e[+-]?\d+)?)|([a-zA-Z_:][\w:]*)|(=~|!~|!=|==|>=|<=|[-+*/%^<>=])|([{}()[\],])|(\s+|.)/g;
+  let out = '', m, brace = 0, paren = 0, pending = false, lblParen = -1;
+  while ((m = re.exec(src))) {
+    const [t, str, com, num, id, op, p] = m;
+    if (str) out += `<span class="t-str">${esc(t)}</span>`;
+    else if (com) out += `<span class="t-com">${esc(t)}</span>`;
+    else if (num) out += `<span class="t-num">${t}</span>`;
+    else if (id) {
+      if (brace > 0 || lblParen >= 0) out += `<span class="t-label">${t}</span>`;
+      else if (KW.has(id)) { out += `<span class="t-kw">${t}</span>`; if (LBLKW.has(id)) pending = true; }
+      else if (FN.has(id) && /^\s*\(/.test(src.slice(re.lastIndex))) out += `<span class="t-fn">${t}</span>`;
+      else if (RECNAME.has(id)) out += `<a class="t-metric" href="#/r/${enc(RECNAME.get(id).id)}">${t}</a>`;
+      else if (lookup(id)) out += `<a class="t-metric" href="#/m/${enc(keyOf(id))}">${t}</a>`;
+      else out += `<span class="t-metric">${t}</span>`;
+    }
+    else if (op) out += `<span class="t-op">${esc(t)}</span>`;
+    else if (p) {
+      if (p === '{') brace++; else if (p === '}') brace = Math.max(0, brace - 1);
+      else if (p === '(') { paren++; if (pending) { lblParen = paren; pending = false; } }
+      else if (p === ')') { if (paren === lblParen) lblParen = -1; paren--; }
+      out += `<span class="t-op">${t}</span>`;
+    }
+    else out += esc(t);
+  }
+  return out;
+}
+function yaml(r) {
+  const ind = s => s.trimEnd().split('\n').map(l => '    ' + l).join('\n');
+  if (r.kind === 'record') return `- record: ${r.record}\n  expr: |\n${ind(r.expr)}\n`;
+  let y = `- alert: ${r.alert}\n  expr: |\n${ind(r.expr)}\n`;
+  if (r.for) y += `  for: ${r.for}\n`;
+  y += `  labels:\n    severity: ${r.severity}\n  annotations:\n`;
+  for (const k of ['summary', 'description', 'runbook_url']) if (r[k]) y += `    ${k}: ${JSON.stringify(r[k])}\n`;
+  return y;
+}
+const ruleLink = o => `<a href="#/r/${enc(o.id)}"><span class="dot ${o.sevk}"></span>${esc(o.name)}</a>`;
+
+/* ---------- render (once) ---------- */
+function ruleHTML(r) {
+  const isA = r.kind === 'alert';
+  const consumers = isA ? [] : (USES.get(r.record) || []);
+  return `<article class="rule ${r.sevk}" id="${esc(r.id)}" data-id="${esc(r.id)}">
+    <div class="rh">
+      <span class="dot ${r.sevk}"></span>
+      <a class="rn" href="#/r/${enc(r.id)}">${esc(r.name)}</a>
+      ${isA ? `<span class="badge ${r.severity}">${r.severity}</span>` : '<span class="badge record">record</span>'}
+      ${r.for ? `<span class="badge">for ${esc(r.for)}</span>` : ''}
+      ${r.runbook_url ? `<a class="badge" href="${esc(r.runbook_url)}" target="_blank" rel="noopener">runbook ↗</a>` : ''}
+      ${r.issues.map(([l, why]) => `<span class="badge issue" title="${esc(why)}">${esc(l)}</span>`).join('')}
+      <span class="csum">${esc(plain(isA ? r.summary : r.expr.replace(/\s+/g, ' ')))}</span>
+      <span class="acts">
+        <button class="act" data-copy="expr">PromQL</button>
+        <button class="act" data-copy="yaml">YAML</button>
+        <button class="act" data-copy="link">Lien</button>
+        <a class="act" href="${esc(r.src)}" target="_blank" rel="noopener" title="${esc(r.file)}${r.line ? ':' + r.line : ''}">Source ↗</a>
+      </span>
+    </div>
+    <div class="rb">
+      ${isA ? `<p class="sum">${tpl(r.summary)}</p>${r.description && r.description !== r.summary ? `<p class="desc">${tpl(r.description)}</p>` : ''}` : ''}
+      <pre class="expr">${promql(r.expr.trim())}</pre>
+      ${!isA ? `<div class="used">${consumers.length ? `Utilisée par ${consumers.map(ruleLink).join('')}` : 'Aucune règle ne la consomme.'}</div>` : ''}
+    </div>
+  </article>`;
+}
+function renderDoc() {
+  $('#doc').innerHTML = GROUPS.map(G => `<section class="grp" id="g-${esc(G.name)}" data-g="${esc(G.name)}">
+      <header class="gh"><h2>${esc(G.name)}</h2><span class="gcat">${esc(G.cat)}</span><span class="meta" data-meta></span>
+        <span class="meta files">${G.files.map(f => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.file)} ↗</a>`).join('')}</span></header>
+      ${G.rules.map(ruleHTML).join('')}
+    </section>`).join('') +
+    `<div class="empty" id="empty" hidden></div><section id="coverage" hidden></section>`;
+  for (const G of GROUPS) {
+    G.el = document.getElementById('g-' + G.name);
+    G.meta = G.el.querySelector('[data-meta]');
+    for (const r of G.rules) r.el = document.getElementById(r.id);
+  }
+  observe();
+}
+
+/* ---------- filtering (toggle visibility only) ---------- */
+const inProduct = r => !S.products.size || S.products.has(r.group);
+const visible = r => inProduct(r) && (S.kind === 'all' || r.kind === S.kind) && (!S.review || r.issues.length) &&
+  (S.sev === 'all' || r.kind !== 'alert' || r.severity === S.sev) &&
+  (!S.q || S.q.split(/\s+/).every(t => r.hay.includes(t)));
+function applyFilter() {
+  let total = 0;
+  const sevBase = { all: 0, critical: 0, warning: 0 };
+  for (const G of GROUPS) {
+    let n = 0, a = 0, c = 0, rec = 0, nAll = 0, cAll = 0;
+    for (const r of G.rules) {
+      const v = visible(r);
+      r.el.hidden = !v;
+      if (v) { n++; if (r.kind === 'alert') { a++; if (r.severity === 'critical') c++; } else rec++; }
+      const base = (S.kind === 'all' || r.kind === S.kind) && (!S.review || r.issues.length) && (!S.q || S.q.split(/\s+/).every(t => r.hay.includes(t)));
+      if (base && (S.sev === 'all' || r.kind !== 'alert' || r.severity === S.sev)) { nAll++; if (r.severity === 'critical') cAll++; }
+      if (base && inProduct(r) && r.kind === 'alert') { sevBase.all++; sevBase[r.severity]++; }
+    }
+    G.n = n; G.c = c; G.nAll = nAll; G.cAll = cAll;
+    G.el.hidden = !n || S.view !== 'rules';
+    G.meta.innerHTML = [a && `${a} alerte${a > 1 ? 's' : ''}`, c && `<span style="color:var(--crit)">${c} critical</span>`, rec && `${rec} record${rec > 1 ? 's' : ''}`].filter(Boolean).join(' · ');
+    total += n;
+  }
+  $('#count').textContent = S.view === 'rules' ? `${total} règle${total > 1 ? 's' : ''}` : '';
+  const empty = $('#empty');
+  empty.hidden = !!total || S.view !== 'rules';
+  empty.textContent = `Aucune règle ne correspond à « ${S.q} ».`;
+  for (const [k, n] of Object.entries(sevBase)) { const el = $(`#segSev [data-sev="${k}"] .n`); if (el) el.textContent = n; }
+  $('#segSev').style.visibility = S.kind === 'record' ? 'hidden' : '';
+  renderToc();
+}
+function renderToc() {
+  const gs = GROUPS.filter(G => G.nAll || S.products.has(G.name));
+  const sel = S.products.size;
+  const byCat = [...CATS].map(([cat, all]) => [cat, all.filter(G => gs.includes(G))]).filter(([, xs]) => xs.length);
+  $('#toc').innerHTML = `<div class="toch"><span>Produits</span>${sel ? `<button data-pall>Tous · ${sel} sélectionné${sel > 1 ? 's' : ''} ✕</button>` : '<em>⌘-clic : plusieurs</em>'}</div>` +
+    byCat.map(([cat, xs]) => `<button class="tocc ${CATS.get(cat).every(G => S.products.has(G.name)) ? 'pick' : ''}" data-cat="${esc(cat)}" title="Filtrer la catégorie">${esc(cat)}</button>` +
+      xs.map(G => `<a href="#/g/${enc(G.name)}" data-toc="${esc(G.name)}" class="${S.products.has(G.name) ? 'pick' : ''}">${esc(G.name)}<span class="c">${G.cAll ? `<span class="dot critical" title="${G.cAll} critical"></span>` : ''}${G.nAll}</span></a>`).join('')).join('');
+  $('#gsel').innerHTML = `<option value="">Tous les produits</option>` + byCat.map(([cat, xs]) => `<optgroup label="${esc(cat)}">` +
+    xs.map(G => `<option value="${esc(G.name)}" ${sel === 1 && S.products.has(G.name) ? 'selected' : ''}>${esc(G.name)} (${G.nAll})</option>`).join('') + '</optgroup>').join('');
+  markToc(current);
+}
+function renderControls() {
+  const na = RULES.filter(r => r.kind === 'alert').length, nr = RULES.length - na;
+  $('#segKind').innerHTML = [['alert', 'Alertes', na], ['record', 'Records', nr], ['all', 'Tout', RULES.length]]
+    .map(([k, l, n]) => `<button data-kind="${k}">${l}<span class="n">${n}</span></button>`).join('');
+  $('#segSev').innerHTML = [['all', 'Toutes', ''], ['critical', 'Critical', 'critical'], ['warning', 'Warning', 'warning']]
+    .map(([k, l, d]) => `<button data-sev="${k}">${d ? `<span class="dot ${d}"></span>` : ''}${l}<span class="n"></span></button>`).join('');
+  syncControls();
+}
+function syncControls() {
+  for (const b of document.querySelectorAll('[data-kind]')) b.setAttribute('aria-pressed', b.dataset.kind === S.kind);
+  for (const b of document.querySelectorAll('[data-sev]')) b.setAttribute('aria-pressed', b.dataset.sev === S.sev);
+  for (const b of document.querySelectorAll('[data-density]')) b.setAttribute('aria-pressed', b.dataset.density === S.density);
+  $('[data-review]').setAttribute('aria-pressed', S.review);
+  $('[data-review] .n').textContent = RULES.filter(r => r.issues.length && (S.kind === 'all' || r.kind === S.kind)).length;
+  document.body.classList.toggle('compact', S.density === 'compact');
+  $('#covLink').classList.toggle('on', S.view === 'coverage');
+}
+
+/* ---------- scrollspy ---------- */
+let current = null, io;
+function observe() {
+  io = new IntersectionObserver(es => {
+    for (const e of es) if (e.isIntersecting) { current = e.target.dataset.g; markToc(current); }
+  }, { rootMargin: '-110px 0px -75% 0px' });
+  for (const G of GROUPS) io.observe(G.el);
+}
+function markToc(g) {
+  for (const a of document.querySelectorAll('.toc a')) a.classList.toggle('on', a.dataset.toc === g);
+  const on = document.querySelector('.toc a.on');
+  if (on) on.scrollIntoView({ block: 'nearest' });
+}
+
+/* ---------- coverage view ---------- */
+async function renderCoverage() {
+  const box = $('#coverage');
+  if (box.dataset.done) return;
+  box.dataset.done = 1;
+  box.innerHTML = '<div class="loading">Chargement des exporters…</div>';
+  await loadExporters();
+  box.innerHTML = `<div class="covh"><h2>Couverture des exporters</h2><p>Part des métriques métier (hors go_/process_) référencées par au moins une règle.</p></div>
+  <div class="cov">${EXP.map(e => {
+    const cov = e.biz - e.unc.length, pct = e.biz ? Math.round(100 * cov / e.biz) : 0;
+    return `<div class="cv"><h4><a href="${esc(e.url)}" target="_blank" rel="noopener" style="text-decoration:none">${esc(e.name)}</a><span class="pct">${pct}%</span></h4>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="sub">${cov}/${e.biz} métriques · ${e.alerts} alertes</div>
+      ${e.unc.length ? `<details><summary>${e.unc.length} non couvertes</summary><ul>${e.unc.map(m => `<li><a href="#/m/${enc(m.name)}">${esc(m.name)}</a></li>`).join('')}</ul></details>` : ''}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ---------- metric drawer ---------- */
+function openMetric(name) {
+  const d = $('#drawer');
+  d.dataset.m = name;
+  renderMetric(name);
+  d.classList.add('open');
+  d.scrollTop = 0;
+  if (!lookup(name)?.full) loadExporters().then(() => { if (d.dataset.m === name && d.classList.contains('open')) renderMetric(name); });
+}
+function renderMetric(name) {
+  const i = lookup(name), uses = USES.get(keyOf(name)) || [];
+  const d = $('#drawer');
+  d.innerHTML = `<div class="dw">
+    <button class="act close" data-close>Fermer ✕</button>
+    <span class="badge">${esc(i?.type || 'untyped')}</span>${i?.exporter ? ` <span class="badge">${esc(i.exporter)}</span>` : ''}
+    <h3>${esc(name)}</h3>
+    <p>${esc(i?.help || 'Pas de description dans la fixture.')}</p>
+    ${i?.labels?.length ? `<div class="label">Labels</div><div class="lbls">${i.labels.map(l => `<code>${esc(l)}</code>`).join('')}</div>` : ''}
+    ${i?.example ? `<div class="label">Exemple</div><pre>${esc(i.example)}</pre>` : ''}
+    <div class="label">Règles qui l'utilisent · ${uses.length}</div>
+    <div class="rl">${uses.length ? uses.map(o => `<a href="#/r/${enc(o.id)}"><span class="dot ${o.sevk}"></span>${esc(o.name)}<span class="g">${esc(o.group)}</span></a>`).join('') : '<p>Aucune : métrique non couverte.</p>'}</div>
+  </div>`;
+}
+const closeDrawer = () => $('#drawer').classList.remove('open');
+
+/* ---------- command palette (⌘K) ---------- */
+const MAC = /Mac|iPhone|iPad/.test(navigator.platform);
+$('#palkbd').textContent = MAC ? '⌘K' : 'Ctrl K';
+$('#palmod').textContent = MAC ? '⌘' : 'Ctrl';
+let PAL = null, palItems = [], palIdx = 0;
+function palIndex() {
+  if (PAL) return PAL;
+  PAL = [];
+  for (const [cat, gs] of CATS) {
+    const n = gs.reduce((s, G) => s + G.rules.filter(r => r.kind === 'alert').length, 0);
+    PAL.push({ t: 'c', key: cat, label: cat, sub: `${gs.map(G => G.name).join(', ')} · ${n} alertes` });
+  }
+  for (const G of GROUPS) {
+    const a = G.rules.filter(r => r.kind === 'alert'), c = a.filter(r => r.severity === 'critical').length;
+    PAL.push({ t: 'p', key: G.name, label: G.name, sub: `${a.length} alertes${c ? ` · ${c} critical` : ''}${a.length < G.rules.length ? ` · ${G.rules.length - a.length} records` : ''}` });
+  }
+  for (const r of RULES) PAL.push({ t: r.kind === 'alert' ? 'a' : 'r', key: r.id, label: r.name, sub: r.group + ' · ' + plain(r.kind === 'alert' ? r.summary : r.expr.replace(/\s+/g, ' ')), sev: r.sevk });
+  for (const [m, uses] of USES) if (!RECNAME.has(m)) PAL.push({ t: 'm', key: m, label: m, sub: `${lookup(m)?.exporter || 'prometheus'} · ${uses.length} règle${uses.length > 1 ? 's' : ''}` });
+  for (const it of PAL) it.l = it.label.toLowerCase();
+  return PAL;
+}
+// exact > prefix > substring > subsequence; returns -1 when no match
+function fuzzy(l, q) {
+  if (l === q) return 1000;
+  if (l.startsWith(q)) return 800 - l.length;
+  const i = l.indexOf(q);
+  if (i >= 0) return 600 - i - l.length / 10;
+  let j = 0, gaps = 0, last = -1;
+  for (let k = 0; k < l.length && j < q.length; k++) if (l[k] === q[j]) { if (last >= 0) gaps += k - last - 1; last = k; j++; }
+  return j === q.length && gaps <= Math.max(2, q.length) ? 300 - gaps - l.length / 10 : -1;
+}
+function hlMatch(label, q) {
+  const l = label.toLowerCase(), i = q ? l.indexOf(q) : -1;
+  if (i >= 0) return esc(label.slice(0, i)) + '<b>' + esc(label.slice(i, i + q.length)) + '</b>' + esc(label.slice(i + q.length));
+  return esc(label);
+}
+const SECS = [['c', 'Catégories', 4], ['p', 'Produits', 8], ['a', 'Alertes', 8], ['r', 'Recording rules', 4], ['m', 'Métriques', 6]];
+// p: products and categories, a: alerts, r: recording rules, m: metrics
+const PREFIX = { p: ['c', 'p'], a: ['a'], r: ['r'], m: ['m'] };
+function palRender() {
+  const raw = $('#palq').value.trimStart().toLowerCase();
+  const pm = raw.match(/^([parm]):\s*(.*)$/);
+  const only = pm ? PREFIX[pm[1]] : null, q = (pm ? pm[2] : raw).trim();
+  const idx = palIndex();
+  palItems = [];
+  let html = '';
+  for (const [t, title, max] of SECS) {
+    if (only && !only.includes(t)) continue;
+    let xs;
+    if (!q) xs = only || t === 'c' || t === 'p' ? idx.filter(i => i.t === t).slice(0, only ? 60 : 99) : [];
+    else xs = idx.filter(i => i.t === t).map(i => [i, fuzzy(i.l, q)]).filter(x => x[1] >= 0).sort((a, b) => b[1] - a[1]).slice(0, only ? 40 : max).map(x => x[0]);
+    if (!xs.length) continue;
+    html += `<div class="palsec">${title}</div>`;
+    for (const it of xs) {
+      const n = palItems.push(it) - 1;
+      const icon = it.t === 'p' ? '<span class="ico p">P</span>' : it.t === 'c' ? '<span class="ico p">C</span>' : it.t === 'm' ? '<span class="ico">M</span>' : `<span class="ico"><span class="dot ${it.sev}"></span></span>`;
+      const picked = it.t === 'p' ? S.products.has(it.key) : it.t === 'c' && CATS.get(it.key).every(G => S.products.has(G.name));
+      const kind = { c: picked ? 'retirer du filtre' : 'filtrer la catégorie', p: picked ? 'retirer du filtre' : 'filtrer', a: 'aller à l\'alerte', r: 'aller à la règle', m: 'voir la métrique' }[it.t];
+      html += `<div class="palit ${picked ? 'picked' : ''}" data-pi="${n}">${icon}<span class="pl ${it.t === 'p' || it.t === 'c' ? '' : 'mono'}">${hlMatch(it.label, q)}</span><span class="ps">${esc(it.sub)}</span><span class="pk">${kind}</span></div>`;
+    }
+  }
+  $('#palres').innerHTML = html || `<div class="palempty">Rien pour « ${esc(q)} ».</div>`;
+  palIdx = 0; palMark();
+}
+function palMark() {
+  for (const el of document.querySelectorAll('.palit')) el.classList.toggle('on', +el.dataset.pi === palIdx);
+  document.querySelector('.palit.on')?.scrollIntoView({ block: 'nearest' });
+}
+function palOpen() { $('#pal').hidden = false; $('#palq').value = ''; palRender(); $('#palq').focus(); }
+function palClose() { $('#pal').hidden = true; }
+function palRun(it, multi) {
+  if (!it) return;
+  palClose();
+  if (it.t === 'p') {
+    const next = new Set(multi ? S.products : []);
+    if (S.products.has(it.key) && (multi || S.products.size === 1)) next.delete(it.key); else next.add(it.key);
+    return setProducts(next);
+  }
+  if (it.t === 'c') return toggleCat(it.key, multi);
+  const h = (it.t === 'm' ? '#/m/' : '#/r/') + enc(it.key);
+  if (location.hash === h) route(); else location.hash = h;
+}
+$('#palq').addEventListener('input', palRender);
+$('#palq').addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    palIdx = Math.max(0, Math.min(palItems.length - 1, palIdx + (e.key === 'ArrowDown' ? 1 : -1))); palMark();
+  } else if (e.key === 'Enter') { e.preventDefault(); palRun(palItems[palIdx], e.metaKey || e.ctrlKey); }
+});
+$('#palres').addEventListener('mousemove', e => { const el = e.target.closest('.palit'); if (el && +el.dataset.pi !== palIdx) { palIdx = +el.dataset.pi; palMark(); } });
+$('#palres').addEventListener('click', e => { const el = e.target.closest('.palit'); if (el) palRun(palItems[+el.dataset.pi], e.metaKey || e.ctrlKey); });
+$('#pal').addEventListener('click', e => { if (e.target.id === 'pal') palClose(); });
+$('#palbtn').addEventListener('click', palOpen);
+
+/* ---------- routing ---------- */
+function setView(v) {
+  S.view = v;
+  $('#coverage').hidden = v !== 'coverage';
+  if (v === 'coverage') renderCoverage();
+  syncControls(); applyFilter();
+}
+function goRule(id) {
+  const r = BYID.get(id); if (!r) return;
+  if (!visible(r)) { S.q = ''; $('#q').value = ''; S.sev = 'all'; if (S.kind !== 'all' && S.kind !== r.kind) S.kind = r.kind; syncControls(); }
+  setView('rules');
+  if (S.density === 'compact') r.el.classList.add('open');
+  focusRule(r.el, true);
+}
+function route() {
+  const [k, ...rest] = location.hash.replace(/^#\/?/, '').split('/');
+  const arg = decodeURIComponent(rest.join('/'));
+  if (k === 'coverage') { closeDrawer(); setView('coverage'); scrollTo({ top: 0 }); return; }
+  if (k === 'm') { if (S.view !== 'coverage') setView('rules'); openMetric(arg); return; }
+  closeDrawer();
+  if (k === 'r') return goRule(arg);
+  if (k === 'p') { S.products = new Set(arg.split(',').filter(g => GROUPS.some(G => G.name === g))); setView('rules'); return; }
+  setView('rules');
+  if (k === 'g') { const G = GROUPS.find(x => x.name === arg); if (G) G.el.scrollIntoView(); }
+  else applyFilter();
+}
+
+/* ---------- keyboard focus ---------- */
+let focused = null;
+function focusRule(el, flash) {
+  if (focused) focused.classList.remove('focus');
+  focused = el; el.classList.add('focus');
+  el.scrollIntoView({ block: flash ? 'start' : 'nearest' });
+  if (flash) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+}
+function move(d) {
+  const els = RULES.map(r => r.el).filter(el => !el.hidden && !el.parentElement.hidden);
+  if (!els.length) return;
+  let i = els.indexOf(focused);
+  if (i < 0) { const y = 140; i = els.findIndex(el => el.getBoundingClientRect().bottom > y) - (d > 0 ? 1 : 0); }
+  focusRule(els[Math.max(0, Math.min(els.length - 1, i + d))]);
+}
+
+/* ---------- events ---------- */
+let t;
+$('#q').addEventListener('input', e => {
+  clearTimeout(t);
+  t = setTimeout(() => { S.q = e.target.value.trim().toLowerCase(); if (S.view !== 'rules') setView('rules'); else applyFilter(); scrollTo({ top: 0 }); }, 70);
+});
+addEventListener('hashchange', route);
+function toggleCat(cat, multi) {
+  const names = CATS.get(cat).map(G => G.name);
+  const all = names.every(n => S.products.has(n));
+  const next = new Set(multi ? S.products : []);
+  if (all && (multi || S.products.size === names.length)) names.forEach(n => next.delete(n)); else names.forEach(n => next.add(n));
+  setProducts(next);
+}
+function setProducts(set) {
+  S.products = set;
+  history.replaceState(null, '', set.size ? '#/p/' + [...set].map(enc).join(',') : '#/');
+  setView('rules'); scrollTo({ top: 0 });
+}
+$('#gsel').addEventListener('change', e => setProducts(new Set(e.target.value ? [e.target.value] : [])));
+
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-copy]');
+  if (c) {
+    const r = BYID.get(c.closest('.rule').dataset.id);
+    const txt = { expr: r.expr.trim(), yaml: yaml(r), link: location.origin + location.pathname + '#/r/' + enc(r.id) }[c.dataset.copy];
+    navigator.clipboard?.writeText(txt);
+    const l = c.textContent; c.textContent = 'Copié'; c.classList.add('ok');
+    setTimeout(() => { c.textContent = l; c.classList.remove('ok'); }, 1100);
+    return;
+  }
+  const b = e.target.closest('[data-kind],[data-sev],[data-density]');
+  if (b) {
+    if (b.dataset.kind) S.kind = b.dataset.kind;
+    if (b.dataset.sev) S.sev = b.dataset.sev;
+    if (b.dataset.density) { S.density = b.dataset.density; try { localStorage.setItem('density', S.density); } catch {} }
+    syncControls(); setView('rules');
+    if (location.hash.startsWith('#/coverage')) history.replaceState(null, '', '#/');
+    return;
+  }
+  if (e.target.closest('[data-pall]')) { setProducts(new Set()); return; }
+  const cb = e.target.closest('[data-cat]');
+  if (cb) { toggleCat(cb.dataset.cat, e.metaKey || e.ctrlKey || e.shiftKey); return; }
+  if (e.target.closest('[data-review]')) { S.review = !S.review; syncControls(); setView('rules'); scrollTo({ top: 0 }); return; }
+  const p = e.target.closest('[data-toc]');
+  if (p) {
+    e.preventDefault();
+    const g = p.dataset.toc, multi = e.metaKey || e.ctrlKey || e.shiftKey;
+    const next = new Set(multi ? S.products : []);
+    if (multi && S.products.has(g)) next.delete(g);
+    else if (!multi && S.products.size === 1 && S.products.has(g)) next.clear();
+    else next.add(g);
+    setProducts(next);
+    return;
+  }
+  if (e.target.closest('[data-close]')) { closeDrawer(); history.replaceState(null, '', '#/'); return; }
+  if (document.body.classList.contains('compact')) {
+    const rule = e.target.closest('.rule');
+    if (rule && !e.target.closest('a,button,pre')) { rule.classList.toggle('open'); focusRule(rule); return; }
+  }
+  if ($('#drawer').classList.contains('open') && !e.target.closest('#drawer') && !e.target.closest('a[href^="#/m/"]')) closeDrawer();
+});
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#pal').hidden ? palOpen() : palClose(); return; }
+  if (!$('#pal').hidden) { if (e.key === 'Escape') palClose(); return; }
+  const inInput = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName);
+  if (e.key === 'Escape') {
+    if ($('#drawer').classList.contains('open')) closeDrawer();
+    else if (inInput && S.q) { $('#q').value = ''; S.q = ''; applyFilter(); }
+    document.activeElement?.blur(); return;
+  }
+  if (inInput || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === '/') { e.preventDefault(); $('#q').focus(); $('#q').select(); return; }
+  if (e.key === 'j' || e.key === 'k') { e.preventDefault(); move(e.key === 'j' ? 1 : -1); return; }
+  if (!focused) return;
+  if (e.key === 'o' || e.key === 'Enter') focused.classList.toggle('open');
+  if (e.key === 'c') focused.querySelector('[data-copy="expr"]').click();
+  if (e.key === 'y') focused.querySelector('[data-copy="yaml"]').click();
+});
+
+/* theme */
+const root = document.documentElement;
+try { const th = localStorage.getItem('theme'); if (th) root.dataset.theme = th; } catch {}
+$('#theme').addEventListener('click', () => {
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('theme', root.dataset.theme); } catch {}
+});
+
+boot().catch(err => { $('#doc').innerHTML = `<div class="empty">Impossible de charger rules.json : ${esc(err.message)}</div>`; });
+})();
 </script>
 </body>
 </html>
