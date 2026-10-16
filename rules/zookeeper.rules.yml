@@ -25,7 +25,7 @@
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} has an insufficient Quorum"
+        description: "The ensemble reports a quorum size of {{ $value }}, below 3. One more node loss prevents it from electing a leader."
         summary: "{{ $labels.instance }} of job {{ $labels.job }} has an insufficient Quorum"
 
     - alert: ZookeeperNoLeader
