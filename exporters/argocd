@@ -1,0 +1,89 @@
+# Argo CD (argoproj/argo-cd, master v3.x). Native exporter: application-controller
+# (:8082) and repo-server (:8084) expose these directly. Names and HELP are taken
+# from controller/metrics and reposerver/metrics; label values are examples.
+# HELP argocd_app_info Information about application.
+# TYPE argocd_app_info gauge
+argocd_app_info{autosync_enabled="true",dest_namespace="example-namespace",dest_server="https://kubernetes.default.svc",health_status="Healthy",hydrator_status="",name="example-app",namespace="argocd",operation="",phase="",project="default",repo="https://example.com/org/repo.git",sync_status="Synced"} 1
+# HELP argocd_app_sync_total Number of application syncs.
+# TYPE argocd_app_sync_total counter
+argocd_app_sync_total{dest_server="https://kubernetes.default.svc",dry_run="false",name="example-app",namespace="argocd",phase="Succeeded",project="default"} 12
+argocd_app_sync_total{dest_server="https://kubernetes.default.svc",dry_run="false",name="example-app",namespace="argocd",phase="Error",project="default"} 1
+# HELP argocd_app_sync_duration_seconds_total Application sync performance in seconds total.
+# TYPE argocd_app_sync_duration_seconds_total counter
+argocd_app_sync_duration_seconds_total{dest_server="https://kubernetes.default.svc",name="example-app",namespace="argocd",project="default"} 48.2
+# HELP argocd_app_k8s_request_total Number of kubernetes requests executed during application reconciliation.
+# TYPE argocd_app_k8s_request_total counter
+argocd_app_k8s_request_total{dry_run="false",name="example-app",namespace="argocd",project="default",resource_kind="Deployment",resource_namespace="example-namespace",response_code="200",server="https://kubernetes.default.svc",verb="Get"} 340
+# HELP argocd_kubectl_exec_total Number of kubectl executions
+# TYPE argocd_kubectl_exec_total counter
+argocd_kubectl_exec_total{command="auth",hostname="argocd-application-controller-0"} 4
+# HELP argocd_kubectl_exec_pending Number of pending kubectl executions
+# TYPE argocd_kubectl_exec_pending gauge
+argocd_kubectl_exec_pending{command="auth",hostname="argocd-application-controller-0"} 0
+# HELP argocd_app_reconcile Application reconciliation performance in seconds.
+# TYPE argocd_app_reconcile histogram
+argocd_app_reconcile_bucket{dest_server="https://kubernetes.default.svc",namespace="argocd",le="0.25"} 10
+argocd_app_reconcile_bucket{dest_server="https://kubernetes.default.svc",namespace="argocd",le="0.5"} 10
+argocd_app_reconcile_bucket{dest_server="https://kubernetes.default.svc",namespace="argocd",le="1"} 10
+argocd_app_reconcile_bucket{dest_server="https://kubernetes.default.svc",namespace="argocd",le="2"} 10
+argocd_app_reconcile_bucket{dest_server="https://kubernetes.default.svc",namespace="argocd",le="4"} 10
+argocd_app_reconcile_bucket{dest_server="https://kubernetes.default.svc",namespace="argocd",le="8"} 10
+argocd_app_reconcile_bucket{dest_server="https://kubernetes.default.svc",namespace="argocd",le="16"} 10
+argocd_app_reconcile_bucket{dest_server="https://kubernetes.default.svc",namespace="argocd",le="+Inf"} 10
+argocd_app_reconcile_sum{dest_server="https://kubernetes.default.svc",namespace="argocd"} 5.0
+argocd_app_reconcile_count{dest_server="https://kubernetes.default.svc",namespace="argocd"} 10
+# HELP argocd_cluster_events_total Number of processes k8s resource events.
+# TYPE argocd_cluster_events_total counter
+argocd_cluster_events_total{group="apps",kind="Deployment",server="https://kubernetes.default.svc"} 2210
+# HELP argocd_redis_request_total Number of redis requests executed during application reconciliation.
+# TYPE argocd_redis_request_total counter
+argocd_redis_request_total{command="get",failed="false",hostname="argocd-application-controller-0",initiator="argocd-application-controller"} 900
+# HELP argocd_redis_request_duration Redis requests duration.
+# TYPE argocd_redis_request_duration histogram
+argocd_redis_request_duration_bucket{hostname="argocd-application-controller-0",initiator="argocd-application-controller",le="0.01"} 10
+argocd_redis_request_duration_bucket{hostname="argocd-application-controller-0",initiator="argocd-application-controller",le="0.05"} 10
+argocd_redis_request_duration_bucket{hostname="argocd-application-controller-0",initiator="argocd-application-controller",le="0.1"} 10
+argocd_redis_request_duration_bucket{hostname="argocd-application-controller-0",initiator="argocd-application-controller",le="0.25"} 10
+argocd_redis_request_duration_bucket{hostname="argocd-application-controller-0",initiator="argocd-application-controller",le="0.5"} 10
+argocd_redis_request_duration_bucket{hostname="argocd-application-controller-0",initiator="argocd-application-controller",le="1"} 10
+argocd_redis_request_duration_bucket{hostname="argocd-application-controller-0",initiator="argocd-application-controller",le="+Inf"} 10
+argocd_redis_request_duration_sum{hostname="argocd-application-controller-0",initiator="argocd-application-controller"} 5.0
+argocd_redis_request_duration_count{hostname="argocd-application-controller-0",initiator="argocd-application-controller"} 10
+# HELP argocd_cluster_info Information about cluster.
+# TYPE argocd_cluster_info gauge
+argocd_cluster_info{k8s_version="v1.31.2",name="in-cluster",server="https://kubernetes.default.svc"} 1
+# HELP argocd_cluster_api_resource_objects Number of k8s resource objects in the cache.
+# TYPE argocd_cluster_api_resource_objects gauge
+argocd_cluster_api_resource_objects{server="https://kubernetes.default.svc"} 5400
+# HELP argocd_cluster_api_resources Number of monitored kubernetes API resources.
+# TYPE argocd_cluster_api_resources gauge
+argocd_cluster_api_resources{server="https://kubernetes.default.svc"} 78
+# HELP argocd_cluster_cache_age_seconds Cluster cache age in seconds.
+# TYPE argocd_cluster_cache_age_seconds gauge
+argocd_cluster_cache_age_seconds{server="https://kubernetes.default.svc"} 3600
+# HELP argocd_cluster_connection_status The k8s cluster current connection status.
+# TYPE argocd_cluster_connection_status gauge
+argocd_cluster_connection_status{k8s_version="v1.31.2",server="https://kubernetes.default.svc"} 1
+# HELP argocd_git_lsremote_fail_total Number of git ls-remote requests failures by repo server
+# TYPE argocd_git_lsremote_fail_total counter
+argocd_git_lsremote_fail_total{repo="https://example.com/org/repo.git",revision="HEAD"} 0
+# HELP argocd_git_request_total Number of git requests performed by repo server
+# TYPE argocd_git_request_total counter
+argocd_git_request_total{repo="https://example.com/org/repo.git",request_type="fetch"} 120
+argocd_git_request_total{repo="https://example.com/org/repo.git",request_type="ls-remote"} 800
+# HELP argocd_git_request_duration_seconds Git requests duration seconds.
+# TYPE argocd_git_request_duration_seconds histogram
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="0.1"} 10
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="0.25"} 10
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="0.5"} 10
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="1"} 10
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="2"} 10
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="4"} 10
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="10"} 10
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="20"} 10
+argocd_git_request_duration_seconds_bucket{repo="https://example.com/org/repo.git",request_type="fetch",le="+Inf"} 10
+argocd_git_request_duration_seconds_sum{repo="https://example.com/org/repo.git",request_type="fetch"} 5.0
+argocd_git_request_duration_seconds_count{repo="https://example.com/org/repo.git",request_type="fetch"} 10
+# HELP argocd_repo_pending_request_total Number of pending requests requiring repository lock
+# TYPE argocd_repo_pending_request_total gauge
+argocd_repo_pending_request_total{repo="https://example.com/org/repo.git"} 0
