@@ -26,6 +26,7 @@
         severity: warning
       annotations:
         summary: reload of Prometheus configuration has failed for {{ $labels.instance }}
+        description: "The last configuration reload failed: Prometheus keeps running the previous config, so recent scrape and rule changes are not applied. Its logs show the parse error."
     - alert: PrometheusErrorSendingAlerts
       expr: rate(prometheus_notifications_errors_total[5m]) / rate(prometheus_notifications_sent_total[5m]) > 0.03
       for: 10m
@@ -33,8 +34,10 @@
         severity: warning
       annotations:
         summary: "Errors while sending alerts from Prometheus {{ $labels.instance }} to Alertmanager {{ $labels.alertmanager }}"
+        description: "More than 3% of notifications to {{ $labels.alertmanager }} fail: alerts may not reach Alertmanager. Check that it is reachable from {{ $labels.instance }}."
     - alert: PrometheusJobMissing
       expr: absent(up{job="prometheus"})
+      for: 5m
       labels:
         severity: warning
       annotations:
@@ -63,6 +66,7 @@
         description: "A Prometheus job does not have living target anymore."
     - alert: PrometheusAlertManagerJobMissing
       expr: absent(up{job="alertmanager"})
+      for: 5m
       labels:
         severity: warning
       annotations:
@@ -70,6 +74,7 @@
         description: "A Prometheus AlertManager job has disappeared"
     - alert: PrometheusTooManyRestarts
       expr: changes(process_start_time_seconds{job=~"prometheus|.*pushgateway|alertmanager"}[15m]) > 2
+      for: 0m
       labels:
         severity: warning
       annotations:
@@ -77,6 +82,7 @@
         description: "Prometheus has restarted more than twice in the last 15 minutes. It might be crashlooping."
     - alert: PrometheusAlertmanagerConfigurationReloadFailure
       expr: alertmanager_config_last_reload_successful != 1
+      for: 5m
       labels:
         severity: warning
       annotations:
@@ -104,6 +110,7 @@
         description: "Prometheus cannot connect the alertmanager"
     - alert: PrometheusRuleEvaluationFailures
       expr: increase(prometheus_rule_evaluation_failures_total[3m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -111,6 +118,7 @@
         description: "Prometheus encountered {{ $value }} rule evaluation failures, leading to potentially ignored alerts."
     - alert: PrometheusTemplateTextExpansionFailures
       expr: increase(prometheus_template_text_expansion_failures_total[3m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -136,6 +144,7 @@
         description: "Rule group {{ $labels.rule_group }} takes longer than its interval to evaluate and skips iterations, so its recording rules and alerts have gaps."
     - alert: PrometheusNotificationsBacklog
       expr: min_over_time(prometheus_notifications_queue_length[10m]) > 0
+      for: 0m
       labels:
         severity: warning
       annotations:
@@ -143,6 +152,7 @@
         description: "The Prometheus notification queue has not been empty for 10 minutes"
     - alert: PrometheusAlertmanagerNotificationFailing
       expr: rate(alertmanager_notifications_failed_total[3m]) > 0.05
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -179,6 +189,7 @@
         description: "Prometheus has many scrapes that exceed the sample limit"
     - alert: PrometheusTargetScrapeDuplicate
       expr: increase(prometheus_target_scrapes_sample_duplicate_timestamp_total[5m]) > 3
+      for: 0m
       labels:
         severity: warning
       annotations:
@@ -186,6 +197,7 @@
         description: "Prometheus has many samples rejected due to duplicate timestamps but different values ({{ $value }} samples)"
     - alert: PrometheusTsdbCheckpointCreationFailures
       expr: increase(prometheus_tsdb_checkpoint_creations_failed_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -193,6 +205,7 @@
         description: "Prometheus encountered {{ $value }} checkpoint creation failures"
     - alert: PrometheusTsdbCheckpointDeletionFailures
       expr: increase(prometheus_tsdb_checkpoint_deletions_failed_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -200,6 +213,7 @@
         description: "Prometheus encountered {{ $value }} checkpoint deletion failures"
     - alert: PrometheusTsdbCompactionsFailed
       expr: increase(prometheus_tsdb_compactions_failed_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -207,6 +221,7 @@
         description: "Prometheus encountered {{ $value }} TSDB compactions failures"
     - alert: PrometheusTsdbHeadTruncationsFailed
       expr: increase(prometheus_tsdb_head_truncations_failed_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -214,6 +229,7 @@
         description: "Prometheus encountered {{ $value }} TSDB head truncation failures"
     - alert: PrometheusTsdbReloadFailures
       expr: increase(prometheus_tsdb_reloads_failures_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -221,6 +237,7 @@
         description: "Prometheus encountered {{ $value }} TSDB reload failures"
     - alert: PrometheusTsdbWalCorruptions
       expr: increase(prometheus_tsdb_wal_corruptions_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -229,6 +246,7 @@
     - alert: PrometheusTsdbMmapChunkCorruptions
       # Same data loss as a WAL corruption, on the head chunks mmapped to disk.
       expr: increase(prometheus_tsdb_mmap_chunk_corruptions_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -237,6 +255,7 @@
     - alert: PrometheusTsdbWalWritesFailed
       # Usually a full volume or a failing disk: every sample after this is lost.
       expr: increase(prometheus_tsdb_wal_writes_failed_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -244,6 +263,7 @@
         description: "Prometheus failed {{ $value }} WAL writes in the last 5 minutes. Check the free space and health of its data volume."
     - alert: PrometheusTsdbWalTruncationsFailed
       expr: increase(prometheus_tsdb_wal_truncations_failed_total[5m]) > 0
+      for: 0m
       labels:
         severity: critical
       annotations:
@@ -259,6 +279,7 @@
         name:tsdb_series:count > 10000
         and
         name:tsdb_series:count / scalar(tsdb_series:total) > 0.10
+      for: 15m
       labels:
         severity: warning
       annotations:
@@ -274,6 +295,7 @@
       # exactly when this alert should start evaluating. Absence is the healthy
       # state, not a broken rule. Works identically on 2.x and 3.x.
       expr: rate(prometheus_remote_storage_samples_dropped_total{reason!="dropped_series"}[5m]) > 0
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -281,6 +303,7 @@
         description: "Prometheus is dropping samples for remote_name={{ $labels.remote_name }}, reason={{ $labels.reason }} ({{ $value | humanize }} samples/s lost)"
     - alert: PrometheusRemoteWriteFailed
       expr: rate(prometheus_remote_storage_samples_failed_total[5m]) > 0
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -319,6 +342,7 @@
         description: "Prometheus is running {{ $value }} concurrent queries, which equals the maximum allowed. New queries may be rejected."
     - alert: PrometheusTsdbOutOfOrderSamples
       expr: rate(prometheus_tsdb_out_of_order_samples_total[5m]) > 0
+      for: 5m
       labels:
         severity: warning
       annotations:
@@ -326,6 +350,7 @@
         description: "Prometheus is receiving out-of-order samples ({{ $value | humanize }}/s). This usually indicates clock skew or a buggy exporter."
     - alert: PrometheusTsdbOutOfBoundSamples
       expr: rate(prometheus_tsdb_out_of_bound_samples_total[5m]) > 0
+      for: 5m
       labels:
         severity: warning
       annotations:
@@ -335,6 +360,7 @@
       # prometheus_target_scrape_pool_exceeded_target_limit_total carries no
       # labels, so the annotation cannot name the offending pool.
       expr: increase(prometheus_target_scrape_pool_exceeded_target_limit_total[5m]) > 0
+      for: 0m
       labels:
         severity: warning
       annotations:
@@ -342,6 +368,7 @@
         description: "Prometheus is silently dropping targets in job {{ $labels.instance }} because the target limit was exceeded."
     - alert: PrometheusScrapedBodySizeExceeded
       expr: rate(prometheus_target_scrapes_exceeded_body_size_limit_total[5m]) > 0
+      for: 5m
       labels:
         severity: warning
       annotations:
@@ -381,6 +408,7 @@
       # Heartbeat, meant to always fire: route it to a dead man's switch, and
       # page when it stops arriving (the alerting pipeline itself is broken).
       expr: vector(1)
+      for: 0m
       labels:
         severity: warning
       annotations:
