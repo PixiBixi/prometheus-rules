@@ -52,8 +52,13 @@ EXPORTER_GENERIC_PREFIXES = (
 # metrics are legitimate business metrics (GC pressure, goroutine leaks, etc.)
 # and must NOT be filtered out.
 NATIVE_EXPORTERS = {
+    "argo-rollouts",
+    "argocd",
     "cert-manager",
+    "controller-runtime",
     "promtail_exporter",
+    "strimzi",
+    "thanos",
 }
 
 # PromQL keywords to ignore when extracting metric names
