@@ -88,7 +88,7 @@ tests:
               instance: b1
               severity: critical
             exp_annotations:
-              description: "b1 of job kafka has some underreplicated partitions"
+              description: "2 partitions have fewer in-sync replicas than their replication factor. A broker is down, slow or partitioned: check broker health and ISR shrinks."
               summary: "b1 of job kafka has some underreplicated partitions"
 
   # 2 failed of 100 produce requests per minute = 2% for 20m. Per-topic series
