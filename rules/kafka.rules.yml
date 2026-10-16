@@ -27,7 +27,7 @@
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} has some underreplicated partitions"
+        description: "{{ $value }} partitions have fewer in-sync replicas than their replication factor. A broker is down, slow or partitioned: check broker health and ISR shrinks."
         summary: "{{ $labels.instance }} of job {{ $labels.job }} has some underreplicated partitions"
     - alert: KafkaOfflinePartitions
       expr: kafka_controller_kafkacontroller_offlinepartitionscount > 0
@@ -43,7 +43,7 @@
       labels:
         severity: warning
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} has some reassigning partitions"
+        description: "{{ $value }} partitions have been reassigning for over 5 minutes. A large reassignment or a replication throttle set too low: check the reassignment progress."
         summary: "{{ $labels.instance }} of job {{ $labels.job }} has some reassigning partitions"
     - alert: KafkaLagExporter
       expr: |
