@@ -1,0 +1,380 @@
+# Built from the Thanos source (thanos-io/thanos main, v0.42.4-193-ga7c9f1e0) and the
+# thanos-io/objstore module (thanos_objstore_*), not from a live scrape. Names, types,
+# labels and HELP strings are read from the metric definitions. Thanos is a native
+# exporter: every component (query, store, receive, rule, compact, sidecar) exposes
+# its own /metrics. One fixture covers all components, so a given metric is only
+# present on the component that owns it. Label values are examples.
+# HELP thanos_status Represents status (0 indicates failure, 1 indicates success) of the component.
+# TYPE thanos_status gauge
+thanos_status{check="healthy",component="query"} 1
+thanos_status{check="ready",component="query"} 1
+# HELP http_requests_total Tracks the number of HTTP requests.
+# TYPE http_requests_total counter
+http_requests_total{code="200",handler="query",method="get"} 100
+http_requests_total{code="200",handler="query_range",method="get"} 100
+http_requests_total{code="200",handler="receive",method="post"} 100
+http_requests_total{code="500",handler="query",method="get"} 1
+# HELP http_request_duration_seconds Tracks the latencies for HTTP requests.
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="0.001"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="0.01"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="0.1"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="0.3"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="0.6"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="1"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="3"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="6"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="9"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="20"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="30"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="60"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="90"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="120"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="240"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="360"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="720"} 100
+http_request_duration_seconds_bucket{code="200",handler="query",method="get",le="+Inf"} 100
+http_request_duration_seconds_sum{code="200",handler="query",method="get"} 10
+http_request_duration_seconds_count{code="200",handler="query",method="get"} 100
+# HELP grpc_server_started_total Total number of RPCs started on the server.
+# TYPE grpc_server_started_total counter
+grpc_server_started_total{grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"} 100
+# HELP grpc_server_handled_total Total number of RPCs completed on the server, regardless of success or failure.
+# TYPE grpc_server_handled_total counter
+grpc_server_handled_total{grpc_code="OK",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"} 100
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"} 1
+# HELP grpc_client_started_total Total number of RPCs started on the client.
+# TYPE grpc_client_started_total counter
+grpc_client_started_total{grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"} 100
+# HELP grpc_client_handled_total Total number of RPCs completed by the client, regardless of success or failure.
+# TYPE grpc_client_handled_total counter
+grpc_client_handled_total{grpc_code="OK",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"} 100
+grpc_client_handled_total{grpc_code="Unavailable",grpc_method="Series",grpc_service="thanos.Store",grpc_type="server_stream"} 1
+# HELP grpc_req_panics_recovered_total Total number of gRPC requests recovered from internal panic.
+# TYPE grpc_req_panics_recovered_total counter
+grpc_req_panics_recovered_total 0
+# HELP thanos_objstore_bucket_operations_total Total number of all attempted operations against a bucket.
+# TYPE thanos_objstore_bucket_operations_total counter
+thanos_objstore_bucket_operations_total{bucket="example-bucket",operation="get"} 100
+# HELP thanos_objstore_bucket_operation_failures_total Total number of operations against a bucket that failed, but were not expected to fail in certain way from caller perspective. Those errors have to be investigated.
+# TYPE thanos_objstore_bucket_operation_failures_total counter
+thanos_objstore_bucket_operation_failures_total{bucket="example-bucket",operation="get"} 0
+# HELP thanos_objstore_bucket_operation_fetched_bytes_total Total number of bytes fetched from bucket, per operation.
+# TYPE thanos_objstore_bucket_operation_fetched_bytes_total counter
+thanos_objstore_bucket_operation_fetched_bytes_total{bucket="example-bucket",operation="get"} 1048576
+# HELP thanos_objstore_bucket_operation_duration_seconds Duration of successful operations against the bucket per operation - iter operations include time spent on each callback.
+# TYPE thanos_objstore_bucket_operation_duration_seconds histogram
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="0.001"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="0.01"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="0.1"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="0.3"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="0.6"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="1"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="3"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="6"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="9"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="20"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="30"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="60"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="90"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="120"} 100
+thanos_objstore_bucket_operation_duration_seconds_bucket{bucket="example-bucket",operation="get",le="+Inf"} 100
+thanos_objstore_bucket_operation_duration_seconds_sum{bucket="example-bucket",operation="get"} 10
+thanos_objstore_bucket_operation_duration_seconds_count{bucket="example-bucket",operation="get"} 100
+# HELP thanos_objstore_bucket_last_successful_upload_time Second timestamp of the last successful upload to the bucket.
+# TYPE thanos_objstore_bucket_last_successful_upload_time gauge
+thanos_objstore_bucket_last_successful_upload_time{bucket="example-bucket"} 1700000000.0
+# HELP thanos_blocks_meta_syncs_total Total blocks metadata synchronization attempts
+# TYPE thanos_blocks_meta_syncs_total counter
+thanos_blocks_meta_syncs_total 100
+# HELP thanos_blocks_meta_sync_failures_total Total blocks metadata synchronization failures
+# TYPE thanos_blocks_meta_sync_failures_total counter
+thanos_blocks_meta_sync_failures_total 0
+# HELP thanos_blocks_meta_sync_duration_seconds Duration of the blocks metadata synchronization in seconds
+# TYPE thanos_blocks_meta_sync_duration_seconds histogram
+thanos_blocks_meta_sync_duration_seconds_bucket{le="0.01"} 100
+thanos_blocks_meta_sync_duration_seconds_bucket{le="0.1"} 100
+thanos_blocks_meta_sync_duration_seconds_bucket{le="1"} 100
+thanos_blocks_meta_sync_duration_seconds_bucket{le="10"} 100
+thanos_blocks_meta_sync_duration_seconds_bucket{le="100"} 100
+thanos_blocks_meta_sync_duration_seconds_bucket{le="1000"} 100
+thanos_blocks_meta_sync_duration_seconds_bucket{le="+Inf"} 100
+thanos_blocks_meta_sync_duration_seconds_sum 10
+thanos_blocks_meta_sync_duration_seconds_count 100
+# HELP thanos_blocks_meta_synced Number of block metadata synced
+# TYPE thanos_blocks_meta_synced gauge
+thanos_blocks_meta_synced{state="loaded"} 10
+thanos_blocks_meta_synced{state="failed"} 0
+thanos_blocks_meta_synced{state="no-meta-json"} 0
+thanos_blocks_meta_synced{state="corrupted-meta-json"} 0
+# HELP thanos_blocks_meta_modified Number of blocks whose metadata changed
+# TYPE thanos_blocks_meta_modified gauge
+thanos_blocks_meta_modified{modified="replica-label-removed"} 0
+# HELP thanos_consistency_delay_seconds Configured consistency delay in seconds.
+# TYPE thanos_consistency_delay_seconds gauge
+thanos_consistency_delay_seconds 1800
+# HELP thanos_store_nodes_grpc_connections Number of gRPC connection to Store APIs. Opened connection means healthy store APIs available for Querier.
+# TYPE thanos_store_nodes_grpc_connections gauge
+thanos_store_nodes_grpc_connections{external_labels="{replica=\"r1\"}",store_type="store"} 1
+# HELP thanos_query_endpoints_dns_lookups_total The number of DNS lookups resolutions attempts
+# TYPE thanos_query_endpoints_dns_lookups_total counter
+thanos_query_endpoints_dns_lookups_total 100
+# HELP thanos_query_endpoints_dns_failures_total The number of DNS lookup failures
+# TYPE thanos_query_endpoints_dns_failures_total counter
+thanos_query_endpoints_dns_failures_total 0
+# HELP thanos_query_endpoints_dns_provider_results The number of resolved endpoints for each configured address
+# TYPE thanos_query_endpoints_dns_provider_results gauge
+thanos_query_endpoints_dns_provider_results{addr="dnssrv+_grpc._tcp.thanos-store.example"} 3
+# HELP thanos_query_duplicated_endpoint_addresses_total The number of times a duplicated endpoint addresses is detected from the different configs
+# TYPE thanos_query_duplicated_endpoint_addresses_total counter
+thanos_query_duplicated_endpoint_addresses_total 0
+# HELP thanos_query_concurrent_gate_queries_max Maximum number of concurrent queries.
+# TYPE thanos_query_concurrent_gate_queries_max gauge
+thanos_query_concurrent_gate_queries_max 20
+# HELP thanos_query_concurrent_gate_queries_in_flight Number of queries that are currently in flight.
+# TYPE thanos_query_concurrent_gate_queries_in_flight gauge
+thanos_query_concurrent_gate_queries_in_flight 1
+# HELP thanos_query_concurrent_gate_queries_total Total number of queries.
+# TYPE thanos_query_concurrent_gate_queries_total counter
+thanos_query_concurrent_gate_queries_total 100
+# HELP thanos_query_concurrent_gate_queries_duration_seconds How many seconds it took for queries to wait at the gate.
+# TYPE thanos_query_concurrent_gate_queries_duration_seconds histogram
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="0.01"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="0.1"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="0.3"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="0.6"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="1"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="3"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="6"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="9"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="20"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="30"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="60"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="90"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="120"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="240"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="360"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="720"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_bucket{le="+Inf"} 100
+thanos_query_concurrent_gate_queries_duration_seconds_sum 10
+thanos_query_concurrent_gate_queries_duration_seconds_count 100
+# HELP thanos_query_range_requested_timespan_duration_seconds A histogram of the query range window in seconds
+# TYPE thanos_query_range_requested_timespan_duration_seconds histogram
+thanos_query_range_requested_timespan_duration_seconds_bucket{le="3600"} 100
+thanos_query_range_requested_timespan_duration_seconds_bucket{le="21600"} 100
+thanos_query_range_requested_timespan_duration_seconds_bucket{le="86400"} 100
+thanos_query_range_requested_timespan_duration_seconds_bucket{le="259200"} 100
+thanos_query_range_requested_timespan_duration_seconds_bucket{le="604800"} 100
+thanos_query_range_requested_timespan_duration_seconds_bucket{le="+Inf"} 100
+thanos_query_range_requested_timespan_duration_seconds_sum 10
+thanos_query_range_requested_timespan_duration_seconds_count 100
+# HELP thanos_bucket_store_block_loads_total Total number of remote block loading attempts.
+# TYPE thanos_bucket_store_block_loads_total counter
+thanos_bucket_store_block_loads_total 100
+# HELP thanos_bucket_store_block_load_failures_total Total number of failed remote block loading attempts.
+# TYPE thanos_bucket_store_block_load_failures_total counter
+thanos_bucket_store_block_load_failures_total 0
+# HELP thanos_bucket_store_block_drops_total Total number of local blocks that were dropped.
+# TYPE thanos_bucket_store_block_drops_total counter
+thanos_bucket_store_block_drops_total 0
+# HELP thanos_bucket_store_block_drop_failures_total Total number of local blocks that failed to be dropped.
+# TYPE thanos_bucket_store_block_drop_failures_total counter
+thanos_bucket_store_block_drop_failures_total 0
+# HELP thanos_bucket_store_queries_dropped_total Number of queries that were dropped due to the limit.
+# TYPE thanos_bucket_store_queries_dropped_total counter
+thanos_bucket_store_queries_dropped_total{reason="bytes_limit",tenant="default-tenant"} 0
+# HELP thanos_bucket_store_indexheader_lazy_load_total Total number of index-header lazy load operations.
+# TYPE thanos_bucket_store_indexheader_lazy_load_total counter
+thanos_bucket_store_indexheader_lazy_load_total 100
+# HELP thanos_bucket_store_indexheader_lazy_load_failed_total Total number of failed index-header lazy load operations.
+# TYPE thanos_bucket_store_indexheader_lazy_load_failed_total counter
+thanos_bucket_store_indexheader_lazy_load_failed_total 0
+# HELP thanos_bucket_store_series_gate_queries_total Total number of queries.
+# TYPE thanos_bucket_store_series_gate_queries_total counter
+thanos_bucket_store_series_gate_queries_total 100
+# HELP thanos_bucket_store_series_gate_queries_max Maximum number of concurrent queries.
+# TYPE thanos_bucket_store_series_gate_queries_max gauge
+thanos_bucket_store_series_gate_queries_max 20
+# HELP thanos_bucket_store_series_gate_queries_in_flight Number of queries that are currently in flight.
+# TYPE thanos_bucket_store_series_gate_queries_in_flight gauge
+thanos_bucket_store_series_gate_queries_in_flight 1
+# HELP thanos_bucket_store_series_gate_queries_duration_seconds How many seconds it took for queries to wait at the gate.
+# TYPE thanos_bucket_store_series_gate_queries_duration_seconds histogram
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="0.01"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="0.1"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="0.3"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="0.6"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="1"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="3"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="6"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="9"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="20"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="30"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="60"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="90"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="120"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="240"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="360"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="720"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_bucket{le="+Inf"} 100
+thanos_bucket_store_series_gate_queries_duration_seconds_sum 10
+thanos_bucket_store_series_gate_queries_duration_seconds_count 100
+# HELP thanos_store_api_query_duration_seconds Duration of the Thanos Store API select phase for a query.
+# TYPE thanos_store_api_query_duration_seconds histogram
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="0.01"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="0.1"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="0.3"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="0.6"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="1"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="3"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="6"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="9"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="20"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="30"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="60"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="90"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="120"} 100
+thanos_store_api_query_duration_seconds_bucket{samples_le="100000",series_le="10000",tenant="default-tenant",le="+Inf"} 100
+thanos_store_api_query_duration_seconds_sum{samples_le="100000",series_le="10000",tenant="default-tenant"} 10
+thanos_store_api_query_duration_seconds_count{samples_le="100000",series_le="10000",tenant="default-tenant"} 100
+# HELP thanos_receive_forward_requests_total The number of forward requests.
+# TYPE thanos_receive_forward_requests_total counter
+thanos_receive_forward_requests_total{result="success"} 100
+thanos_receive_forward_requests_total{result="error"} 0
+# HELP thanos_receive_replications_total The number of replication operations done by the receiver. The success of replication is fulfilled when a quorum is met.
+# TYPE thanos_receive_replications_total counter
+thanos_receive_replications_total{result="success"} 100
+thanos_receive_replications_total{result="error"} 0
+# HELP thanos_receive_pending_write_requests The number of pending write requests.
+# TYPE thanos_receive_pending_write_requests gauge
+thanos_receive_pending_write_requests 0
+# HELP thanos_receive_config_hash Hash of the currently loaded hashring configuration file.
+# TYPE thanos_receive_config_hash gauge
+thanos_receive_config_hash 123456
+# HELP thanos_receive_config_last_reload_successful Whether the last hashring configuration file reload attempt was successful.
+# TYPE thanos_receive_config_last_reload_successful gauge
+thanos_receive_config_last_reload_successful 1
+# HELP thanos_receive_config_last_reload_success_timestamp_seconds Timestamp of the last successful hashring configuration file reload.
+# TYPE thanos_receive_config_last_reload_success_timestamp_seconds gauge
+thanos_receive_config_last_reload_success_timestamp_seconds 1700000000.0
+# HELP thanos_receive_hashrings_file_changes_total The number of times the hashrings configuration file has changed.
+# TYPE thanos_receive_hashrings_file_changes_total counter
+thanos_receive_hashrings_file_changes_total 0
+# HELP thanos_receive_hashrings_file_errors_total The number of errors watching the hashrings configuration file.
+# TYPE thanos_receive_hashrings_file_errors_total counter
+thanos_receive_hashrings_file_errors_total{name="hashring.json"} 0
+# HELP thanos_receive_hashrings_file_refreshes_total The number of refreshes of the hashrings configuration file.
+# TYPE thanos_receive_hashrings_file_refreshes_total counter
+thanos_receive_hashrings_file_refreshes_total{name="hashring.json"} 10
+# HELP thanos_receive_write_timeseries The number of timeseries received in the incoming write requests.
+# TYPE thanos_receive_write_timeseries histogram
+thanos_receive_write_timeseries_bucket{code="200",tenant="default-tenant",le="10"} 100
+thanos_receive_write_timeseries_bucket{code="200",tenant="default-tenant",le="50"} 100
+thanos_receive_write_timeseries_bucket{code="200",tenant="default-tenant",le="100"} 100
+thanos_receive_write_timeseries_bucket{code="200",tenant="default-tenant",le="500"} 100
+thanos_receive_write_timeseries_bucket{code="200",tenant="default-tenant",le="1000"} 100
+thanos_receive_write_timeseries_bucket{code="200",tenant="default-tenant",le="5000"} 100
+thanos_receive_write_timeseries_bucket{code="200",tenant="default-tenant",le="10000"} 100
+thanos_receive_write_timeseries_bucket{code="200",tenant="default-tenant",le="+Inf"} 100
+thanos_receive_write_timeseries_sum{code="200",tenant="default-tenant"} 10
+thanos_receive_write_timeseries_count{code="200",tenant="default-tenant"} 100
+# HELP thanos_receive_write_samples The number of sampled received in the incoming write requests.
+# TYPE thanos_receive_write_samples histogram
+thanos_receive_write_samples_bucket{code="200",tenant="default-tenant",le="10"} 100
+thanos_receive_write_samples_bucket{code="200",tenant="default-tenant",le="50"} 100
+thanos_receive_write_samples_bucket{code="200",tenant="default-tenant",le="100"} 100
+thanos_receive_write_samples_bucket{code="200",tenant="default-tenant",le="500"} 100
+thanos_receive_write_samples_bucket{code="200",tenant="default-tenant",le="1000"} 100
+thanos_receive_write_samples_bucket{code="200",tenant="default-tenant",le="5000"} 100
+thanos_receive_write_samples_bucket{code="200",tenant="default-tenant",le="10000"} 100
+thanos_receive_write_samples_bucket{code="200",tenant="default-tenant",le="+Inf"} 100
+thanos_receive_write_samples_sum{code="200",tenant="default-tenant"} 10
+thanos_receive_write_samples_count{code="200",tenant="default-tenant"} 100
+# HELP prometheus_tsdb_head_min_time Minimum time bound of the head block. The unit is decided by the library consumer.
+# TYPE prometheus_tsdb_head_min_time gauge
+prometheus_tsdb_head_min_time 1700000000000.0
+# HELP thanos_shipper_dir_syncs_total Total number of dir syncs
+# TYPE thanos_shipper_dir_syncs_total counter
+thanos_shipper_dir_syncs_total 100
+# HELP thanos_shipper_dir_sync_failures_total Total number of failed dir syncs
+# TYPE thanos_shipper_dir_sync_failures_total counter
+thanos_shipper_dir_sync_failures_total 0
+# HELP thanos_shipper_uploads_total Total number of uploaded blocks
+# TYPE thanos_shipper_uploads_total counter
+thanos_shipper_uploads_total 10
+# HELP thanos_shipper_upload_failures_total Total number of block upload failures
+# TYPE thanos_shipper_upload_failures_total counter
+thanos_shipper_upload_failures_total 0
+# HELP thanos_shipper_corrupted_blocks_total Total number of corrupted blocks
+# TYPE thanos_shipper_corrupted_blocks_total counter
+thanos_shipper_corrupted_blocks_total 0
+# HELP thanos_shipper_upload_compacted_done If 1 it means shipper uploaded all compacted blocks from the filesystem.
+# TYPE thanos_shipper_upload_compacted_done gauge
+thanos_shipper_upload_compacted_done 1
+# HELP thanos_alert_queue_alerts_dropped_total Total number of alerts that were dropped from the queue.
+# TYPE thanos_alert_queue_alerts_dropped_total counter
+thanos_alert_queue_alerts_dropped_total 0
+# HELP thanos_alert_queue_alerts_pushed_total Total number of alerts pushed to the queue.
+# TYPE thanos_alert_queue_alerts_pushed_total counter
+thanos_alert_queue_alerts_pushed_total 10
+# HELP thanos_alert_queue_alerts_popped_total Total number of alerts popped from the queue.
+# TYPE thanos_alert_queue_alerts_popped_total counter
+thanos_alert_queue_alerts_popped_total 10
+# HELP thanos_alert_queue_capacity Capacity of the alert queue.
+# TYPE thanos_alert_queue_capacity gauge
+thanos_alert_queue_capacity 10000
+# HELP thanos_alert_queue_length Length of the alert queue.
+# TYPE thanos_alert_queue_length gauge
+thanos_alert_queue_length 0
+# HELP thanos_alert_sender_alerts_sent_total Total number of alerts sent by alertmanager.
+# TYPE thanos_alert_sender_alerts_sent_total counter
+thanos_alert_sender_alerts_sent_total{alertmanager="http://alertmanager.example:9093"} 10
+# HELP thanos_alert_sender_errors_total Total number of errors while sending alerts to alertmanager.
+# TYPE thanos_alert_sender_errors_total counter
+thanos_alert_sender_errors_total{alertmanager="http://alertmanager.example:9093"} 0
+# HELP thanos_alert_sender_alerts_dropped_total Total number of alerts dropped in case of all sends to alertmanagers failed.
+# TYPE thanos_alert_sender_alerts_dropped_total counter
+thanos_alert_sender_alerts_dropped_total 0
+# HELP thanos_alert_sender_latency_seconds Latency for sending alert notifications (not including dropped notifications).
+# TYPE thanos_alert_sender_latency_seconds histogram
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="0.005"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="0.01"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="0.025"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="0.05"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="0.1"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="0.25"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="0.5"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="1"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="2.5"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="5"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="10"} 100
+thanos_alert_sender_latency_seconds_bucket{alertmanager="http://alertmanager.example:9093",le="+Inf"} 100
+thanos_alert_sender_latency_seconds_sum{alertmanager="http://alertmanager.example:9093"} 10
+thanos_alert_sender_latency_seconds_count{alertmanager="http://alertmanager.example:9093"} 100
+# HELP thanos_rule_config_last_reload_successful Whether the last configuration reload attempt was successful.
+# TYPE thanos_rule_config_last_reload_successful gauge
+thanos_rule_config_last_reload_successful 1
+# HELP thanos_rule_config_last_reload_success_timestamp_seconds Timestamp of the last successful configuration reload.
+# TYPE thanos_rule_config_last_reload_success_timestamp_seconds gauge
+thanos_rule_config_last_reload_success_timestamp_seconds 1700000000.0
+# HELP thanos_rule_loaded_rules Loaded rules partitioned by file and group.
+# TYPE thanos_rule_loaded_rules gauge
+thanos_rule_loaded_rules{file="rules.yaml",group="example",strategy="abort"} 5
+# HELP thanos_rule_evaluation_with_warnings_total The total number of rule evaluation that were successful but had non PromQL warnings which can indicate partial error.
+# TYPE thanos_rule_evaluation_with_warnings_total counter
+thanos_rule_evaluation_with_warnings_total{strategy="abort"} 0
+# HELP prometheus_rule_evaluations_total The total number of rule evaluations.
+# TYPE prometheus_rule_evaluations_total counter
+prometheus_rule_evaluations_total{rule_group="rules.yaml;example"} 100
+# HELP prometheus_rule_evaluation_failures_total The total number of rule evaluation failures.
+# TYPE prometheus_rule_evaluation_failures_total counter
+prometheus_rule_evaluation_failures_total{rule_group="rules.yaml;example"} 0
+# HELP thanos_compact_halted Set to 1 if the compactor halted due to an unexpected error.
+# TYPE thanos_compact_halted gauge
+thanos_compact_halted 0
+# HELP thanos_compact_group_compactions_total Total number of group compaction attempts that resulted in a new block.
+# TYPE thanos_compact_group_compactions_total counter
+thanos_compact_group_compactions_total{resolution="0"} 5
+# HELP thanos_compact_group_compactions_failures_total Total number of failed group compactions.
+# TYPE thanos_compact_group_compactions_failures_total counter
+thanos_compact_group_compactions_failures_total{resolution="0"} 0

@@ -1,0 +1,283 @@
+- name: thanos.rules
+  rules:
+    - alert: ThanosComponentDown
+      expr: up{job=~".*thanos.*"} == 0
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos component {{ $labels.job }} is down"
+        description: "Thanos target {{ $labels.job }} ({{ $labels.instance }}) has failed its scrape for 20 minutes. The process is down or unreachable."
+
+    - alert: ThanosStatusUnhealthy
+      expr: thanos_status{check="healthy"} == 0
+      for: 30m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos {{ $labels.component }} reports unhealthy"
+        description: "Thanos {{ $labels.component }} on {{ $labels.instance }} has been reporting an unhealthy status for 30 minutes. The process runs but flagged an internal error."
+
+    - alert: ThanosQueryIsDown
+      expr: sum by (job) (up{job=~".*thanos.*query.*"}) == 0
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Query {{ $labels.job }} has no healthy instance"
+        description: "Every instance of {{ $labels.job }} has been down for 20 minutes. All queries fail until one returns."
+
+    - alert: ThanosQueryNoStoreConnections
+      expr: sum by (job, instance) (thanos_store_nodes_grpc_connections{job=~".*thanos.*query.*"}) == 0
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Query {{ $labels.instance }} has no store connection"
+        description: "Thanos Query {{ $labels.instance }} has no gRPC connection to any Store API. It returns no data until connections are restored."
+
+    - alert: ThanosQueryHttpErrorRateHigh
+      expr: |
+        sum by (job, handler) (rate(http_requests_total{job=~".*thanos.*query.*", handler=~"query|query_range", code=~"5.."}[5m]))
+        /
+        sum by (job, handler) (rate(http_requests_total{job=~".*thanos.*query.*", handler=~"query|query_range"}[5m]))
+        * 100 > 5
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Query {{ $labels.job }}: 5xx on {{ $labels.handler }} requests"
+        description: "{{ $value | humanize }}% of {{ $labels.handler }} requests handled by {{ $labels.job }} return a 5xx."
+
+    - alert: ThanosQueryGrpcServerErrorRate
+      expr: |
+        sum by (job) (rate(grpc_server_handled_total{job=~".*thanos.*query.*", grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded"}[5m]))
+        /
+        sum by (job) (rate(grpc_server_started_total{job=~".*thanos.*query.*"}[5m]))
+        * 100 > 5
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Query {{ $labels.job }}: gRPC server errors"
+        description: "{{ $value | humanize }}% of the gRPC requests served by {{ $labels.job }} fail."
+
+    - alert: ThanosQueryGrpcClientErrorRate
+      expr: |
+        sum by (job) (rate(grpc_client_handled_total{job=~".*thanos.*query.*", grpc_code!="OK"}[15m]))
+        /
+        sum by (job) (rate(grpc_client_started_total{job=~".*thanos.*query.*"}[15m]))
+        * 100 > 10
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Query {{ $labels.job }}: gRPC client errors towards stores"
+        description: "{{ $value | humanize }}% of the gRPC requests sent by {{ $labels.job }} to its store endpoints fail. Store gateways or receivers may be unhealthy."
+
+    # 40s and 90s are loose defaults, tune them to your query load.
+    - alert: ThanosQueryInstantLatencyHigh
+      expr: |
+        histogram_quantile(0.99,
+          sum by (job, le) (rate(http_request_duration_seconds_bucket{job=~".*thanos.*query.*", handler="query"}[5m]))
+        ) > 40
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Query {{ $labels.job }}: slow instant queries"
+        description: "p99 latency of instant queries on {{ $labels.job }} is {{ $value | humanizeDuration }}."
+
+    - alert: ThanosQueryRangeLatencyHigh
+      expr: |
+        histogram_quantile(0.99,
+          sum by (job, le) (rate(http_request_duration_seconds_bucket{job=~".*thanos.*query.*", handler="query_range"}[5m]))
+        ) > 90
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Query {{ $labels.job }}: slow range queries"
+        description: "p99 latency of range queries on {{ $labels.job }} is {{ $value | humanizeDuration }}."
+
+    - alert: ThanosStoreGrpcErrorRate
+      expr: |
+        sum by (job) (rate(grpc_server_handled_total{job=~".*thanos.*store.*", grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded"}[5m]))
+        /
+        sum by (job) (rate(grpc_server_started_total{job=~".*thanos.*store.*"}[5m]))
+        * 100 > 5
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Store {{ $labels.job }}: gRPC errors"
+        description: "{{ $value | humanize }}% of the gRPC requests served by {{ $labels.job }} fail. Queriers get errors or partial results for historical ranges."
+
+    - alert: ThanosStoreBucketHighOperationFailures
+      expr: |
+        sum by (job, bucket) (rate(thanos_objstore_bucket_operation_failures_total{job=~".*thanos.*store.*"}[5m]))
+        /
+        sum by (job, bucket) (rate(thanos_objstore_bucket_operations_total{job=~".*thanos.*store.*"}[5m]))
+        * 100 > 5
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Store {{ $labels.job }}: object storage failures on {{ $labels.bucket }}"
+        description: "{{ $value | humanize }}% of the operations of {{ $labels.job }} against bucket {{ $labels.bucket }} fail. Check bucket availability, credentials and network."
+
+    - alert: ThanosStoreBlockLoadFailures
+      expr: sum by (job) (rate(thanos_bucket_store_block_load_failures_total{job=~".*thanos.*store.*"}[5m])) > 0
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Store {{ $labels.job }}: block load failures"
+        description: "{{ $labels.job }} fails to load blocks from object storage. Some time ranges return incomplete results."
+
+    - alert: ThanosReceiveHttpErrorRateHigh
+      expr: |
+        sum by (job) (rate(http_requests_total{job=~".*thanos.*receive.*", handler="receive", code=~"5.."}[5m]))
+        /
+        sum by (job) (rate(http_requests_total{job=~".*thanos.*receive.*", handler="receive"}[5m]))
+        * 100 > 5
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Receive {{ $labels.job }}: 5xx on remote write"
+        description: "{{ $value | humanize }}% of the write requests received by {{ $labels.job }} return a 5xx. Remote write senders are losing or retrying data."
+
+    - alert: ThanosReceiveHighForwardFailureRate
+      expr: |
+        sum by (job) (rate(thanos_receive_forward_requests_total{job=~".*thanos.*receive.*", result="error"}[5m]))
+        /
+        sum by (job) (rate(thanos_receive_forward_requests_total{job=~".*thanos.*receive.*"}[5m]))
+        * 100 > 20
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Receive {{ $labels.job }}: forward failures"
+        description: "{{ $value | humanize }}% of the requests forwarded by {{ $labels.job }} to other receivers fail. Check connectivity between replicas."
+
+    - alert: ThanosReceiveConfigReloadFailure
+      expr: avg by (job, instance) (thanos_receive_config_last_reload_successful{job=~".*thanos.*receive.*"}) != 1
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Receive {{ $labels.instance }}: hashring reload failed"
+        description: "The last hashring configuration reload of {{ $labels.instance }} failed. Routing changes have not taken effect."
+
+    # `> 0` guard: an empty head reports head_min_time as a MaxInt64 sentinel, a huge negative age.
+    # 6h is above the nominal 2h block range plus head truncation delay.
+    - alert: ThanosReceiveHeadCompactionStalled
+      expr: |
+        max by (job, instance) (
+          ((time() - prometheus_tsdb_head_min_time{job=~".*thanos.*receive.*"} / 1000) / 3600) > 0
+        ) > 6
+      for: 30m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Receive {{ $labels.instance }}: head block not compacted"
+        description: "The head block of {{ $labels.instance }} spans {{ $value | humanize }}h. Compaction has stalled and memory keeps growing until an OOM kill."
+
+    - alert: ThanosRuleQueueIsDroppingAlerts
+      expr: sum by (job, instance) (rate(thanos_alert_queue_alerts_dropped_total{job=~".*thanos.*rule.*"}[5m])) > 0
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Rule {{ $labels.instance }}: alert queue dropping alerts"
+        description: "{{ $labels.instance }} drops alerts from its queue. Alertmanager may not receive every firing alert."
+
+    - alert: ThanosRuleSenderIsFailingAlerts
+      expr: sum by (job, instance) (rate(thanos_alert_sender_alerts_dropped_total{job=~".*thanos.*rule.*"}[5m])) > 0
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Rule {{ $labels.instance }}: failing to send alerts"
+        description: "{{ $labels.instance }} cannot deliver alerts to any Alertmanager. Firing alerts are dropped."
+
+    - alert: ThanosRuleHighRuleEvaluationFailures
+      expr: |
+        sum by (job, instance) (rate(prometheus_rule_evaluation_failures_total{job=~".*thanos.*rule.*"}[5m]))
+        /
+        sum by (job, instance) (rate(prometheus_rule_evaluations_total{job=~".*thanos.*rule.*"}[5m]))
+        * 100 > 5
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Rule {{ $labels.instance }}: rule evaluation failures"
+        description: "{{ $value | humanize }}% of the rule evaluations of {{ $labels.instance }} fail. Alerts and recording rules are stale or missing."
+
+    - alert: ThanosNoRuleEvaluations
+      expr: |
+        sum by (job, instance) (rate(prometheus_rule_evaluations_total{job=~".*thanos.*rule.*"}[5m])) <= 0
+        and
+        sum by (job, instance) (thanos_rule_loaded_rules{job=~".*thanos.*rule.*"}) > 0
+      for: 20m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Rule {{ $labels.instance }}: no rule evaluations"
+        description: "{{ $labels.instance }} has rules loaded but evaluated none for 20 minutes. It is stuck or cannot reach its query endpoints."
+
+    - alert: ThanosRuleConfigReloadFailure
+      expr: avg by (job, instance) (thanos_rule_config_last_reload_successful{job=~".*thanos.*rule.*"}) != 1
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Rule {{ $labels.instance }}: config reload failed"
+        description: "{{ $labels.instance }} could not reload its rule files. New or changed rule groups do not take effect."
+
+    # Window must stay well above the 2h block cut interval, otherwise the gap between blocks fires it.
+    - alert: ThanosShipperNoUploads
+      expr: sum by (job, instance) (increase(thanos_shipper_uploads_total{job=~".*thanos.*"}[6h])) == 0
+      for: 30m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Shipper {{ $labels.instance }}: no block uploaded in 6h"
+        description: "{{ $labels.instance }} has shipped no block to object storage for 6 hours. The bucket is unreachable or block cutting has stalled."
+
+    - alert: ThanosShipperUploadFailures
+      expr: sum by (job, instance) (rate(thanos_shipper_upload_failures_total{job=~".*thanos.*"}[5m])) > 0
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Shipper {{ $labels.instance }}: block upload failures"
+        description: "{{ $labels.instance }} fails to upload TSDB blocks to object storage. Check credentials, connectivity and logs."
+
+    - alert: ThanosShipperCorruptedBlocks
+      expr: sum by (job, instance) (increase(thanos_shipper_corrupted_blocks_total{job=~".*thanos.*"}[1h])) > 0
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos Shipper {{ $labels.instance }}: corrupted blocks"
+        description: "{{ $labels.instance }} detected corrupted TSDB blocks in the last hour. Data may be lost, check TSDB integrity."
+
+    - alert: ThanosBlockMetaSyncFailures
+      expr: sum by (job, instance) (rate(thanos_blocks_meta_sync_failures_total{job=~".*thanos.*"}[5m])) > 0
+      for: 20m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Thanos {{ $labels.job }}: block metadata sync failures"
+        description: "{{ $labels.instance }} fails to sync block metadata from object storage and works on a stale view of the available blocks."
+
+    - alert: ThanosCompactHalted
+      expr: thanos_compact_halted{job=~".*thanos.*compact.*"} == 1
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Thanos Compact {{ $labels.instance }} halted"
+        description: "{{ $labels.instance }} halted after an unexpected error and no longer compacts or downsamples. It needs manual investigation, usually a corrupted or overlapping block."
