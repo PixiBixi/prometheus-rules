@@ -314,3 +314,68 @@ tests:
       - alertname: HAproxyFrontendDown
         eval_time: 5m
         exp_alerts: []
+
+  - interval: 15s
+    name: process connections near hard max, warning at 70 percent and critical at 90 percent
+    input_series:
+      - series: 'haproxy_process_hard_max_connections{instance="warn",job="hap"}'
+        values: '1000x200'
+      - series: 'haproxy_process_current_connections{instance="warn",job="hap"}'
+        values: '800x200'
+      - series: 'haproxy_process_hard_max_connections{instance="crit",job="hap"}'
+        values: '1000x200'
+      - series: 'haproxy_process_current_connections{instance="crit",job="hap"}'
+        values: '950x200'
+      - series: 'haproxy_process_hard_max_connections{instance="low",job="hap"}'
+        values: '1000x200'
+      - series: 'haproxy_process_current_connections{instance="low",job="hap"}'
+        values: '600x200'
+    alert_rule_test:
+      - alertname: HAproxyProcessConnectionsNearHardMax
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: HAproxyProcessConnectionsNearHardMax
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyProcessConnectionsNearHardMax
+              instance: warn
+              job: hap
+              severity: warning
+            exp_annotations:
+              summary: "HAProxy connections near hard max - warn"
+              description: "HAProxy current connections exceed 70% of the hard connection ceiling on warn, already beyond the configured maxconn"
+          - exp_labels:
+              alertname: HAproxyProcessConnectionsNearHardMax
+              instance: crit
+              job: hap
+              severity: warning
+            exp_annotations:
+              summary: "HAProxy connections near hard max - crit"
+              description: "HAProxy current connections exceed 70% of the hard connection ceiling on crit, already beyond the configured maxconn"
+      - alertname: HAproxyProcessConnectionsNearHardMaxCritical
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              alertname: HAproxyProcessConnectionsNearHardMaxCritical
+              instance: crit
+              job: hap
+              severity: critical
+            exp_annotations:
+              summary: "HAProxy connections critically near hard max - crit"
+              description: "HAProxy current connections exceed 90% of the hard connection ceiling on crit - the process is about to be unable to accept new sockets"
+
+  - interval: 15s
+    name: process connections near hard max stays silent when the hard max is 0
+    input_series:
+      - series: 'haproxy_process_hard_max_connections{instance="h1",job="hap"}'
+        values: '0x200'
+      - series: 'haproxy_process_current_connections{instance="h1",job="hap"}'
+        values: '500x200'
+    alert_rule_test:
+      - alertname: HAproxyProcessConnectionsNearHardMax
+        eval_time: 20m
+        exp_alerts: []
+      - alertname: HAproxyProcessConnectionsNearHardMaxCritical
+        eval_time: 20m
+        exp_alerts: []
