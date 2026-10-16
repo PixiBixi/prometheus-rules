@@ -74,7 +74,7 @@
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} missing Galera instances {{ $value }}"
+        description: "This node sees a Galera cluster of {{ $value }} members, fewer than the expected 3. One more loss drops it below quorum and it stops accepting writes."
         summary: "{{ $labels.instance }} of job {{ $labels.job }} missing Galera instances {{ $value }}"
     - alert: GaleraNodeUnhealthy
       expr: sum(mysql_global_status_wsrep_cluster_status) by (job,instance) != 1
@@ -82,7 +82,7 @@
       labels:
         severity: critical
       annotations:
-        description: "{{ $labels.instance }} of job {{ $labels.job }} unhealthy node"
+        description: "wsrep_cluster_status is not Primary: this node sits in a non-primary component and refuses writes. Usually a network partition or a quorum loss."
         summary: "{{ $labels.instance }} of job {{ $labels.job }} unhealthy node"
     - alert: GaleraOutOfSync
       expr: mysql_global_status_wsrep_local_state != 4 and mysql_global_variables_wsrep_desync == 0
