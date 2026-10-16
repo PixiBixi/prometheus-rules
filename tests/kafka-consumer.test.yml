@@ -1,0 +1,99 @@
+# Tests for rules/kafka-consumer.rules.yml
+rule_files:
+  - kafka-consumer.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 15s
+    name: a group with 200000 messages of total lag alerts
+    input_series:
+      - series: 'kafka_consumergroup_lag_sum{consumergroup="g1",topic="t1"}'
+        values: '200000x200'
+    alert_rule_test:
+      - alertname: KafkaConsumerGroupLagHigh
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              consumergroup: g1
+              topic: t1
+            exp_annotations:
+              description: "Total lag above 100000 messages for 15 minutes. Tune the threshold to the topic throughput."
+              summary: "Consumer group g1 is 200k messages behind on t1"
+
+  - interval: 15s
+    name: a group with a small lag does not alert
+    input_series:
+      - series: 'kafka_consumergroup_lag_sum{consumergroup="g1",topic="t1"}'
+        values: '500x200'
+    alert_rule_test:
+      - alertname: KafkaConsumerGroupLagHigh
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 15s
+    name: a partition with high lag and a frozen offset is stalled
+    input_series:
+      - series: 'kafka_consumergroup_lag{consumergroup="g1",topic="t1",partition="0"}'
+        values: '5000x400'
+      - series: 'kafka_consumergroup_current_offset{consumergroup="g1",topic="t1",partition="0"}'
+        values: '100000x400'
+    alert_rule_test:
+      - alertname: KafkaConsumerGroupPartitionStalled
+        eval_time: 1h
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              consumergroup: g1
+              topic: t1
+            exp_annotations:
+              description: "At least one partition committed no offset for 15m, worst backlog 5000 messages."
+              summary: "Consumer group g1 is stuck on t1"
+
+  - interval: 15s
+    name: a partition with high lag but advancing offsets is not stalled
+    input_series:
+      - series: 'kafka_consumergroup_lag{consumergroup="g1",topic="t1",partition="0"}'
+        values: '5000x400'
+      - series: 'kafka_consumergroup_current_offset{consumergroup="g1",topic="t1",partition="0"}'
+        values: '0+100x400'
+    alert_rule_test:
+      - alertname: KafkaConsumerGroupPartitionStalled
+        eval_time: 1h
+        exp_alerts: []
+
+  - interval: 15s
+    name: one partition far behind the median is skewed
+    input_series:
+      - series: 'kafka_consumergroup_lag{consumergroup="g1",topic="t1",partition="0"}'
+        values: '100x400'
+      - series: 'kafka_consumergroup_lag{consumergroup="g1",topic="t1",partition="1"}'
+        values: '100x400'
+      - series: 'kafka_consumergroup_lag{consumergroup="g1",topic="t1",partition="2"}'
+        values: '50000x400'
+    alert_rule_test:
+      - alertname: KafkaConsumerGroupPartitionSkew
+        eval_time: 1h
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              consumergroup: g1
+              topic: t1
+            exp_annotations:
+              description: "The worst partition is 500x further behind than the median partition."
+              summary: "Consumer group g1 is uneven on t1"
+
+  - interval: 15s
+    name: evenly lagging partitions are not skewed
+    input_series:
+      - series: 'kafka_consumergroup_lag{consumergroup="g1",topic="t1",partition="0"}'
+        values: '5000x400'
+      - series: 'kafka_consumergroup_lag{consumergroup="g1",topic="t1",partition="1"}'
+        values: '5200x400'
+      - series: 'kafka_consumergroup_lag{consumergroup="g1",topic="t1",partition="2"}'
+        values: '4800x400'
+    alert_rule_test:
+      - alertname: KafkaConsumerGroupPartitionSkew
+        eval_time: 1h
+        exp_alerts: []

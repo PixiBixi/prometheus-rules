@@ -1,0 +1,49 @@
+# danielqsj/kafka_exporter (Kafka broker and consumer group metrics over the Kafka protocol)
+# Built from kafka_exporter.go: names, help and labels from source. Not exposed by this
+# exporter: kafka_consumergroup_lag_seconds (that comes from kminion or similar).
+# Named kafka_consumer_exporter because exporters/kafka_exporter is the JMX exporter fixture.
+# HELP kafka_brokers Number of Brokers in the Kafka Cluster.
+# TYPE kafka_brokers gauge
+kafka_brokers 3
+# HELP kafka_broker_info Information about the Kafka Broker.
+# TYPE kafka_broker_info gauge
+kafka_broker_info{address="kafka-0.example:9092",id="0"} 1
+# HELP kafka_topic_partitions Number of partitions for this Topic
+# TYPE kafka_topic_partitions gauge
+kafka_topic_partitions{topic="example-topic"} 3
+# HELP kafka_topic_partition_current_offset Current Offset of a Broker at Topic/Partition
+# TYPE kafka_topic_partition_current_offset gauge
+kafka_topic_partition_current_offset{partition="0",topic="example-topic"} 1.2e+06
+# HELP kafka_topic_partition_oldest_offset Oldest Offset of a Broker at Topic/Partition
+# TYPE kafka_topic_partition_oldest_offset gauge
+kafka_topic_partition_oldest_offset{partition="0",topic="example-topic"} 0
+# HELP kafka_topic_partition_leader Leader Broker ID of this Topic/Partition
+# TYPE kafka_topic_partition_leader gauge
+kafka_topic_partition_leader{partition="0",topic="example-topic"} 0
+# HELP kafka_topic_partition_replicas Number of Replicas for this Topic/Partition
+# TYPE kafka_topic_partition_replicas gauge
+kafka_topic_partition_replicas{partition="0",topic="example-topic"} 3
+# HELP kafka_topic_partition_in_sync_replica Number of In-Sync Replicas for this Topic/Partition
+# TYPE kafka_topic_partition_in_sync_replica gauge
+kafka_topic_partition_in_sync_replica{partition="0",topic="example-topic"} 3
+# HELP kafka_topic_partition_leader_is_preferred 1 if Topic/Partition is using the Preferred Broker
+# TYPE kafka_topic_partition_leader_is_preferred gauge
+kafka_topic_partition_leader_is_preferred{partition="0",topic="example-topic"} 1
+# HELP kafka_topic_partition_under_replicated_partition 1 if Topic/Partition is under Replicated
+# TYPE kafka_topic_partition_under_replicated_partition gauge
+kafka_topic_partition_under_replicated_partition{partition="0",topic="example-topic"} 0
+# HELP kafka_consumergroup_current_offset Current Offset of a ConsumerGroup at Topic/Partition
+# TYPE kafka_consumergroup_current_offset gauge
+kafka_consumergroup_current_offset{consumergroup="example-group",partition="0",topic="example-topic"} 1.19e+06
+# HELP kafka_consumergroup_current_offset_sum Current Offset of a ConsumerGroup at Topic for all partitions
+# TYPE kafka_consumergroup_current_offset_sum gauge
+kafka_consumergroup_current_offset_sum{consumergroup="example-group",topic="example-topic"} 3.57e+06
+# HELP kafka_consumergroup_lag Current Approximate Lag of a ConsumerGroup at Topic/Partition
+# TYPE kafka_consumergroup_lag gauge
+kafka_consumergroup_lag{consumergroup="example-group",partition="0",topic="example-topic"} 10000
+# HELP kafka_consumergroup_lag_sum Current Approximate Lag of a ConsumerGroup at Topic for all partitions
+# TYPE kafka_consumergroup_lag_sum gauge
+kafka_consumergroup_lag_sum{consumergroup="example-group",topic="example-topic"} 30000
+# HELP kafka_consumergroup_members Amount of members in a consumer group
+# TYPE kafka_consumergroup_members gauge
+kafka_consumergroup_members{consumergroup="example-group"} 3
