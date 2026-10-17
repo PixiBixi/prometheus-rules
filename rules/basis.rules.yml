@@ -740,7 +740,7 @@
         severity: warning
       annotations:
         summary: "Bonding interface degraded on {{ $labels.instance }}"
-        description: "Bonding interface {{ $labels.master }} at {{ $labels.instance }} has slave failures."
+        description: "Bonding interface {{ $labels.master }} at {{ $labels.instance }} has failed member links."
 
     # ── Swap ───────────────────────────────────────────────────────────────────
 
