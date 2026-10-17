@@ -46,29 +46,17 @@
         summary: "Cant scrape {{ $labels.instance }} file"
         description: "Cant scrape {{ $labels.instance }} for more than 5 minutes, please check the instance"
     - alert: OldMetricsTextfile
-      expr: node_textfile_mtime_seconds{file=~".*bid.*"} < time() - 60
+      # aerospike_backup is written hourly, every other textfile every minute; server_metrics is not watched.
+      expr: |
+        node_textfile_mtime_seconds{file!~".*(server_metrics|aerospike_backup).*"} < time() - 60
+        or
+        node_textfile_mtime_seconds{file=~".*aerospike_backup.*"} < time() - 3700
       for: 2m
       labels:
         severity: critical
       annotations:
         summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
-        description: "Check why `{{ $labels.file}}` hasn't been scraped on {{ $labels.instance}} for 2 minutes"
-    - alert: OldMetricsTextfile
-      expr: node_textfile_mtime_seconds{file=~".*aerospike_backup.*"} < time() - 3700
-      for: 2m
-      labels:
-        severity: critical
-      annotations:
-        summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
-        description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minutes"
-    - alert: OldMetricsTextfile
-      expr: node_textfile_mtime_seconds{file!~"(.*bid.*|.*server_metrics.*|.*aerospike_backup.*)"} < time() - 60
-      for: 2m
-      labels:
-        severity: critical
-      annotations:
-        summary: "Old metrics of {{ $labels.file }} on {{ $labels.instance }}"
-        description: "Check why `{{ $labels.file }}` hasn't been scraped on {{ $labels.instance}} for 2 minutes"
+        description: "`{{ $labels.file }}` on {{ $labels.instance }} was last written {{ $value | humanizeTimestamp }}: check the job that writes it."
 
     - alert: HighDroppedPackages
       # rx_dropped can move while rx_packets stays flat (VLAN mistag, secondary
