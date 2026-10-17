@@ -468,6 +468,22 @@
         summary: "HAProxy server down - {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }}"
         description: "Server {{ $labels.proxy }}/{{ $labels.server }} @ {{ $labels.instance }} is DOWN"
 
+    - alert: HAproxyServerDownOnSingleInstance
+      # Needs several HAProxy instances in one job serving the same backends. A
+      # network path fault (switch, VLAN) between one LB and a rack stays invisible
+      # to the backend-level alerts while the other LBs keep the servers UP.
+      expr: |
+        count by (job, instance, proxy) (
+          haproxy_server_status{state="DOWN"} == 1
+          and on (job, proxy, server) haproxy_server_status{state="UP"} == 1
+        )
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "HAProxy servers down on one instance only - {{ $labels.proxy }} @ {{ $labels.instance }}"
+        description: "{{ $value }} servers of {{ $labels.proxy }} are DOWN on {{ $labels.instance }} while other instances of {{ $labels.job }} see them UP. Check the network path from {{ $labels.instance }} to those servers (shared rack, switch, VLAN)."
+
     - alert: HAproxyServerConnectionErrors
       expr: |
         (
