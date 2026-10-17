@@ -147,3 +147,40 @@ tests:
       - eval_time: 30s
         alertname: DownSystemdNginx
         exp_alerts: []
+
+  # OldMetricsTextfile: aerospike_backup is written hourly, every other textfile
+  # every minute, server_metrics is never watched.
+  - interval: 1m
+    name: textfile staleness thresholds per file
+    input_series:
+      - series: 'node_textfile_mtime_seconds{file="/var/lib/node/bid.prom",instance="h1"}'
+        values: '0x80'
+      - series: 'node_textfile_mtime_seconds{file="/var/lib/node/foo.prom",instance="h1"}'
+        values: '0x80'
+      - series: 'node_textfile_mtime_seconds{file="/var/lib/node/aerospike_backup.prom",instance="h1"}'
+        values: '0x80'
+      - series: 'node_textfile_mtime_seconds{file="/var/lib/node/server_metrics.prom",instance="h1"}'
+        values: '0x80'
+    alert_rule_test:
+      - alertname: OldMetricsTextfile
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels: {severity: critical, file: /var/lib/node/bid.prom, instance: h1}
+            exp_annotations: &old_bid
+              summary: "Old metrics of /var/lib/node/bid.prom on h1"
+              description: "`/var/lib/node/bid.prom` on h1 was last written 1970-01-01 00:00:00 +0000 UTC: check the job that writes it."
+          - exp_labels: {severity: critical, file: /var/lib/node/foo.prom, instance: h1}
+            exp_annotations: &old_foo
+              summary: "Old metrics of /var/lib/node/foo.prom on h1"
+              description: "`/var/lib/node/foo.prom` on h1 was last written 1970-01-01 00:00:00 +0000 UTC: check the job that writes it."
+      - alertname: OldMetricsTextfile
+        eval_time: 70m
+        exp_alerts:
+          - exp_labels: {severity: critical, file: /var/lib/node/bid.prom, instance: h1}
+            exp_annotations: *old_bid
+          - exp_labels: {severity: critical, file: /var/lib/node/foo.prom, instance: h1}
+            exp_annotations: *old_foo
+          - exp_labels: {severity: critical, file: /var/lib/node/aerospike_backup.prom, instance: h1}
+            exp_annotations:
+              summary: "Old metrics of /var/lib/node/aerospike_backup.prom on h1"
+              description: "`/var/lib/node/aerospike_backup.prom` on h1 was last written 1970-01-01 00:00:00 +0000 UTC: check the job that writes it."
