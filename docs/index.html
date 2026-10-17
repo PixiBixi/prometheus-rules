@@ -31,7 +31,8 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{scroll-padding-top:120px}
+/* --top-h tracks the sticky header height (ResizeObserver): it wraps differently per width. */
+html{scroll-padding-top:calc(var(--top-h,105px) + 15px)}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
 code,pre,.mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
 a{color:inherit}
@@ -67,7 +68,7 @@ kbd{font:11px ui-monospace,monospace;border:1px solid var(--line);border-bottom-
 
 /* layout */
 .layout{display:grid;grid-template-columns:220px minmax(0,1fr);max-width:1440px;margin:0 auto}
-.toc{position:sticky;top:105px;align-self:start;height:calc(100vh - 105px);overflow:auto;padding:18px 10px 40px 18px;overscroll-behavior:contain}
+.toc{position:sticky;top:var(--top-h,105px);align-self:start;height:calc(100vh - var(--top-h,105px));overflow:auto;padding:18px 10px 40px 18px;overscroll-behavior:contain}
 .toc a{display:flex;justify-content:space-between;gap:8px;padding:4px 10px;border-radius:7px;font-size:13.5px;color:var(--muted);text-decoration:none;border-left:2px solid transparent}
 .toc a:hover{color:var(--text);background:var(--sunken)}
 .toc a.on{color:var(--text);font-weight:600;border-left-color:var(--accent);border-radius:0 7px 7px 0;background:var(--sunken)}
@@ -85,7 +86,7 @@ kbd{font:11px ui-monospace,monospace;border:1px solid var(--line);border-bottom-
 
 /* groups */
 .grp{margin-top:22px}
-.gh{position:sticky;top:105px;z-index:5;background:var(--bg);display:flex;align-items:baseline;gap:12px;padding:12px 2px 10px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.gh{position:sticky;top:var(--top-h,105px);z-index:5;background:var(--bg);display:flex;align-items:baseline;gap:12px;padding:12px 2px 10px;border-bottom:1px solid var(--line);margin-bottom:10px}
 .gh h2{margin:0;font-size:19px;letter-spacing:-.015em;font-weight:700}
 .gh .meta{font-size:12.5px;color:var(--faint);display:flex;gap:12px;align-items:center;font-variant-numeric:tabular-nums}
 .gh .meta a{text-decoration:none;color:var(--muted)}
@@ -93,7 +94,8 @@ kbd{font:11px ui-monospace,monospace;border:1px solid var(--line);border-bottom-
 .gh .files{margin-left:auto}
 
 /* rules */
-.rule{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;position:relative;overflow:hidden;scroll-margin-top:170px}
+/* content-visibility: offscreen rules skip style and layout, the bulk of the boot cost with 500+ rules. */
+.rule{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;position:relative;overflow:hidden;scroll-margin-top:calc(var(--top-h,105px) + 65px);content-visibility:auto;contain-intrinsic-size:auto 200px}
 .rule::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
 .rule.critical::before{background:var(--crit)}.rule.warning::before{background:var(--warn)}.rule.record::before{background:var(--rec)}
 .rule.focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -123,7 +125,7 @@ a.t-metric:hover{border-bottom-style:solid}
 .used a:hover{color:var(--text);border-color:var(--accent)}
 
 /* compact mode: one line per rule, expand on click */
-body.compact .rule{border-radius:0;margin:0;border-width:0 0 1px;background:transparent;cursor:pointer;overflow:visible}
+body.compact .rule{border-radius:0;margin:0;border-width:0 0 1px;background:transparent;cursor:pointer;overflow:visible;contain-intrinsic-size:auto 36px}
 body.compact .grp .rule:first-of-type{border-top-width:0}
 body.compact .rh{padding:7px 12px 7px 16px;flex-wrap:nowrap}
 body.compact .rn{font-size:13.5px;flex:none;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -208,14 +210,22 @@ body.compact .rule.open .acts{display:flex}
   .row1{padding:10px 16px;gap:10px;flex-wrap:wrap}
   .search{order:3;flex-basis:100%}
   .palhint kbd{display:none}
-  .row2{padding:0 16px 10px;gap:6px}
+  /* One scrollable row of filters: wrapped, they made the sticky header a third of the screen. */
+  .row2{padding:0 16px 10px;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .row2>*{flex:none}
+  .top{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
   .seg .n{display:none}
   .count{display:none}
-  .gh{top:150px}
-  html{scroll-padding-top:200px}
-  .rule{scroll-margin-top:210px}
-  .acts{opacity:1}
   body.compact .rn{max-width:60%}
+}
+@media (hover:none){.acts{opacity:1}}
+@media (pointer:coarse){
+  .iconbtn{width:44px;height:44px}
+  .search input{height:44px}
+  .palhint{top:6px;height:32px}
+  .seg button,.link,.gsel{min-height:40px}
+  .act{min-height:36px;padding:2px 12px;display:inline-flex;align-items:center}
+  body.compact .rh{min-height:44px}
 }
 @media (prefers-reduced-motion:reduce){.drawer{transition:none}.rule.flash{animation:none}}
 </style>
@@ -237,8 +247,16 @@ body.compact .rule.open .acts{display:flex}
   </div>
   <div class="row2">
     <select class="gsel" id="gsel"></select>
-    <div class="seg" id="segKind"></div>
-    <div class="seg" id="segSev"></div>
+    <div class="seg" id="segKind">
+      <button data-kind="alert">Alertes<span class="n"></span></button>
+      <button data-kind="record">Records<span class="n"></span></button>
+      <button data-kind="all">Tout<span class="n"></span></button>
+    </div>
+    <div class="seg" id="segSev">
+      <button data-sev="all">Toutes<span class="n"></span></button>
+      <button data-sev="critical"><span class="dot critical"></span>Critical<span class="n"></span></button>
+      <button data-sev="warning"><span class="dot warning"></span>Warning<span class="n"></span></button>
+    </div>
     <div class="seg" id="segDensity">
       <button data-density="full" title="Tout déplié">Détaillé</button>
       <button data-density="compact" title="Une ligne par règle">Compact</button>
@@ -328,10 +346,12 @@ async function boot() {
   renderControls();
   renderDoc();
   route();
-  // exporters.json (~1.5 MB) only feeds the metric drawer and the coverage page: fetch it once idle.
-  if (window.requestIdleCallback) requestIdleCallback(() => loadExporters(), { timeout: 3000 });
-  else setTimeout(loadExporters, 1500);
+  // exporters.json (~1.5 MB) only feeds the metric drawer and the coverage page: prefetch it on the
+  // first interaction, never at boot, where it competed with the first paint on slow mobile links.
+  const pre = () => { for (const ev of PREFETCH_ON) removeEventListener(ev, pre); loadExporters(); };
+  for (const ev of PREFETCH_ON) addEventListener(ev, pre, { passive: true });
 }
+const PREFETCH_ON = ['pointermove', 'touchstart', 'keydown', 'scroll'];
 let EXP_P = null;
 function loadExporters() {
   return EXP_P ||= fetch('exporters.json').then(r => r.json()).then(d => {
@@ -422,7 +442,7 @@ function ruleHTML(r) {
     </div>
     <div class="rb">
       ${isA ? `<p class="sum">${tpl(r.summary)}</p>${r.description && r.description !== r.summary ? `<p class="desc">${tpl(r.description)}</p>` : ''}` : ''}
-      <pre class="expr">${promql(r.expr.trim())}</pre>
+      <pre class="expr">${esc(r.expr.trim())}</pre>
       ${!isA ? `<div class="used">${consumers.length ? `Utilisée par ${consumers.map(ruleLink).join('')}` : 'Aucune règle ne la consomme.'}</div>` : ''}
     </div>
   </article>`;
@@ -440,13 +460,26 @@ function renderDoc() {
     for (const r of G.rules) r.el = document.getElementById(r.id);
   }
   observe();
+  // PromQL is highlighted only near the viewport: done eagerly it was ~10k spans at boot.
+  const hl = new IntersectionObserver(es => {
+    for (const e of es) if (e.isIntersecting) {
+      hl.unobserve(e.target);
+      const r = BYID.get(e.target.dataset.id);
+      e.target.querySelector('pre.expr').innerHTML = promql(r.expr.trim());
+    }
+  }, { rootMargin: '600px 0px' });
+  for (const r of RULES) hl.observe(r.el);
 }
 
 /* ---------- filtering (toggle visibility only) ---------- */
 const inProduct = r => !S.products.size || S.products.has(r.group);
+let termsQ = '', TERMS = [];
+const matchQ = r => {
+  if (termsQ !== S.q) { termsQ = S.q; TERMS = S.q ? S.q.split(/\s+/) : []; }
+  return TERMS.every(t => r.hay.includes(t));
+};
 const visible = r => inProduct(r) && (S.kind === 'all' || r.kind === S.kind) && (!S.review || r.issues.length) &&
-  (S.sev === 'all' || r.kind !== 'alert' || r.severity === S.sev) &&
-  (!S.q || S.q.split(/\s+/).every(t => r.hay.includes(t)));
+  (S.sev === 'all' || r.kind !== 'alert' || r.severity === S.sev) && matchQ(r);
 function applyFilter() {
   let total = 0;
   const sevBase = { all: 0, critical: 0, warning: 0 };
@@ -456,7 +489,7 @@ function applyFilter() {
       const v = visible(r);
       r.el.hidden = !v;
       if (v) { n++; if (r.kind === 'alert') { a++; if (r.severity === 'critical') c++; } else rec++; }
-      const base = (S.kind === 'all' || r.kind === S.kind) && (!S.review || r.issues.length) && (!S.q || S.q.split(/\s+/).every(t => r.hay.includes(t)));
+      const base = (S.kind === 'all' || r.kind === S.kind) && (!S.review || r.issues.length) && matchQ(r);
       if (base && (S.sev === 'all' || r.kind !== 'alert' || r.severity === S.sev)) { nAll++; if (r.severity === 'critical') cAll++; }
       if (base && inProduct(r) && r.kind === 'alert') { sevBase.all++; sevBase[r.severity]++; }
     }
@@ -484,12 +517,10 @@ function renderToc() {
     xs.map(G => `<option value="${esc(G.name)}" ${sel === 1 && S.products.has(G.name) ? 'selected' : ''}>${esc(G.name)} (${G.nAll})</option>`).join('') + '</optgroup>').join('');
   markToc(current);
 }
+// Buttons are static HTML so the header keeps its height when data arrives (no layout shift).
 function renderControls() {
-  const na = RULES.filter(r => r.kind === 'alert').length, nr = RULES.length - na;
-  $('#segKind').innerHTML = [['alert', 'Alertes', na], ['record', 'Records', nr], ['all', 'Tout', RULES.length]]
-    .map(([k, l, n]) => `<button data-kind="${k}">${l}<span class="n">${n}</span></button>`).join('');
-  $('#segSev').innerHTML = [['all', 'Toutes', ''], ['critical', 'Critical', 'critical'], ['warning', 'Warning', 'warning']]
-    .map(([k, l, d]) => `<button data-sev="${k}">${d ? `<span class="dot ${d}"></span>` : ''}${l}<span class="n"></span></button>`).join('');
+  const na = RULES.filter(r => r.kind === 'alert').length;
+  for (const [k, n] of [['alert', na], ['record', RULES.length - na], ['all', RULES.length]]) $(`#segKind [data-kind="${k}"] .n`).textContent = n;
   syncControls();
 }
 function syncControls() {
@@ -510,10 +541,13 @@ function observe() {
   }, { rootMargin: '-110px 0px -75% 0px' });
   for (const G of GROUPS) io.observe(G.el);
 }
+let tocOn = null;
 function markToc(g) {
-  for (const a of document.querySelectorAll('.toc a')) a.classList.toggle('on', a.dataset.toc === g);
-  const on = document.querySelector('.toc a.on');
-  if (on) on.scrollIntoView({ block: 'nearest' });
+  const a = g && document.querySelector(`.toc a[data-toc="${CSS.escape(g)}"]`);
+  if (a === tocOn && a?.isConnected) return;
+  tocOn?.classList.remove('on');
+  tocOn = a;
+  if (a) { a.classList.add('on'); if (a.offsetParent) a.scrollIntoView({ block: 'nearest' }); }
 }
 
 /* ---------- coverage view ---------- */
@@ -776,8 +810,10 @@ document.addEventListener('keydown', e => {
   if (e.key === 'y') focused.querySelector('[data-copy="yaml"]').click();
 });
 
-/* theme */
 const root = document.documentElement;
+new ResizeObserver(([e]) => root.style.setProperty('--top-h', Math.round(e.borderBoxSize[0].blockSize) + 'px')).observe($('.top'));
+
+/* theme */
 try { const th = localStorage.getItem('theme'); if (th) root.dataset.theme = th; } catch {}
 $('#theme').addEventListener('click', () => {
   const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme:dark)').matches;
