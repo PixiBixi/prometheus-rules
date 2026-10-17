@@ -36,11 +36,15 @@ of staleness the script exists to catch. Ask for it when you need it.
 |---|---|---|---|
 | `aerospike` | _not recorded_ | 1.9.0 | unverified: carried over from the README |
 | `apache_exporter` | 1.1.1 | - | - |
+| `argo-rollouts` | _no version_ | - | - |
+| `argocd` | _no version_ | - | - |
 | `blackbox_exporter` | 0.24.0 | - | - |
 | `cert-manager` | 1.21.1 | 1.21.1 | confirmed with the cluster operators |
+| `controller-runtime` | _no version_ | - | - |
 | `haproxy_exporter_2x` | 2.7.11 | 2.7.11 | promex is built into HAProxy; version is HAProxy's own |
 | `haproxy_exporter_3x` | 3.2.21 | 3.2.21 | promex is built into HAProxy; version is HAProxy's own |
 | `ipsec_exporter` | _not recorded_ | 0.4.0 | unverified: carried over from the README |
+| `kafka_consumer_exporter` | _no version_ | - | - |
 | `kafka_exporter` | 0.17.2 | - | - |
 | `keepalived_exporter` | 1.3.2 | - | - |
 | `keydb_exporter` | 1.52.0 | 1.52.0 and 1.58.0 | redis_exporter_build_info: 210 instances on 1.52.0, 11 on 1.58.0 |
@@ -57,6 +61,8 @@ of staleness the script exists to catch. Ask for it when you need it.
 | `rabbitmq_exporter` | 4.3.4 | - | - |
 | `rds_enhanced` | _not recorded_ | - | - |
 | `stackdriver_exporter` | 0.18.0 | - | - |
+| `strimzi` | _no version_ | - | - |
+| `thanos` | 0.42.4-193 | - | - |
 | `varnish_exporter` | 1.6.1 | - | - |
 | `zookeeper_exporter` | 0.17.2 | - | - |
 
